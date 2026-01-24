@@ -35,8 +35,8 @@ public class Drive extends Command {
      swerveDrive.drive(new Translation2d(translationX.getAsDouble() * swerveDrive.getMaxDriveSpeed(),
                                           translationY.getAsDouble() * swerveDrive.getMaxDriveSpeed()),
                         angularRotationX.getAsDouble() * swerveDrive.getMaxTurnSpeed(),
-                        true,
-                        false);
+                        false,
+                        true);
   }
 
   // Called once the command ends or is interrupted.

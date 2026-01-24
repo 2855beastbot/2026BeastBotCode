@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.Drive;
 import frc.robot.subsystems.Swerve;
 
@@ -19,13 +20,20 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
+
+    new Trigger(()->driveController.getAButton()).whileTrue(new Drive(
+      ()->0.5,
+      ()->0.5,
+      ()->0.0,
+      swerveDrive
+    ));
   }
 
   private void setDefaultCommands(){
     swerveDrive.setDefaultCommand(new Drive(
-      ()->0.5,
-      ()->0.5,
-      ()->0,
+      ()->driveController.getLeftX(),
+      ()->driveController.getLeftY(),
+      ()->driveController.getRightX(),
       swerveDrive
     ));
   }
