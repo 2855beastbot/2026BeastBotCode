@@ -21,19 +21,14 @@ public class RobotContainer {
 
   private void configureBindings() {
 
-    new Trigger(()->driveController.getAButton()).whileTrue(new Drive(
-      ()->0.5,
-      ()->0.5,
-      ()->0.0,
-      swerveDrive
-    ));
   }
 
   private void setDefaultCommands(){
     swerveDrive.setDefaultCommand(new Drive(
-      ()->driveController.getLeftX(),
-      ()->driveController.getLeftY(),
+      ()->-driveController.getLeftY(),
+      ()->-driveController.getLeftX(),
       ()->driveController.getRightX(),
+      0.25,
       swerveDrive
     ));
   }

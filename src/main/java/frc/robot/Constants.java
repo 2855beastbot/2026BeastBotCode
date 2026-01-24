@@ -8,7 +8,9 @@ package frc.robot;
 public class Constants {
 
     public static class SwerveConstants{
-        public static final double maxDriveSpeed = .75;
-        public static final double maxTurnSpeed = .5;
+        public static final double maxDriveSpeed = 4.5;
+        public static final double maxTurnSpeed = 4;
+
+        public static final double slowModeVal = 0.25;
     }
 }

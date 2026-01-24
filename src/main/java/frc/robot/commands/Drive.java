@@ -16,13 +16,16 @@ public class Drive extends Command {
   /** Creates a new Drive. */
   private DoubleSupplier translationX, translationY, angularRotationX;
   private Swerve swerveDrive;
-  public Drive(DoubleSupplier xSpeed, DoubleSupplier ySpeed, DoubleSupplier rot, Swerve drivetrain) {
+  private double slowModeVal;
+  public Drive(DoubleSupplier xSpeed, DoubleSupplier ySpeed, DoubleSupplier rot, double slowmode, Swerve drivetrain) {
     // Use addRequirements() here to declare subsystem dependencies.
     swerveDrive = drivetrain;
     translationX = xSpeed;
     translationY = ySpeed;
     angularRotationX = rot;
     addRequirements(drivetrain);
+    slowModeVal = slowmode;
+
   }
 
   // Called when the command is initially scheduled.
@@ -32,9 +35,9 @@ public class Drive extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-     swerveDrive.drive(new Translation2d(translationX.getAsDouble() * swerveDrive.getMaxDriveSpeed(),
-                                          translationY.getAsDouble() * swerveDrive.getMaxDriveSpeed()),
-                        angularRotationX.getAsDouble() * swerveDrive.getMaxTurnSpeed(),
+     swerveDrive.drive(new Translation2d(translationX.getAsDouble() * swerveDrive.getMaxDriveSpeed() * slowModeVal,
+                                          translationY.getAsDouble() * swerveDrive.getMaxDriveSpeed() * slowModeVal),
+                        angularRotationX.getAsDouble() * swerveDrive.getMaxTurnSpeed() * slowModeVal,
                         false,
                         true);
   }
