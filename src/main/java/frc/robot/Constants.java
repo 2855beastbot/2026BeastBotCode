@@ -13,4 +13,18 @@ public class Constants {
 
         public static final double slowModeVal = 0.25;
     }
+
+    public static class CANIDConstants{
+        public static final int intakeLeft = 13;
+        public static final int intakeRight = 14;
+        public static final int intakeArmLeft = 15;
+        public static final int intakeArmRight = 16;
+        public static final int indexer = 17;
+        public static final int shooterLeft = 18;
+        public static final int shooterRight = 19;
+    }
+
+    public static class SubsystemConstants{
+        public static final double maxShooterRPM = 1500;
+    }
 }

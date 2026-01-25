@@ -4,23 +4,31 @@
 
 package frc.robot;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.Drive;
+import frc.robot.commands.RPMShoot;
+import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 
 public class RobotContainer {
   private Swerve swerveDrive = new Swerve();
   private XboxController driveController = new XboxController(0);
+  private CommandXboxController operatorController = new CommandXboxController(1);
+
+  private Shooter ballShooter = new Shooter();
   public RobotContainer() {
     setDefaultCommands();
     configureBindings();
   }
 
   private void configureBindings() {
-
+    operatorController.axisGreaterThan(0, 0.3).whileTrue(new RPMShoot(()->operatorController.getRightTriggerAxis(), ballShooter));
   }
 
   private void setDefaultCommands(){
