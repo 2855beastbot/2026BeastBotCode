@@ -18,7 +18,9 @@ public class Shooter extends SubsystemBase {
   private final double passiveTargetRPM = 60;
   private double targetRPM;
   private boolean isUsingRPM;
+
   public Shooter() {
+    setRPMUse(true);
     setTargetRPM(passiveTargetRPM);
   }
 
@@ -32,7 +34,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setRPMUse(boolean useRPM){
-    isUsingRPM = (useRPM) ? true : false;
+    isUsingRPM = useRPM;
 
   }
 

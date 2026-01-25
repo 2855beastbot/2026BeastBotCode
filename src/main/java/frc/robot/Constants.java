@@ -26,5 +26,8 @@ public class Constants {
 
     public static class SubsystemConstants{
         public static final double maxShooterRPM = 1500;
+        public static final double intakeWristKp = 0.1;
+        public static final double intakeWristKi = 0.0;
+        public static final double intakeWristKd = 0.0;
     }
 }
