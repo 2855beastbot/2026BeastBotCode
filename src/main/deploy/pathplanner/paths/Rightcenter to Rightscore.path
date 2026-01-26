@@ -1,0 +1,95 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 7.735,
+        "y": 3.35
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.482585071345662,
+        "y": 2.0377325650506615
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.933542039355992,
+        "y": 0.7169051878354196
+      },
+      "prevControl": {
+        "x": 6.558996266283028,
+        "y": 1.0855527486347791
+      },
+      "nextControl": {
+        "x": 5.5263884149292,
+        "y": 0.476925691249388
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.428855098389982,
+        "y": 1.0414132379248655
+      },
+      "prevControl": {
+        "x": 3.128248686547975,
+        "y": 0.5388555846322182
+      },
+      "nextControl": {
+        "x": 2.2258331681196615,
+        "y": 1.1872970815447574
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.3,
+        "y": 1.85
+      },
+      "prevControl": {
+        "x": 2.2205752269433594,
+        "y": 1.6129521030996032
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.9020979020979014,
+      "rotationDegrees": 180.0
+    },
+    {
+      "waypointRelativePos": 1.5034965034965024,
+      "rotationDegrees": 180.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -135.0
+  },
+  "reversed": false,
+  "folder": "Right",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 90.0
+  },
+  "useDefaultConstraints": true
+}
