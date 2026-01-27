@@ -29,5 +29,7 @@ public class Constants {
         public static final double intakeWristKp = 0.1;
         public static final double intakeWristKi = 0.0;
         public static final double intakeWristKd = 0.0;
+        public static final double wristOut = 0.0;
+        public static final double wristIn = 100.0;
     }
 }

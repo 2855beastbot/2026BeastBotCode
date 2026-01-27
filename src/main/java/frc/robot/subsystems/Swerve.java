@@ -7,7 +7,9 @@ package frc.robot.subsystems;
 import java.io.File;
 import java.io.IOException;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -43,6 +45,15 @@ public class Swerve extends SubsystemBase {
 
   public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop){
     swerveDrive.drive(translation, rotation, fieldRelative, isOpenLoop);
+  }
+
+  public void setXMode(){
+    SwerveModuleState[] swerveXModeStates = {
+      new SwerveModuleState(0, Rotation2d.fromDegrees(135)),
+      new SwerveModuleState(0, Rotation2d.fromDegrees(135)),
+      new SwerveModuleState(0, Rotation2d.fromDegrees(135)),
+      new SwerveModuleState(0, Rotation2d.fromDegrees(135))};
+    swerveDrive.setModuleStates(swerveXModeStates, false);
   }
 
   @Override
