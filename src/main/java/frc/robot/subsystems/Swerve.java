@@ -7,12 +7,18 @@ package frc.robot.subsystems;
 import java.io.File;
 import java.io.IOException;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.RobotConfig;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.SwerveConstants;
@@ -24,6 +30,7 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 public class Swerve extends SubsystemBase {
   /** Creates a new Swerve. */
   private SwerveDrive swerveDrive;
+  private RobotConfig config;
   public Swerve() {
     double maximumSpeed = Units.feetToMeters(4.5);
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(),"swerve");
@@ -32,6 +39,12 @@ public class Swerve extends SubsystemBase {
       SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     }catch(IOException e){
       throw new RuntimeException(e);
+    }
+
+    try{
+      config = RobotConfig.fromGUISettings();
+    }catch(Exception e){
+      e.printStackTrace();
     }
   }
 
@@ -54,6 +67,39 @@ public class Swerve extends SubsystemBase {
       new SwerveModuleState(0, Rotation2d.fromDegrees(135)),
       new SwerveModuleState(0, Rotation2d.fromDegrees(135))};
     swerveDrive.setModuleStates(swerveXModeStates, false);
+  }
+
+  public Pose2d getPose2d(){
+    return swerveDrive.getPose();
+  }
+
+  public void resetOdometry(Pose2d pose){
+    swerveDrive.resetOdometry(pose);
+  }
+
+  public ChassisSpeeds getChassisSpeeds(){
+    return swerveDrive.getRobotVelocity();
+  }
+
+  public void setRobotRelativeSpeeds(ChassisSpeeds speed){
+    swerveDrive.setChassisSpeeds(speed);
+  }
+  
+
+  public void configureAutoBuilder(){
+    AutoBuilder.configure(
+      this::getPose2d, 
+      this::resetOdometry, 
+      this::getChassisSpeeds, 
+      this::setRobotRelativeSpeeds, 
+      SwerveConstants.autoController, 
+      config, 
+      ()->{var alliance = DriverStation.getAlliance();
+          if(alliance.isPresent()){
+            return alliance.get() == DriverStation.Alliance.Red;
+          } return false;
+        }, 
+      this);
   }
 
   @Override

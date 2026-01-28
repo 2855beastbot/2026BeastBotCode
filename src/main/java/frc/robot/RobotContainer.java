@@ -12,7 +12,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.Drive;
+import frc.robot.commands.Index;
 import frc.robot.commands.RPMShoot;
+import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 
@@ -22,6 +24,7 @@ public class RobotContainer {
   private CommandXboxController operatorController = new CommandXboxController(1);
 
   private Shooter ballShooter = new Shooter();
+  private Indexer indexer = new Indexer();
   public RobotContainer() {
     setDefaultCommands();
     configureBindings();
@@ -29,6 +32,7 @@ public class RobotContainer {
 
   private void configureBindings() {
     operatorController.axisGreaterThan(0, 0.3).whileTrue(new RPMShoot(()->operatorController.getRightTriggerAxis(), ballShooter));
+    operatorController.rightBumper().whileTrue(new Index(()->1, indexer));
   }
 
   private void setDefaultCommands(){
