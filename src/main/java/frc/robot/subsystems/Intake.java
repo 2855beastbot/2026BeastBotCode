@@ -23,7 +23,9 @@ public class Intake extends SubsystemBase {
   private AbsoluteEncoder encoder;
 
   private double targetSetpoint;
-  public Intake() {}
+  public Intake() {
+    
+  }
 
   public void spin(double speed){
     leftIntake.set(speed);
