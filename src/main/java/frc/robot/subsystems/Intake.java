@@ -38,6 +38,12 @@ public class Intake extends SubsystemBase {
     return encoder.getPosition();
   }
 
+  public void runMotor(int motorID){
+    if(motorID == rightWrist.getDeviceId()){
+      rightWrist.set(0.3);
+    }
+  }
+
   @Override
   public void periodic() {
     leftWrist.set(PIDController.calculate(encoder.getPosition(), targetSetpoint));

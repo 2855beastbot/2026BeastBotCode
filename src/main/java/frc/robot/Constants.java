@@ -15,13 +15,13 @@ public class Constants {
     }
 
     public static class CANIDConstants{
-        public static final int intakeLeft = 13;
-        public static final int intakeRight = 14;
-        public static final int intakeArmLeft = 15;
-        public static final int intakeArmRight = 16;
-        public static final int indexer = 17;
-        public static final int shooterLeft = 18;
-        public static final int shooterRight = 19;
+        public static final int intakeLeft = 20;
+        public static final int intakeRight = 21;
+        public static final int intakeArmLeft = 22;
+        public static final int intakeArmRight = 23;
+        public static final int indexer = 31;
+        public static final int shooterLeft = 32;
+        public static final int shooterRight = 33;
     }
 
     public static class SubsystemConstants{
