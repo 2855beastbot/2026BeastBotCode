@@ -24,7 +24,7 @@ public class Intake extends SubsystemBase {
 
   private double targetSetpoint;
   public Intake() {
-    
+    encoder = rightWrist.getAbsoluteEncoder();
   }
 
   public void spin(double speed){
@@ -32,14 +32,23 @@ public class Intake extends SubsystemBase {
     rightIntake.set(speed);
   }
 
+  /**
+   * Sets the target angle for the intake to hold measured in degrees up from horizontal ("out") position
+   * @param setpoint target angle in degrees
+   */
   public void setTargetSetpoint(double setpoint){
-    targetSetpoint = setpoint;
+    // TODO: make sure encoder is configured so that readings match specification in doc comment (zero position, positive direction) 
+    targetSetpoint = (setpoint / 360) * SubsystemConstants.wristGearboxCoef;  //convert degrees to rotations, gear ratios
   }
 
   public double getPose(){
-    return encoder.getPosition();
+    return encoder.getPosition() / SubsystemConstants.wristGearboxCoef; // converts from encoder to intake rotations
   }
 
+
+  public void moveWrist(double speed){
+    rightWrist.set(speed);
+  }
   public void runMotor(int motorID){
     if(motorID == rightWrist.getDeviceId()){
       rightWrist.set(0.3);
