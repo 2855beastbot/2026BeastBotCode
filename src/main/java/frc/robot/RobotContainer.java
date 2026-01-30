@@ -38,14 +38,20 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    operatorController.axisGreaterThan(0, 0.3).whileTrue(new RPMShoot(()->operatorController.getRightTriggerAxis(), ballShooter));
+
+    //Driver commands
+    
     new Trigger(()->driveController.getAButton()).onTrue(new RunCommand(()->intake.runMotor(CANIDConstants.intakeArmRight), intake));
     new Trigger(()->driveController.getXButton()).onTrue(new RunCommand(()->intake.runMotor(CANIDConstants.intakeArmLeft), intake));
+    
+
+    //Operator Commands
     operatorController.rightBumper().whileTrue(new Index(()->1, indexer));
     operatorController.y().onTrue(new InstantCommand(()->intake.setTargetSetpoint(SubsystemConstants.wristOut), intake));
     operatorController.b().onTrue(new InstantCommand(()->intake.setTargetSetpoint(SubsystemConstants.wristIn), intake));
-    new Trigger(()->operatorController.getLeftY() > 0.3).whileTrue(new RunCommand(()->intake.moveWrist(operatorController.getLeftY()), intake));
+    operatorController.axisGreaterThan(0, 0.3).whileTrue(new RunCommand(()->intake.moveWrist(operatorController.getLeftY()), intake));
     operatorController.axisGreaterThan(2, 0.3).whileTrue(new SpinIntake(()->operatorController.getLeftTriggerAxis(), intake));
+    operatorController.axisGreaterThan(3, 0.3).whileTrue(new RPMShoot(()->operatorController.getRightTriggerAxis(), ballShooter));
   }
 
   private void setDefaultCommands(){

@@ -16,6 +16,10 @@ public class Indexer extends SubsystemBase {
   private SparkMax indexer = new SparkMax(CANIDConstants.indexer, MotorType.kBrushless);
   public Indexer() {}
 
+  /**
+   * runs the indexer
+   * @param speed percent power to run the indexer at, from 0-1
+   */
   public void spin(double speed){
     indexer.set(speed);
   }

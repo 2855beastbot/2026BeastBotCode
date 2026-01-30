@@ -21,12 +21,16 @@ public class Intake extends SubsystemBase {
   private SparkMax rightWrist = new SparkMax(CANIDConstants.intakeArmRight, MotorType.kBrushless);
   private PIDController PIDController = new PIDController(SubsystemConstants.intakeWristKp, SubsystemConstants.intakeWristKi, SubsystemConstants.intakeWristKd);
   private AbsoluteEncoder encoder;
-
   private double targetSetpoint;
+
   public Intake() {
     encoder = rightWrist.getAbsoluteEncoder();
   }
 
+  /**
+   * runs the intake wheels
+   * @param speed the percent power to the wheels, from 0-1
+   */
   public void spin(double speed){
     leftIntake.set(speed);
     rightIntake.set(speed);
@@ -41,17 +45,35 @@ public class Intake extends SubsystemBase {
     targetSetpoint = (setpoint / 360) * SubsystemConstants.wristGearboxCoef;  //convert degrees to rotations, gear ratios
   }
 
+  /**
+   * gets the encoders current position
+   * @return the encoder position, converted to intake rotations
+   */
   public double getPose(){
     return encoder.getPosition() / SubsystemConstants.wristGearboxCoef; // converts from encoder to intake rotations
   }
 
-
+  /**
+   * open loop for both wrist motors
+   * @param speed the power to feed the motors, from 0-1
+   */
   public void moveWrist(double speed){
     rightWrist.set(speed);
   }
+
+  /**
+   * runs a single motor at 30% speed
+   * @param motorID the CAN ID of the motor to run
+   */
   public void runMotor(int motorID){
     if(motorID == rightWrist.getDeviceId()){
       rightWrist.set(0.3);
+    }else if(motorID == leftWrist.getDeviceId()){
+      leftWrist.set(0.3);
+    }else if(motorID == leftIntake.getDeviceId()){
+      leftIntake.set(0.3);
+    }else if(motorID == rightIntake.getDeviceId()){
+      rightIntake.set(0.3);
     }
   }
 

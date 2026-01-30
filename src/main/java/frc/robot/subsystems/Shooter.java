@@ -24,28 +24,51 @@ public class Shooter extends SubsystemBase {
     setTargetRPM(passiveTargetRPM);
   }
 
+  /**
+   * sets the speed of the Shooter
+   * @param speed either a traget RPM or percent power output, dependant on whether using RPM
+   */
   public void spin(double speed){
     if(!isUsingRPM){
       left.setControl(new DutyCycleOut(speed));
       right.setControl(new DutyCycleOut(speed));
+    }else{
+      setTargetRPM(speed);
     }
 
 
   }
 
+  /**
+   * determines whether the shooter uses RPM or percent power
+   * @param useRPM true uses RPM, false uses percent power
+   */
   public void setRPMUse(boolean useRPM){
     isUsingRPM = useRPM;
 
   }
 
+  /**
+   * gets whether the shooter is using RPM
+   * @return true for RPM use, false for percent power use
+   */
   public boolean getRPMUse(){
     return isUsingRPM;
   }
 
+  /**
+   * sets the target RPM for the shooter
+   * @param RPM the target RPM to set
+   */
   public void setTargetRPM(double RPM){
     targetRPM = RPM;
   }
 
+
+  /**
+   * gets the RPM of the shooters passive state
+   * @return the value of passive target RPM
+   */
   public double getPassiveRPM(){
     return passiveTargetRPM;
   }
