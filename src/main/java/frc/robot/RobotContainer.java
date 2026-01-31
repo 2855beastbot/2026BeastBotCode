@@ -52,6 +52,7 @@ public class RobotContainer {
     operatorController.axisGreaterThan(0, 0.3).whileTrue(new RunCommand(()->intake.moveWrist(operatorController.getLeftY()), intake));
     operatorController.axisGreaterThan(2, 0.3).whileTrue(new SpinIntake(()->operatorController.getLeftTriggerAxis(), intake));
     operatorController.axisGreaterThan(3, 0.3).whileTrue(new RPMShoot(()->operatorController.getRightTriggerAxis(), ballShooter));
+    operatorController.axisGreaterThan(1, 0.3).whileTrue(new RunCommand(()->intake.moveWrist(operatorController.getLeftY()), intake));
   }
 
   private void setDefaultCommands(){
