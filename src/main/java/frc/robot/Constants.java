@@ -41,7 +41,7 @@ public class Constants {
     }
 
     public static class SubsystemConstants{
-        public static final double maxShooterRPM = 1500;
+        public static final double maxShooterRPM = 5000;
         public static final double intakeWristKp = 0.1;
         public static final double intakeWristKi = 0.0;
         public static final double intakeWristKd = 0.0;
@@ -49,5 +49,36 @@ public class Constants {
         public static final double wristIn = 100.0;
 
         public static final double wristGearboxCoef = (62/18)*(48/18);  //9.1851851852;
+    }
+
+    public static class VisionConstants{
+        public static final String aimingLimelightName = "";
+        public static final String locationLimelightName = "";
+
+        public static final double[] aimingConfig = {
+            0.0, //forward
+            0.0, //side
+            0.0, //up
+            0.0, //roll
+            0.0, //pitch
+            0.0 //yaw
+        };
+
+        public static final double[] locationConfig = {
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+        };
+
+        public static final int[] targetingIDs = {
+            22, 23
+        };
+
+        public static final int[] allIDs = {
+            1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36
+        };
     }
 }

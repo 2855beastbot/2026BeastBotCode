@@ -10,18 +10,18 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CANIDConstants;
+import frc.robot.Constants.SubsystemConstants;
 
 public class Shooter extends SubsystemBase {
   /** Creates a new Shooter. */
   private TalonFX left = new TalonFX(CANIDConstants.shooterLeft);
   private TalonFX right = new TalonFX(CANIDConstants.shooterRight);
-  private final double passiveTargetRPM = 60;
+  private final double passiveTargetRPM = SubsystemConstants.maxShooterRPM / 3;
   private double targetRPM;
   private boolean isUsingRPM;
 
   public Shooter() {
     setRPMUse(true);
-    setTargetRPM(passiveTargetRPM);
   }
 
   /**

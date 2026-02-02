@@ -40,9 +40,7 @@ public class RobotContainer {
   private void configureBindings() {
 
     //Driver commands
-    
-    new Trigger(()->driveController.getAButton()).onTrue(new RunCommand(()->intake.runMotor(CANIDConstants.intakeArmRight), intake));
-    new Trigger(()->driveController.getXButton()).onTrue(new RunCommand(()->intake.runMotor(CANIDConstants.intakeArmLeft), intake));
+    new Trigger(()->driveController.getAButton()).whileTrue(new RunCommand(()->swerveDrive.setXMode(), swerveDrive));
     
 
     //Operator Commands
