@@ -58,7 +58,8 @@ public class Intake extends SubsystemBase {
    * @param speed the power to feed the motors, from 0-1
    */
   public void moveWrist(double speed){
-    rightWrist.set(speed);
+    rightWrist.set(-speed);
+    leftWrist.set(speed);
   }
 
   /**
