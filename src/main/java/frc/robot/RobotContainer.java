@@ -17,6 +17,7 @@ import frc.robot.Constants.CANIDConstants;
 import frc.robot.Constants.SubsystemConstants;
 import frc.robot.commands.Drive;
 import frc.robot.commands.Index;
+import frc.robot.commands.MoveIntakeWrist;
 import frc.robot.commands.RPMShoot;
 import frc.robot.commands.SpinIntake;
 import frc.robot.subsystems.Intake;
@@ -49,7 +50,7 @@ public class RobotContainer {
     operatorController.b().onTrue(new InstantCommand(()->intake.setTargetSetpoint(SubsystemConstants.wristIn), intake));
     operatorController.axisGreaterThan(2, 0.3).whileTrue(new SpinIntake(()->operatorController.getLeftTriggerAxis(), intake));
     operatorController.axisGreaterThan(3, 0.3).whileTrue(new RPMShoot(()->operatorController.getRightTriggerAxis(), ballShooter));
-    operatorController.axisMagnitudeGreaterThan(1, 0.3).whileTrue(new RunCommand(()->intake.moveWrist(operatorController.getLeftY()),intake));
+    operatorController.axisMagnitudeGreaterThan(1, 0.3).whileTrue(new MoveIntakeWrist(()->operatorController.getLeftY(), intake));
     
   }
 

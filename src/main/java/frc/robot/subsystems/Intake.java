@@ -22,6 +22,7 @@ public class Intake extends SubsystemBase {
   private PIDController PIDController = new PIDController(SubsystemConstants.intakeWristKp, SubsystemConstants.intakeWristKi, SubsystemConstants.intakeWristKd);
   private AbsoluteEncoder encoder;
   private double targetSetpoint;
+  private boolean isOpenLoop;
 
   public Intake() {
     encoder = rightWrist.getAbsoluteEncoder();
@@ -41,6 +42,7 @@ public class Intake extends SubsystemBase {
    * @param setpoint target angle in degrees
    */
   public void setTargetSetpoint(double setpoint){
+    isOpenLoop = true;
     // TODO: make sure encoder is configured so that readings match specification in doc comment (zero position, positive direction) 
     targetSetpoint = (setpoint / 360) * SubsystemConstants.wristGearboxCoef;  //convert degrees to rotations, gear ratios
   }
@@ -78,10 +80,17 @@ public class Intake extends SubsystemBase {
     }
   }
 
+  public void setOpenLoop(boolean openLoop){
+    isOpenLoop = openLoop;
+  }
+
   @Override
   public void periodic() {
-    leftWrist.set(PIDController.calculate(encoder.getPosition(), targetSetpoint));
-    rightWrist.set(PIDController.calculate(encoder.getPosition(), targetSetpoint));
+    if(!isOpenLoop){
+      leftWrist.set(PIDController.calculate(encoder.getPosition(), targetSetpoint));
+      rightWrist.set(PIDController.calculate(encoder.getPosition(), targetSetpoint));
+    }
+    
     // This method will be called once per scheduler run
   }
 }
