@@ -9,7 +9,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.controller.PIDController;
-
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CANIDConstants;
 import frc.robot.Constants.SubsystemConstants;
@@ -49,6 +49,10 @@ public class Intake extends SubsystemBase {
     targetSetpoint = (setpoint / 360) * SubsystemConstants.wristGearboxCoef;  //convert degrees to rotations, gear ratios
   }
 
+  public double getTargetSetpoint(){
+    return targetSetpoint;
+  }
+
   /**
    * gets the encoders current position
    * @return the encoder position, converted to intake rotations
@@ -86,6 +90,10 @@ public class Intake extends SubsystemBase {
     isOpenLoop = openLoop;
   }
 
+  public boolean isOpenLoop(){
+    return isOpenLoop;
+  }
+
   public void zeroEncoders(){
     leftWrist.getAlternateEncoder().setPosition(0.0);
     rightWrist.getAlternateEncoder().setPosition(0.0);
@@ -100,4 +108,22 @@ public class Intake extends SubsystemBase {
     
     // This method will be called once per scheduler run
   }
+
+  @Override
+  public void initSendable(SendableBuilder builder){
+    super.initSendable(builder);
+    // open Elastic -> Add Widget -> scroll to Intake and open the dropdown -> drag values onto dashboard
+    builder.addBooleanProperty("Open Loop", this::isOpenLoop, null);
+    builder.addDoubleProperty("Left Wrist/Speed", leftWrist::get, null);
+    builder.addDoubleProperty("Left Wrist/Output", leftWrist::getAppliedOutput, null);
+    builder.addDoubleProperty("Left Wrist/Current (A)", leftWrist::getOutputCurrent, null);
+    builder.addDoubleProperty("Left Wrist/Temperature (C)", leftWrist::getMotorTemperature, null);
+    builder.addDoubleProperty("Right Wrist/Speed", rightWrist::get, null);
+    builder.addDoubleProperty("Right Wrist/Output", rightWrist::getAppliedOutput, null);
+    builder.addDoubleProperty("Right Wrist/Current (A)", rightWrist::getOutputCurrent, null);
+    builder.addDoubleProperty("Right Wrist/Temperature (C)", rightWrist::getMotorTemperature, null);
+    builder.addDoubleProperty("Position", encoder::getPosition, null);
+    builder.addDoubleProperty("Target Pos", this::getTargetSetpoint, null);
+  }
+
 }

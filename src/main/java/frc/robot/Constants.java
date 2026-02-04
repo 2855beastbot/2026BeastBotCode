@@ -48,7 +48,7 @@ public class Constants {
         public static final double wristOut = 0.0;
         public static final double wristIn = 30.0;
 
-        public static final double wristGearboxCoef = (62/18)*(48/18);  //9.1851851852;
+        public static final double wristGearboxCoef = (62.0/18)*(48.0/18);  //9.1851851852;
     }
 
     public static class VisionConstants{
