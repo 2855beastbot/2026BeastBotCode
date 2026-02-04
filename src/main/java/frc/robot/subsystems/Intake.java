@@ -5,8 +5,10 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.PersistMode;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -28,6 +30,9 @@ public class Intake extends SubsystemBase {
 
   public Intake() {
     encoder = rightWrist.getAbsoluteEncoder();
+    
+    // make left follow right, now everything sent to right, left will do automatically
+    leftWrist.configure(new SparkMaxConfig().follow(rightWrist, true), null, PersistMode.kPersistParameters);
   }
 
   /**
@@ -67,7 +72,6 @@ public class Intake extends SubsystemBase {
    */
   public void moveWrist(double speed){
     rightWrist.set(-speed);
-    leftWrist.set(speed);
   }
 
   /**
@@ -77,8 +81,6 @@ public class Intake extends SubsystemBase {
   public void runMotor(int motorID){
     if(motorID == rightWrist.getDeviceId()){
       rightWrist.set(0.3);
-    }else if(motorID == leftWrist.getDeviceId()){
-      leftWrist.set(0.3);
     }else if(motorID == leftIntake.getDeviceId()){
       leftIntake.set(0.3);
     }else if(motorID == rightIntake.getDeviceId()){
@@ -102,7 +104,6 @@ public class Intake extends SubsystemBase {
   @Override
   public void periodic() {
     if(!isOpenLoop){
-      leftWrist.set(PIDController.calculate(encoder.getPosition(), targetSetpoint));
       rightWrist.set(PIDController.calculate(encoder.getPosition(), targetSetpoint));
     }
     

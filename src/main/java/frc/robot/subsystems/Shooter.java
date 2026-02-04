@@ -19,7 +19,7 @@ public class Shooter extends SubsystemBase {
   private TalonFX left = new TalonFX(CANIDConstants.shooterLeft);
   private TalonFX right = new TalonFX(CANIDConstants.shooterRight);
   private final double passiveTargetRPM = SubsystemConstants.maxShooterRPM / 30;
-  private double targetRPM;
+  private double targetRPS; // making this RPS instead of RPM for better internal consistency, everything outside the class is still RPM
   private boolean isUsingRPM;
   private TalonFXConfiguration config = new TalonFXConfiguration();
 
@@ -71,7 +71,7 @@ public class Shooter extends SubsystemBase {
    * @param RPM the target RPM to set
    */
   public void setTargetRPM(double RPM){
-    targetRPM = RPM;
+    targetRPS = RPM / 60.0;
   }
 
 
@@ -86,8 +86,8 @@ public class Shooter extends SubsystemBase {
   @Override
   public void periodic() {
     if(isUsingRPM){
-      left.setControl(new VelocityDutyCycle(targetRPM / 60));
-      right.setControl(new VelocityDutyCycle(targetRPM / 60));
+      left.setControl(new VelocityDutyCycle(targetRPS));
+      right.setControl(new VelocityDutyCycle(targetRPS));
     }
     // This method will be called once per scheduler run
   }
@@ -96,8 +96,8 @@ public class Shooter extends SubsystemBase {
   public void initSendable(SendableBuilder builder){
     super.initSendable(builder);
     // open Elastic -> Add Widget -> scroll to Shooter and open the dropdown -> drag values onto dashboard
-    builder.addBooleanProperty("Closed Loop RPM", this::getRPMUse, null);
-    builder.addDoubleProperty("Target RPS", () -> targetRPM, null);
+    builder.addBooleanProperty("Closed Loop", this::getRPMUse, null);
+    builder.addDoubleProperty("Target RPS", () -> targetRPS, null);
     builder.addDoubleProperty("Left/Speed", left::get, null);
     builder.addDoubleProperty("Left/RPS", () -> left.getVelocity().getValueAsDouble(), null);
     builder.addDoubleProperty("Left/Current (A)", () -> left.getSupplyCurrent().getValueAsDouble(), null);
