@@ -42,6 +42,10 @@ public class RobotContainer {
 
     //Driver commands
     new Trigger(()->driveController.getAButton()).whileTrue(new RunCommand(()->swerveDrive.setXMode(), swerveDrive));
+    /* 
+    new Trigger(()->driveController.getRightTriggerAxis() > 0.3).whileTrue(new InstantCommand(()->ballShooter.setRPMUse(false), ballShooter)
+                .andThen(new RunCommand(()->ballShooter.spin(driveController.getRightTriggerAxis()), ballShooter)));
+                */
     
 
     //Operator Commands
@@ -50,7 +54,8 @@ public class RobotContainer {
     operatorController.b().onTrue(new InstantCommand(()->intake.setTargetSetpoint(SubsystemConstants.wristIn), intake));
     operatorController.axisGreaterThan(2, 0.3).whileTrue(new SpinIntake(()->operatorController.getLeftTriggerAxis(), intake));
     operatorController.axisGreaterThan(3, 0.3).whileTrue(new RPMShoot(()->operatorController.getRightTriggerAxis(), ballShooter));
-    operatorController.axisMagnitudeGreaterThan(1, 0.3).whileTrue(new MoveIntakeWrist(()->operatorController.getLeftY(), intake));
+    operatorController.axisMagnitudeGreaterThan(1, 0.3).whileTrue(new MoveIntakeWrist(()->-operatorController.getLeftY(), intake));
+    operatorController.button(8).onTrue(new InstantCommand(()->intake.zeroEncoders(), intake));
     
   }
 

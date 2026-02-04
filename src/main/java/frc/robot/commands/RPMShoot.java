@@ -31,7 +31,7 @@ public class RPMShoot extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    shooter.setTargetRPM(SubsystemConstants.maxShooterRPM / targetRPM.getAsDouble());
+    shooter.setTargetRPM(SubsystemConstants.maxShooterRPM * targetRPM.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.

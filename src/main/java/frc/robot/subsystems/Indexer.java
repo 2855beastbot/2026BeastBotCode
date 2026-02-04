@@ -21,7 +21,7 @@ public class Indexer extends SubsystemBase {
    * @param speed percent power to run the indexer at, from 0-1
    */
   public void spin(double speed){
-    indexer.set(speed);
+    indexer.set(-speed);
   }
 
   

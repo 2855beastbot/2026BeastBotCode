@@ -46,7 +46,7 @@ public class Constants {
         public static final double intakeWristKi = 0.0;
         public static final double intakeWristKd = 0.0;
         public static final double wristOut = 0.0;
-        public static final double wristIn = 100.0;
+        public static final double wristIn = 30.0;
 
         public static final double wristGearboxCoef = (62/18)*(48/18);  //9.1851851852;
     }

@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.controller.PIDController;
@@ -23,6 +24,7 @@ public class Intake extends SubsystemBase {
   private AbsoluteEncoder encoder;
   private double targetSetpoint;
   private boolean isOpenLoop;
+  
 
   public Intake() {
     encoder = rightWrist.getAbsoluteEncoder();
@@ -82,6 +84,11 @@ public class Intake extends SubsystemBase {
 
   public void setOpenLoop(boolean openLoop){
     isOpenLoop = openLoop;
+  }
+
+  public void zeroEncoders(){
+    leftWrist.getAlternateEncoder().setPosition(0.0);
+    rightWrist.getAlternateEncoder().setPosition(0.0);
   }
 
   @Override

@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -16,12 +17,20 @@ public class Shooter extends SubsystemBase {
   /** Creates a new Shooter. */
   private TalonFX left = new TalonFX(CANIDConstants.shooterLeft);
   private TalonFX right = new TalonFX(CANIDConstants.shooterRight);
-  private final double passiveTargetRPM = SubsystemConstants.maxShooterRPM / 3;
+  private final double passiveTargetRPM = SubsystemConstants.maxShooterRPM / 30;
   private double targetRPM;
   private boolean isUsingRPM;
+  private TalonFXConfiguration config = new TalonFXConfiguration();
 
   public Shooter() {
     setRPMUse(true);
+    spin(0);
+    config.Slot0.kP = 0.1;
+    config.Slot0.kI = 0.0;
+    config.Slot0.kD = 0.0;
+    left.getConfigurator().apply(config);
+    right.getConfigurator().apply(config);
+    
   }
 
   /**
