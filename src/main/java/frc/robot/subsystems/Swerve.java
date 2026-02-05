@@ -9,7 +9,10 @@ import java.io.IOException;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
+import com.studica.frc.AHRS;
 
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -21,7 +24,9 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.LimelightHelpers;
 import frc.robot.Constants.SwerveConstants;
+import frc.robot.Constants.VisionConstants;
 import swervelib.SwerveDrive;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
@@ -31,6 +36,8 @@ public class Swerve extends SubsystemBase {
   /** Creates a new Swerve. */
   private SwerveDrive swerveDrive;
   private RobotConfig config;
+  private Vision aimingCamera = new Vision(VisionConstants.aimingLimelightName, VisionConstants.aimingConfig);
+  
   public Swerve() {
     double maximumSpeed = Units.feetToMeters(4.5);
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(),"swerve");
@@ -84,6 +91,15 @@ public class Swerve extends SubsystemBase {
   public void setRobotRelativeSpeeds(ChassisSpeeds speed){
     swerveDrive.setChassisSpeeds(speed);
   }
+
+  public void updatePoseWithVision(){
+    
+    LimelightHelpers.PoseEstimate measurement = aimingCamera.getMegaTag2();
+    //if(!Math.abs(gyro.getRate > 360))
+        swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 9999999));
+        swerveDrive.addVisionMeasurement(measurement.pose, measurement.timestampSeconds);
+  }
+
   
 
   public void configureAutoBuilder(){
@@ -105,5 +121,6 @@ public class Swerve extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    //updatePoseWithVision();
   }
 }
