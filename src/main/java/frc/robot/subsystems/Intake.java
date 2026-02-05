@@ -40,6 +40,7 @@ public class Intake extends SubsystemBase {
    * @param speed the percent power to the wheels, from 0-1
    */
   public void spin(double speed){
+    speed *= 0.75;
     leftIntake.set(speed);
     rightIntake.set(speed);
   }
@@ -104,7 +105,7 @@ public class Intake extends SubsystemBase {
   @Override
   public void periodic() {
     if(!isOpenLoop){
-      rightWrist.set(PIDController.calculate(encoder.getPosition(), targetSetpoint));
+      rightWrist.set(PIDController.calculate(encoder.getPosition(), targetSetpoint) + 0.1);
     }
     
     // This method will be called once per scheduler run

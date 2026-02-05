@@ -15,7 +15,7 @@ public class Constants {
         public static final double maxDriveSpeed = 4.5;
         public static final double maxTurnSpeed = 4;
 
-        public static final double slowModeVal = 0.25;
+        public static final double slowModeVal = 1;
 
         public static final PPHolonomicDriveController autoController = new PPHolonomicDriveController(
             new PIDConstants(5.0, 0.0, 0.0),
@@ -52,8 +52,8 @@ public class Constants {
     }
 
     public static class VisionConstants{
-        public static final String aimingLimelightName = "";
-        public static final String locationLimelightName = "";
+        public static final String aimingLimelightName = "2855AimingLimelight";
+        public static final String locationLimelightName = "2855LocationLimelight";
 
         public static final double[] aimingConfig = {
             0.0, //forward
