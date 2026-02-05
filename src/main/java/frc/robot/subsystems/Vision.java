@@ -4,6 +4,9 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
 import frc.robot.Constants.SwerveConstants;
@@ -14,6 +17,7 @@ public class Vision extends SubsystemBase {
   public Vision(String name, double[] config) {
     this.name = name;
     LimelightHelpers.setCameraPose_RobotSpace(name, config[0], config[1], config[2], config[3], config[4], config[5]);
+    
   }
 
   public double aimWithVision(){
@@ -33,6 +37,13 @@ public class Vision extends SubsystemBase {
   public void setValidIDs(int[] validIDs){
     LimelightHelpers.SetFiducialIDFiltersOverride(name, validIDs);
   }
+
+  public LimelightHelpers.PoseEstimate getMegaTag2(){
+    LimelightHelpers.PoseEstimate megaTag2 = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
+    return megaTag2;
+  }
+
+  
 
   @Override
   public void periodic() {

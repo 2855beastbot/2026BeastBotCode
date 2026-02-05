@@ -6,6 +6,7 @@ package frc.robot;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -35,7 +36,6 @@ public class RobotContainer {
   private XboxController driveController = new XboxController(0);
   private CommandXboxController operatorController = new CommandXboxController(1);
   private Intake intake = new Intake();
-
   private Shooter ballShooter = new Shooter();
   private Indexer indexer = new Indexer();
 

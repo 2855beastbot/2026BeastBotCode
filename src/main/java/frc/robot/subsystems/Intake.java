@@ -5,7 +5,6 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
@@ -116,6 +115,8 @@ public class Intake extends SubsystemBase {
     super.initSendable(builder);
     // open Elastic -> Add Widget -> scroll to Intake and open the dropdown -> drag values onto dashboard
     builder.addBooleanProperty("Open Loop", this::isOpenLoop, null);
+    builder.addDoubleProperty("Position", encoder::getPosition, null);
+    builder.addDoubleProperty("Target Pos", this::getTargetSetpoint, null);
     builder.addDoubleProperty("Left Wrist/Speed", leftWrist::get, null);
     builder.addDoubleProperty("Left Wrist/Output", leftWrist::getAppliedOutput, null);
     builder.addDoubleProperty("Left Wrist/Current (A)", leftWrist::getOutputCurrent, null);
@@ -124,8 +125,8 @@ public class Intake extends SubsystemBase {
     builder.addDoubleProperty("Right Wrist/Output", rightWrist::getAppliedOutput, null);
     builder.addDoubleProperty("Right Wrist/Current (A)", rightWrist::getOutputCurrent, null);
     builder.addDoubleProperty("Right Wrist/Temperature (C)", rightWrist::getMotorTemperature, null);
-    builder.addDoubleProperty("Position", encoder::getPosition, null);
-    builder.addDoubleProperty("Target Pos", this::getTargetSetpoint, null);
+    builder.addDoubleProperty("Intake Speed (left)", leftIntake::get, null);
+    builder.addDoubleProperty("Intake Speed (right)", rightIntake::get, null);
   }
 
 }
