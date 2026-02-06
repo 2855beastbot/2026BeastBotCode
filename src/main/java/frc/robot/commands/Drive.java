@@ -8,23 +8,24 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.SwerveConstants;
 import frc.robot.subsystems.Swerve;
-import swervelib.SwerveDrive;
+
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class Drive extends Command {
   /** Creates a new Drive. */
   private DoubleSupplier translationX, translationY, angularRotationX;
   private Swerve swerveDrive;
-  private double slowModeVal;
-  public Drive(DoubleSupplier xSpeed, DoubleSupplier ySpeed, DoubleSupplier rot, double slowmode, Swerve drivetrain) {
+  private double slowModeVal = SwerveConstants.slowModeVal;
+  public Drive(DoubleSupplier xSpeed, DoubleSupplier ySpeed, DoubleSupplier rot, Swerve drivetrain) {
     // Use addRequirements() here to declare subsystem dependencies.
     swerveDrive = drivetrain;
     translationX = xSpeed;
     translationY = ySpeed;
     angularRotationX = rot;
     addRequirements(drivetrain);
-    slowModeVal = slowmode;
+    
 
   }
 

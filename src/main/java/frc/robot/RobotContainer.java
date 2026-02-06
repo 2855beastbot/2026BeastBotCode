@@ -4,9 +4,9 @@
 
 package frc.robot;
 
-import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+
+
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -19,9 +19,12 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.CANIDConstants;
+
 import frc.robot.Constants.SubsystemConstants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.Drive;
+import frc.robot.commands.DriveWithAim;
+import frc.robot.commands.DriveWithRange;
 import frc.robot.commands.Index;
 import frc.robot.commands.MoveIntakeWrist;
 import frc.robot.commands.RPMShoot;
@@ -59,16 +62,19 @@ public class RobotContainer {
 
     //Driver commands
     new Trigger(()->driveController.getAButton()).whileTrue(new RunCommand(()->swerveDrive.setXMode(), swerveDrive));
-    /* 
-    new Trigger(()->driveController.getRightTriggerAxis() > 0.3).whileTrue(new InstantCommand(()->ballShooter.setRPMUse(false), ballShooter)
-                .andThen(new RunCommand(()->ballShooter.spin(driveController.getRightTriggerAxis()), ballShooter)));
-                */
-    
+    new Trigger(()->driveController.getRightBumperButton()).whileTrue(new DriveWithAim(
+      ()-> driveController.getLeftY(), 
+      ()->driveController.getLeftX(),
+       swerveDrive));
+    new Trigger(()->driveController.getLeftBumperButton()).whileTrue(new DriveWithRange(
+      ()->driveController.getLeftX(),
+       swerveDrive,
+        VisionConstants.idealShootingRange));
 
     //Operator Commands
     operatorController.rightBumper().whileTrue(new Index(()->1, indexer));
-    operatorController.y().onTrue(new InstantCommand(()->intake.setTargetSetpoint(SubsystemConstants.wristOut), intake));
-    operatorController.b().onTrue(new InstantCommand(()->intake.setTargetSetpoint(SubsystemConstants.wristIn), intake));
+    operatorController.x().onTrue(new InstantCommand(()->intake.setTargetSetpoint(SubsystemConstants.wristOut), intake));
+    operatorController.a().onTrue(new InstantCommand(()->intake.setTargetSetpoint(SubsystemConstants.wristIn), intake));
     operatorController.axisGreaterThan(2, 0.3).whileTrue(new SpinIntake(()->operatorController.getLeftTriggerAxis(), intake));
     operatorController.axisGreaterThan(3, 0.3).whileTrue(new RPMShoot(()->operatorController.getRightTriggerAxis(), ballShooter));
     operatorController.axisMagnitudeGreaterThan(1, 0.3).whileTrue(new MoveIntakeWrist(()->-operatorController.getLeftY(), intake));
@@ -81,7 +87,6 @@ public class RobotContainer {
       ()->-driveController.getLeftY(),
       ()->-driveController.getLeftX(),
       ()->driveController.getRightX(),
-      0.25,
       swerveDrive
     ));
   }

@@ -9,7 +9,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CANIDConstants;
-import frc.robot.Constants.SubsystemConstants;
+
 
 public class Indexer extends SubsystemBase {
   /** Creates a new Indexer. */

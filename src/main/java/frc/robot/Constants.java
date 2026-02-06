@@ -6,7 +6,7 @@ package frc.robot;
 
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.controllers.PathFollowingController;
+
 
 /** Add your docs here. */
 public class Constants {
@@ -54,6 +54,8 @@ public class Constants {
     public static class VisionConstants{
         public static final String aimingLimelightName = "2855AimingLimelight";
         public static final String locationLimelightName = "2855LocationLimelight";
+
+        public static final double idealShootingRange = 2;
 
         public static final double[] aimingConfig = {
             0.0, //forward

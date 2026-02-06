@@ -9,18 +9,18 @@ import java.io.IOException;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
-import com.studica.frc.AHRS;
+
 
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.wpilibj.DataLogManager;
+
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -100,6 +100,10 @@ public class Swerve extends SubsystemBase {
         swerveDrive.addVisionMeasurement(measurement.pose, measurement.timestampSeconds);
   }
 
+  public Vision getAimingCamera(){
+    return aimingCamera;
+  }
+
   
 
   public void configureAutoBuilder(){
@@ -121,6 +125,6 @@ public class Swerve extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    //updatePoseWithVision();
+    updatePoseWithVision();
   }
 }

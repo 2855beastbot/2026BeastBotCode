@@ -5,46 +5,25 @@
 package frc.robot.commands.autoCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Indexer;
-import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.Swerve;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class AutoShoot extends Command {
-  /** Creates a new AutoShoot. */
-  private Shooter ballShooter;
-  private Swerve drivetrain;
-  private Indexer indexer;
-  public AutoShoot(Shooter ballShooter, Swerve drivetrain, Indexer indexer) {
-    addRequirements(ballShooter);
-    addRequirements(drivetrain);
-    this.ballShooter = ballShooter;
-    this.drivetrain = drivetrain;
-    this.indexer = indexer;
-
+public class DriveWithAim extends Command {
+  /** Creates a new DriveWithAim. */
+  public DriveWithAim() {
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-    drivetrain.setXMode();
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-    ballShooter.setRPMUse(true);
-    ballShooter.setTargetRPM(3000);
-    indexer.spin(1);
-  }
+  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    ballShooter.setTargetRPM(ballShooter.getPassiveRPM());
-    indexer.spin(0);
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override

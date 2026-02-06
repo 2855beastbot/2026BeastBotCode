@@ -4,9 +4,7 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-import edu.wpi.first.math.geometry.Pose2d;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
 import frc.robot.Constants.SwerveConstants;
@@ -27,9 +25,9 @@ public class Vision extends SubsystemBase {
     return targetingAngularVelocity;
   }
 
-  public double rangeWithVision(){
+  public double rangeWithVision(double range){
     double  kP = 0.1;
-    double targetingRangeVelocity = LimelightHelpers.getTY(name) * kP;
+    double targetingRangeVelocity = (LimelightHelpers.getTY(name) * kP) + range;
     targetingRangeVelocity *= SwerveConstants.maxDriveSpeed;
     return targetingRangeVelocity;
   }
