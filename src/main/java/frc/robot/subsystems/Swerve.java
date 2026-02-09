@@ -53,6 +53,7 @@ public class Swerve extends SubsystemBase {
     }catch(Exception e){
       e.printStackTrace();
     }
+    swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 9999999));
   }
 
   public double getMaxDriveSpeed(){
@@ -96,7 +97,6 @@ public class Swerve extends SubsystemBase {
     
     LimelightHelpers.PoseEstimate measurement = aimingCamera.getMegaTag2();
     //if(!Math.abs(gyro.getRate > 360))
-        swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 9999999));
         swerveDrive.addVisionMeasurement(measurement.pose, measurement.timestampSeconds);
   }
 

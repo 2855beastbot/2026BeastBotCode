@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import frc.robot.Constants.SubsystemConstants;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.commands.DeployWrist;
 import frc.robot.commands.Drive;
 import frc.robot.commands.DriveWithAim;
 import frc.robot.commands.DriveWithRange;
@@ -74,7 +75,7 @@ public class RobotContainer {
     //Operator Commands
     operatorController.rightBumper().whileTrue(new Index(()->1, indexer));
     operatorController.x().onTrue(new InstantCommand(()->intake.setTargetSetpoint(SubsystemConstants.wristOut), intake));
-    operatorController.a().onTrue(new InstantCommand(()->intake.setTargetSetpoint(SubsystemConstants.wristIn), intake));
+    operatorController.a().onTrue(new DeployWrist(intake));
     operatorController.axisGreaterThan(2, 0.3).whileTrue(new SpinIntake(()->operatorController.getLeftTriggerAxis(), intake));
     operatorController.axisGreaterThan(3, 0.3).whileTrue(new RPMShoot(()->operatorController.getRightTriggerAxis(), ballShooter));
     operatorController.axisMagnitudeGreaterThan(1, 0.3).whileTrue(new MoveIntakeWrist(()->-operatorController.getLeftY(), intake));

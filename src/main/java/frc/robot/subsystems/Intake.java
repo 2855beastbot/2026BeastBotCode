@@ -5,12 +5,19 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.MAXMotionConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.AbsoluteEncoder;
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.ControlType;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CANIDConstants;
 import frc.robot.Constants.SubsystemConstants;
@@ -21,14 +28,24 @@ public class Intake extends SubsystemBase {
   private SparkMax rightIntake = new SparkMax(CANIDConstants.intakeRight, MotorType.kBrushless);
   private SparkMax leftWrist = new SparkMax(CANIDConstants.intakeArmLeft, MotorType.kBrushless);
   private SparkMax rightWrist = new SparkMax(CANIDConstants.intakeArmRight, MotorType.kBrushless);
-  private PIDController PIDController = new PIDController(SubsystemConstants.intakeWristKp, SubsystemConstants.intakeWristKi, SubsystemConstants.intakeWristKd);
-  private AbsoluteEncoder encoder;
+  private SparkMaxConfig config = new SparkMaxConfig();
+  private MAXMotionConfig trapezoidalPID = config.closedLoop.maxMotion;
+  private SparkAbsoluteEncoder encoder;
   private double targetSetpoint;
   private boolean isOpenLoop;
   
 
   public Intake() {
     encoder = rightWrist.getAbsoluteEncoder();
+    setTargetSetpoint(getPose());
+    config.closedLoop.pid(SubsystemConstants.intakeWristKp, SubsystemConstants.intakeWristKi, SubsystemConstants.intakeWristKd);
+    trapezoidalPID.maxAcceleration(1);
+    trapezoidalPID.cruiseVelocity(2);
+    trapezoidalPID.allowedProfileError(0.1);
+    config.closedLoop.feedForward.kCos(SubsystemConstants.intakeWristKff);
+    leftWrist.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    
+
     
     // make left follow right, now everything sent to right, left will do automatically
     leftWrist.configure(new SparkMaxConfig().follow(rightWrist, true), null, PersistMode.kPersistParameters);
@@ -39,7 +56,6 @@ public class Intake extends SubsystemBase {
    * @param speed the percent power to the wheels, from 0-1
    */
   public void spin(double speed){
-    speed *= 0.75;
     leftIntake.set(speed);
     rightIntake.set(speed);
   }
@@ -49,9 +65,9 @@ public class Intake extends SubsystemBase {
    * @param setpoint target angle in degrees
    */
   public void setTargetSetpoint(double setpoint){
-    isOpenLoop = true;
+    isOpenLoop = false;
     // TODO: make sure encoder is configured so that readings match specification in doc comment (zero position, positive direction) 
-    targetSetpoint = (setpoint / 360) * SubsystemConstants.wristGearboxCoef;  //convert degrees to rotations, gear ratios
+    targetSetpoint = (setpoint / 360) * SubsystemConstants.wristGearboxCoef;  //convert degrees to encoder rotations 
   }
 
   public double getTargetSetpoint(){
@@ -63,7 +79,7 @@ public class Intake extends SubsystemBase {
    * @return the encoder position, converted to intake rotations
    */
   public double getPose(){
-    return encoder.getPosition() / SubsystemConstants.wristGearboxCoef; // converts from encoder to intake rotations
+    return encoder.getPosition(); // converts from encoder to intake rotations
   }
 
   /**
@@ -78,16 +94,7 @@ public class Intake extends SubsystemBase {
    * runs a single motor at 30% speed
    * @param motorID the CAN ID of the motor to run
    */
-  public void runMotor(int motorID){
-    if(motorID == rightWrist.getDeviceId()){
-      rightWrist.set(0.3);
-    }else if(motorID == leftIntake.getDeviceId()){
-      leftIntake.set(0.3);
-    }else if(motorID == rightIntake.getDeviceId()){
-      rightIntake.set(0.3);
-    }
-  }
-
+  
   public void setOpenLoop(boolean openLoop){
     isOpenLoop = openLoop;
   }
@@ -99,12 +106,17 @@ public class Intake extends SubsystemBase {
   public void zeroEncoders(){
     leftWrist.getAlternateEncoder().setPosition(0.0);
     rightWrist.getAlternateEncoder().setPosition(0.0);
+    
+    
+  }
+  public SparkMax getWrist(){
+    return leftWrist;
   }
 
   @Override
   public void periodic() {
     if(!isOpenLoop){
-      rightWrist.set(PIDController.calculate(encoder.getPosition(), targetSetpoint) + 0.1);
+      rightWrist.getClosedLoopController().setSetpoint(targetSetpoint, ControlType.kPosition, ClosedLoopSlot.kSlot0);
     }
     
     // This method will be called once per scheduler run
@@ -116,6 +128,7 @@ public class Intake extends SubsystemBase {
     // open Elastic -> Add Widget -> scroll to Intake and open the dropdown -> drag values onto dashboard
     builder.addBooleanProperty("Open Loop", this::isOpenLoop, null);
     builder.addDoubleProperty("Position", encoder::getPosition, null);
+    builder.addDoubleProperty("Motor Pos", ()->leftWrist.getEncoder().getPosition(), null);
     builder.addDoubleProperty("Target Pos", this::getTargetSetpoint, null);
     builder.addDoubleProperty("Left Wrist/Speed", leftWrist::get, null);
     builder.addDoubleProperty("Left Wrist/Output", leftWrist::getAppliedOutput, null);

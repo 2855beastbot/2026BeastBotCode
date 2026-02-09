@@ -41,14 +41,15 @@ public class Constants {
     }
 
     public static class SubsystemConstants{
-        public static final double maxShooterRPM = 5000;
-        public static final double intakeWristKp = 0.1;
+        public static final double maxShooterRPM = 3000;
+        public static final double intakeWristKp = 0.2;
         public static final double intakeWristKi = 0.0;
         public static final double intakeWristKd = 0.0;
+        public static final double intakeWristKff = 1.0; // measured in volts
         public static final double wristOut = 0.0;
         public static final double wristIn = 30.0;
 
-        public static final double wristGearboxCoef = (62.0/18)*(48.0/18);  //9.1851851852;
+        public static final double wristGearboxCoef = (62.0/18)*(48.0/19);  
     }
 
     public static class VisionConstants{
