@@ -45,9 +45,9 @@ public class Constants {
         public static final double intakeWristKp = 0.2;
         public static final double intakeWristKi = 0.0;
         public static final double intakeWristKd = 0.0;
-        public static final double intakeWristKff = 1.0; // measured in volts
+        public static final double intakeWristKff = 1.33; // measured in volts
         public static final double wristOut = 0.0;
-        public static final double wristIn = 30.0;
+        public static final double wristIn = 6;
 
         public static final double wristGearboxCoef = (62.0/18)*(48.0/19);  
     }
@@ -59,21 +59,21 @@ public class Constants {
         public static final double idealShootingRange = 2;
 
         public static final double[] aimingConfig = {
+            0.275, //forward (m)
+            0.25, //side (m)
+            0.16, //up (m)
+            0.0, //roll (deg)
+            -30.0, //pitch (deg)
+            0.0 //yaw (deg)
+        };
+
+        public static final double[] locationConfig = {
             0.0, //forward
             0.0, //side
             0.0, //up
             0.0, //roll
-            0.0, //pitch
+            0.0, // pitch
             0.0 //yaw
-        };
-
-        public static final double[] locationConfig = {
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0
         };
 
         public static final int[] targetingIDs = {

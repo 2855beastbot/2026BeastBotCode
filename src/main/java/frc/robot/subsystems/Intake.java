@@ -42,13 +42,13 @@ public class Intake extends SubsystemBase {
     trapezoidalPID.maxAcceleration(1);
     trapezoidalPID.cruiseVelocity(2);
     trapezoidalPID.allowedProfileError(0.1);
-    config.closedLoop.feedForward.kCos(SubsystemConstants.intakeWristKff);
-    leftWrist.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    //config.closedLoop.feedForward.kCos(0);
+    rightWrist.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     
 
     
     // make left follow right, now everything sent to right, left will do automatically
-    leftWrist.configure(new SparkMaxConfig().follow(rightWrist, true), null, PersistMode.kPersistParameters);
+    leftWrist.configure(new SparkMaxConfig().follow(rightWrist, true), null, PersistMode.kNoPersistParameters);
   }
 
   /**
@@ -78,8 +78,12 @@ public class Intake extends SubsystemBase {
    * gets the encoders current position
    * @return the encoder position, converted to intake rotations
    */
-  public double getPose(){
+  public double getAbsPose(){
     return encoder.getPosition(); // converts from encoder to intake rotations
+  }
+
+  public double getPose(){
+    return rightWrist.getEncoder().getPosition();
   }
 
   /**
@@ -101,6 +105,10 @@ public class Intake extends SubsystemBase {
 
   public boolean isOpenLoop(){
     return isOpenLoop;
+  }
+
+  public boolean isAtSetpoint(){
+    return rightWrist.getClosedLoopController().isAtSetpoint();
   }
 
   public void zeroEncoders(){

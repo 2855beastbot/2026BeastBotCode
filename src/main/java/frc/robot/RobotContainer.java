@@ -74,6 +74,7 @@ public class RobotContainer {
 
     //Operator Commands
     operatorController.rightBumper().whileTrue(new Index(()->1, indexer));
+    operatorController.leftBumper().whileTrue(new SpinIntake(()->-1, intake));
     operatorController.x().onTrue(new InstantCommand(()->intake.setTargetSetpoint(SubsystemConstants.wristOut), intake));
     operatorController.a().onTrue(new DeployWrist(intake));
     operatorController.axisGreaterThan(2, 0.3).whileTrue(new SpinIntake(()->operatorController.getLeftTriggerAxis(), intake));
