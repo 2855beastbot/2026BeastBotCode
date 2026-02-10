@@ -5,6 +5,8 @@
 package frc.robot.subsystems;
 
 
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
 import frc.robot.Constants.SwerveConstants;
@@ -46,5 +48,8 @@ public class Vision extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    if(DriverStation.isDisabled() || DriverStation.isEStopped()){
+      LimelightHelpers.SetThrottle(name, 200);    //reduce processing when robot isn't actually running
+    }
   }
 }
