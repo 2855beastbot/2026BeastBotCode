@@ -52,6 +52,8 @@ public class Vision extends SubsystemBase {
     // This method will be called once per scheduler run
     if(DriverStation.isDisabled() || DriverStation.isEStopped()){
       LimelightHelpers.SetThrottle(name, 200);    //reduce processing when robot isn't actually running
+    }else{
+      LimelightHelpers.SetThrottle(name, 0);
     }
   }
 }
