@@ -48,6 +48,7 @@ public class Constants {
         public static final double intakeWristKff = 1.33; // measured in volts
         public static final double wristOut = 0.0;
         public static final double wristIn = 6;
+        public static final double wristZeroVoltage = 33.0;
 
         public static final double wristGearboxCoef = (62.0/18)*(48.0/19);  
     }

@@ -39,7 +39,7 @@ public class Drive extends Command {
      swerveDrive.drive(new Translation2d(translationX.getAsDouble() * swerveDrive.getMaxDriveSpeed() * slowModeVal,
                                           translationY.getAsDouble() * swerveDrive.getMaxDriveSpeed() * slowModeVal),
                         angularRotationX.getAsDouble() * swerveDrive.getMaxTurnSpeed() * slowModeVal,
-                        false,
+                        true,
                         true);
   }
 

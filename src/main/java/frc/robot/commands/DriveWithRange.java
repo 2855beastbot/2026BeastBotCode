@@ -47,10 +47,10 @@ public class DriveWithRange extends Command {
     drivetrain.drive(
       new Translation2d(
         xSpeed.getAsDouble() * SwerveConstants.maxDriveSpeed * SwerveConstants.slowModeVal,
-        aimingCamera.rangeWithVision(range) * SwerveConstants.maxDriveSpeed * SwerveConstants.slowModeVal
+        aimingCamera.rangeWithVision(range) * SwerveConstants.slowModeVal
       ), 
-      aimingCamera.aimWithVision() * SwerveConstants.maxTurnSpeed * SwerveConstants.slowModeVal, 
-      false, 
+      aimingCamera.aimWithVision() * SwerveConstants.slowModeVal, 
+      true, 
       true);
   }
 

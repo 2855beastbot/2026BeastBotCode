@@ -47,8 +47,8 @@ public class DriveWithAim extends Command {
       new Translation2d(
         xSpeed.getAsDouble() * SwerveConstants.maxDriveSpeed * SwerveConstants.slowModeVal, 
         ySpeed.getAsDouble() * SwerveConstants.maxDriveSpeed * SwerveConstants.slowModeVal), 
-      aimingCamera.aimWithVision() * SwerveConstants.maxTurnSpeed * SwerveConstants.slowModeVal, 
-      false, 
+      aimingCamera.aimWithVision() * SwerveConstants.slowModeVal, 
+      true, 
       true);
   }
 
