@@ -126,5 +126,7 @@ public class Swerve extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     updatePoseWithVision();
+
+    swerveDrive.field.getObject("Vision Pose").setPose(LimelightHelpers.getBotPose2d_wpiBlue(VisionConstants.aimingLimelightName));
   }
 }
