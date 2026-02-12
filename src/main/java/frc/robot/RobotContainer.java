@@ -7,10 +7,14 @@ package frc.robot;
 
 
 
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -43,8 +47,14 @@ public class RobotContainer {
   private Shooter ballShooter = new Shooter();
   private Indexer indexer = new Indexer();
 
+  private SendableChooser<String> autoChooser = new SendableChooser<>();
+  private String leftAuto = "Left.auto";
+  private String rightAuto = "Right.auto";
 
   public RobotContainer() {
+    
+    autoChooser.addOption("Right auto", rightAuto);
+    autoChooser.addOption("Left auto", leftAuto);
     DataLogManager.start(); //logs everything in Network Tables
     DriverStation.startDataLog(DataLogManager.getLog());  //logs joystick values
 
@@ -54,6 +64,8 @@ public class RobotContainer {
     SmartDashboard.putData(intake);
     SmartDashboard.putData(ballShooter);
     SmartDashboard.putData(indexer);
+    SmartDashboard.putData(swerveDrive);
+    SmartDashboard.putData("auto selector", autoChooser);
 
     setDefaultCommands();
     configureBindings();
@@ -64,11 +76,11 @@ public class RobotContainer {
     //Driver commands
     new Trigger(()->driveController.getAButton()).whileTrue(new RunCommand(()->swerveDrive.setXMode(), swerveDrive));
     new Trigger(()->driveController.getRightBumperButton()).whileTrue(new DriveWithAim(
-      ()-> driveController.getLeftY(), 
-      ()->driveController.getLeftX(),
+      ()->-MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
+      ()->-MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
        swerveDrive));
     new Trigger(()->driveController.getLeftBumperButton()).whileTrue(new DriveWithRange(
-      ()->driveController.getLeftX(),
+      ()->-MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
        swerveDrive,
         VisionConstants.idealShootingRange));
 
@@ -86,14 +98,14 @@ public class RobotContainer {
 
   private void setDefaultCommands(){
     swerveDrive.setDefaultCommand(new Drive(
-      ()->-driveController.getLeftY(),
-      ()->-driveController.getLeftX(),
+      ()->-MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
+      ()->-MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
       ()->driveController.getRightX(),
       swerveDrive
     ));
   }
 
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return new PathPlannerAuto(autoChooser.getSelected());
   }
 }

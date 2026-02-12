@@ -67,7 +67,7 @@ public class Intake extends SubsystemBase {
   public void setTargetSetpoint(double setpoint){
     isOpenLoop = false;
     // TODO: make sure encoder is configured so that readings match specification in doc comment (zero position, positive direction) 
-    targetSetpoint = (setpoint / 360) * SubsystemConstants.wristGearboxCoef;  //convert degrees to encoder rotations 
+    targetSetpoint = setpoint;
   }
 
   public double getTargetSetpoint(){
@@ -112,8 +112,8 @@ public class Intake extends SubsystemBase {
   }
 
   public void zeroEncoders(){
-    leftWrist.getAlternateEncoder().setPosition(0.0);
-    rightWrist.getAlternateEncoder().setPosition(0.0);
+    leftWrist.getEncoder().setPosition(0.0);
+    rightWrist.getEncoder().setPosition(0.0);
     
     
   }
