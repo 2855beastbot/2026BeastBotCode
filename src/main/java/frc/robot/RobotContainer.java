@@ -85,7 +85,7 @@ public class RobotContainer {
        swerveDrive,
         VisionConstants.idealShootingRange));
 
-    new Trigger(()->driveController.getRawButton(0)).onTrue(new InstantCommand(()->swerveDrive.resetOdometry(new Pose2d())));
+    new Trigger(()->driveController.getRawButton(8)).onTrue(new InstantCommand(()->swerveDrive.resetOdometry(new Pose2d())));
 
     //Operator Commands
     operatorController.rightBumper().whileTrue(new Index(()->1, indexer));
