@@ -10,6 +10,7 @@ package frc.robot;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -83,6 +84,8 @@ public class RobotContainer {
       ()->-MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
        swerveDrive,
         VisionConstants.idealShootingRange));
+
+    new Trigger(()->driveController.getRawButton(0)).onTrue(new InstantCommand(()->swerveDrive.resetOdometry(new Pose2d())));
 
     //Operator Commands
     operatorController.rightBumper().whileTrue(new Index(()->1, indexer));
