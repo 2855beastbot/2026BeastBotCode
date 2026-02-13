@@ -39,8 +39,8 @@ public class Intake extends SubsystemBase {
     encoder = rightWrist.getAbsoluteEncoder();
     setTargetSetpoint(getPose());
     config.closedLoop.pid(SubsystemConstants.intakeWristKp, SubsystemConstants.intakeWristKi, SubsystemConstants.intakeWristKd);
-    trapezoidalPID.maxAcceleration(1);
-    trapezoidalPID.cruiseVelocity(2);
+    trapezoidalPID.maxAcceleration(2);
+    trapezoidalPID.cruiseVelocity(5);
     trapezoidalPID.allowedProfileError(0.1);
     //config.closedLoop.feedForward.kCos(0);
     rightWrist.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);

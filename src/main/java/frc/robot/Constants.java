@@ -60,12 +60,12 @@ public class Constants {
         public static final double idealShootingRange = 2;
 
         public static final double[] aimingConfig = {
-            0.275, //forward (m)
+            -0.275, //forward (m)
             0.25, //side (m)
             0.16, //up (m)
             0.0, //roll (deg)
-            -30.0, //pitch (deg)
-            0.0 //yaw (deg)
+            30.0, //pitch (deg)
+            180 //yaw (deg)
         };
 
         public static final double[] locationConfig = {
