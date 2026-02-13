@@ -5,11 +5,11 @@
 package frc.robot.subsystems;
 
 
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
 import frc.robot.Constants.SwerveConstants;
+import frc.robot.Constants.VisionConstants;
 
 public class Vision extends SubsystemBase {
   /** Creates a new Vision. */
@@ -36,6 +36,21 @@ public class Vision extends SubsystemBase {
 
   public void setValidIDs(int[] validIDs){
     LimelightHelpers.SetFiducialIDFiltersOverride(name, validIDs);
+  }
+
+
+  //TODO: find actual constant and verify range works as intended
+  /**
+   * finds a target RPM based on the distance to a target
+   * @return a number of rpm based on distance from the target
+   */
+  public double calculateRPMFromRange(){
+    double camera_height = VisionConstants.aimingConfig[2];
+    double tag_height = VisionConstants.aimingTagHeight;
+    double angle = Math.toRadians(LimelightHelpers.getTY(name) + VisionConstants.aimingConfig[4]);
+    double distance = (tag_height - camera_height) / Math.tan(angle);
+    return distance * VisionConstants.distanceToRPMRatio;
+
   }
 
 

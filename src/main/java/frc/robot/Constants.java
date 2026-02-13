@@ -59,13 +59,19 @@ public class Constants {
 
         public static final double idealShootingRange = 2;
 
+        /**
+         * 1 meter to number of rpm
+         */
+        public static final double distanceToRPMRatio = 750;
+        public static final double aimingTagHeight = 1.12395;
+
         public static final double[] aimingConfig = {
-            -0.275, //forward (m)
-            0.25, //side (m)
-            0.16, //up (m)
-            0.0, //roll (deg)
-            30.0, //pitch (deg)
-            180 //yaw (deg)
+            -0.275, //forward (m) intake positive
+            0.25, //side (m) left positive
+            0.16, //up (m) 
+            0.0, //roll (deg) around Y axis
+            30.0, //pitch (deg) around X axis
+            180 //yaw (deg) around Z axis
         };
 
         public static final double[] locationConfig = {
