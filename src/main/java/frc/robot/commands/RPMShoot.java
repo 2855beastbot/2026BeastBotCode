@@ -38,6 +38,7 @@ public class RPMShoot extends Command {
   @Override
   public void end(boolean interrupted) {
     //shooter.setTargetRPM(shooter.getPassiveRPM());
+    shooter.setRPMUse(false);
   }
 
   // Returns true when the command should end.
