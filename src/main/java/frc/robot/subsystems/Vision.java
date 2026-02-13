@@ -53,6 +53,10 @@ public class Vision extends SubsystemBase {
 
   }
 
+  public boolean hasValidIDs(){
+    return LimelightHelpers.getTV(name);
+  }
+
 
 
   public LimelightHelpers.PoseEstimate getMegaTag2(){
