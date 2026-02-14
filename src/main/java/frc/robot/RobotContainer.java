@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -34,6 +35,7 @@ import frc.robot.commands.DriveWithRange;
 import frc.robot.commands.Index;
 import frc.robot.commands.MoveIntakeWrist;
 import frc.robot.commands.RPMShoot;
+import frc.robot.commands.ShootWithRange;
 import frc.robot.commands.SpinIntake;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Indexer;
@@ -76,10 +78,14 @@ public class RobotContainer {
 
     //Driver commands
     new Trigger(()->driveController.getAButton()).whileTrue(new RunCommand(()->swerveDrive.setXMode(), swerveDrive));
-    new Trigger(()->driveController.getRightBumperButton()).whileTrue(new DriveWithAim(
+    new Trigger(()->driveController.getRightBumperButton()).whileTrue(new ParallelCommandGroup(new DriveWithAim(
       ()->-MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
       ()->-MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
-       swerveDrive));
+       swerveDrive),
+       new ShootWithRange(swerveDrive.getAimingCamera(), ballShooter)
+       ));
+      
+    
     new Trigger(()->driveController.getLeftBumperButton()).whileTrue(new DriveWithRange(
       ()->-MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
        swerveDrive,
@@ -93,7 +99,7 @@ public class RobotContainer {
     operatorController.x().onTrue(new InstantCommand(()->intake.setTargetSetpoint(SubsystemConstants.wristOut), intake));
     operatorController.a().onTrue(new DeployWrist(intake));
     operatorController.axisGreaterThan(2, 0.3).whileTrue(new SpinIntake(()->operatorController.getLeftTriggerAxis(), intake));
-    operatorController.axisGreaterThan(3, 0.3).whileTrue(new RPMShoot(()->operatorController.getRightTriggerAxis(), ballShooter));
+    operatorController.axisGreaterThan(3, 0.3).whileTrue(new RunCommand(()->ballShooter.spin(operatorController.getRightTriggerAxis(), false), ballShooter));
     operatorController.axisMagnitudeGreaterThan(1, 0.3).whileTrue(new MoveIntakeWrist(()->-operatorController.getLeftY(), intake));
     operatorController.button(8).onTrue(new InstantCommand(()->intake.zeroEncoders(), intake));
     

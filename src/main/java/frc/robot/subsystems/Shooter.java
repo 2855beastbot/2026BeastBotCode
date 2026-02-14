@@ -34,6 +34,11 @@ public class Shooter extends SubsystemBase {
     
   }
 
+  public void spin(double speed, boolean isUsingRPM){
+    setRPMUse(isUsingRPM);
+    spin(speed);
+  }
+
   /**
    * sets the speed of the Shooter
    * @param speed either a traget RPM or percent power output, dependant on whether using RPM

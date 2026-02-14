@@ -41,7 +41,7 @@ public class Constants {
     }
 
     public static class SubsystemConstants{
-        public static final double maxShooterRPM = 3000;
+        public static final double maxShooterRPM = 6000;
         public static final double intakeWristKp = 0.2;
         public static final double intakeWristKi = 0.0;
         public static final double intakeWristKd = 0.0;
@@ -54,7 +54,7 @@ public class Constants {
     }
 
     public static class VisionConstants{
-        public static final String aimingLimelightName = "2855AimingLimelight";
+        public static final String aimingLimelightName = "limelight-beast";
         public static final String locationLimelightName = "2855LocationLimelight";
 
         public static final double idealShootingRange = 2;
@@ -62,13 +62,13 @@ public class Constants {
         /**
          * 1 meter to number of rpm
          */
-        public static final double distanceToRPMRatio = 750;
+        //public static final double distanceToRPMRatio = 750;
         public static final double aimingTagHeight = 1.12395; //meter
 
         public static final double[] aimingConfig = {
-            -0.275, //forward (m) intake positive
-            0.25, //side (m) left positive
-            0.16, //up (m) 
+            -0.2667, //forward (m) intake positive
+            0.2413, //side (m) left positive
+            0.2159, //up (m) 
             0.0, //roll (deg) around Y axis
             30.0, //pitch (deg) around X axis
             180 //yaw (deg) around Z axis

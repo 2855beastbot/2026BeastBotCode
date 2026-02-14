@@ -137,5 +137,7 @@ public class Swerve extends SubsystemBase {
       getPose2d().getY(),
       getPose2d().getRotation().getDegrees()
     }, null);
+
+    builder.addDoubleProperty("dist to rpm val", ()->aimingCamera.getDistToRPMVal(), (newVal)->aimingCamera.setDistToRPMVal(newVal));
   }
 }
