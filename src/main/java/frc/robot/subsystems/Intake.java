@@ -30,6 +30,7 @@ public class Intake extends SubsystemBase {
   private SparkMax rightWrist = new SparkMax(CANIDConstants.intakeArmRight, MotorType.kBrushless);
   private SparkMaxConfig config = new SparkMaxConfig();
   private MAXMotionConfig trapezoidalPID = config.closedLoop.maxMotion;
+  private PIDController pidController = new PIDController(SubsystemConstants.intakeWristKp, SubsystemConstants.intakeWristKi, SubsystemConstants.intakeWristKd);
   private SparkAbsoluteEncoder encoder;
   private double targetSetpoint;
   private boolean isOpenLoop;
@@ -124,7 +125,7 @@ public class Intake extends SubsystemBase {
   @Override
   public void periodic() {
     if(!isOpenLoop){
-      rightWrist.getClosedLoopController().setSetpoint(targetSetpoint, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+      rightWrist.set(pidController.calculate(encoder.getPosition(), targetSetpoint));
     }
     
     // This method will be called once per scheduler run

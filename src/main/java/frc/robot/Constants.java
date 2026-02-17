@@ -46,8 +46,8 @@ public class Constants {
         public static final double intakeWristKi = 0.0;
         public static final double intakeWristKd = 0.0;
         public static final double intakeWristKff = 1.33; // measured in volts
-        public static final double wristOut = -26.4;
-        public static final double wristIn = 6;
+        public static final double wristOut = 0;
+        public static final double wristIn = Math.PI / 2;
         public static final double wristZeroVoltage = 33.0;
 
         public static final double wristGearboxCoef = (62.0/18)*(48.0/19);  
@@ -55,7 +55,7 @@ public class Constants {
 
     public static class VisionConstants{
         public static final String aimingLimelightName = "limelight-beast";
-        public static final String locationLimelightName = "2855LocationLimelight";
+        public static final String locationLimelightName = "limelight-threea";
 
         public static final double idealShootingRange = 2;
 
