@@ -15,7 +15,7 @@ public class Constants {
         public static final double maxDriveSpeed = 4.5;
         public static final double maxTurnSpeed = 4;
 
-        public static final double slowModeVal = 1;
+        public static final double slowModeVal = 0.25;
 
         public static final PPHolonomicDriveController autoController = new PPHolonomicDriveController(
             new PIDConstants(5.0, 0.0, 0.0),
@@ -43,13 +43,13 @@ public class Constants {
     public static class SubsystemConstants{
         public static final double maxShooterRPM = 6000;
 
-        public static final double intakeWristKp = 0.1;
+        public static final double intakeWristKp = 0.4;
         public static final double intakeWristKi = 0.0;
         public static final double intakeWristKd = 0.0;
 
         public static final double intakeWristKff = 1.33; // measured in volts
-        public static final double wristOut = 0;
-        public static final double wristIn = 1; // 2 is real value
+        public static final double wristOut = 0.2;
+        public static final double wristIn = 2.15; // 2 is real value
         public static final double wristZeroVoltage = 33.0;
 
         public static final double wristGearboxCoef = (62.0/18)*(48.0/19);  

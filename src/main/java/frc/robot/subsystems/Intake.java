@@ -116,10 +116,10 @@ public class Intake extends SubsystemBase {
 
   public void runPID(){
     double angle = encoder.getPosition();
-    if(angle > 2.3){
-      angle = angle + (Math.PI * 2);
+    if(angle > 2.15){
+      angle = angle - (Math.PI * 2);
     }
-    rightWrist.set(pidController.calculate(angle, targetSetpoint));
+    rightWrist.set(-pidController.calculate(angle, targetSetpoint));
   }
 
   @Override
