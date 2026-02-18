@@ -40,7 +40,6 @@ public class WristJuggle extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if(intake.getPose() > (SubsystemConstants.wristIn - 0.0125));
-    return false;
+    return(intake.getPose() > (SubsystemConstants.wristIn - 0.0125));
   }
 }
