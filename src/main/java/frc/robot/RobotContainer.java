@@ -7,6 +7,7 @@ package frc.robot;
 
 
 
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.MathUtil;
@@ -37,6 +38,9 @@ import frc.robot.commands.MoveIntakeWrist;
 import frc.robot.commands.RPMShoot;
 import frc.robot.commands.ShootWithRange;
 import frc.robot.commands.SpinIntake;
+import frc.robot.commands.WristJuggle;
+import frc.robot.commands.autoCommands.AutoShoot;
+import frc.robot.commands.autoCommands.ExtendHopper;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Shooter;
@@ -53,6 +57,7 @@ public class RobotContainer {
   private SendableChooser<String> autoChooser = new SendableChooser<>();
   private String leftAuto = "Left.auto";
   private String rightAuto = "Right.auto";
+
 
   public RobotContainer() {
     
@@ -115,6 +120,9 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
+    NamedCommands.registerCommand("AutoShoot", new AutoShoot(ballShooter, swerveDrive, indexer));
+    NamedCommands.registerCommand("HopperJuggle", new WristJuggle(intake));
+    NamedCommands.registerCommand("ExtendHopper", new ExtendHopper(intake));
     return new PathPlannerAuto(autoChooser.getSelected());
   }
 }
