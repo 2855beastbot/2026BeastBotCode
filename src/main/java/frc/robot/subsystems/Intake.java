@@ -17,6 +17,7 @@ import com.revrobotics.spark.SparkBase.ControlType;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CANIDConstants;
@@ -48,7 +49,7 @@ public class Intake extends SubsystemBase {
     rightWrist.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     pidController.disableContinuousInput();
     
-
+    SmartDashboard.putData("Intake PID controller", pidController);
     
     // make left follow right, now everything sent to right, left will do automatically
     leftWrist.configure(new SparkMaxConfig().follow(rightWrist, true), null, PersistMode.kNoPersistParameters);
@@ -64,12 +65,11 @@ public class Intake extends SubsystemBase {
   }
 
   /**
-   * Sets the target angle for the intake to hold measured in degrees up from horizontal ("out") position
+   * Sets the target angle for the intake to hold measured in radians up from horizontal ("out") position
    * @param setpoint target angle in degrees
    */
   public void setTargetSetpoint(double setpoint){
     isOpenLoop = false;
-    // TODO: make sure encoder is configured so that readings match specification in doc comment (zero position, positive direction) 
     targetSetpoint = setpoint;
   }
 
@@ -81,10 +81,6 @@ public class Intake extends SubsystemBase {
    * gets the encoders current position
    * @return the encoder position, converted to intake rotations
    */
-  public double getAbsPose(){
-    return encoder.getPosition(); // converts from encoder to intake rotations
-  }
-
   public double getPose(){
     return encoder.getPosition();
   }
@@ -94,16 +90,8 @@ public class Intake extends SubsystemBase {
    * @param speed the power to feed the motors, from 0-1
    */
   public void moveWrist(double speed){
+    isOpenLoop = true;
     rightWrist.set(-speed);
-  }
-
-  /**
-   * runs a single motor at 30% speed
-   * @param motorID the CAN ID of the motor to run
-   */
-  
-  public void setOpenLoop(boolean openLoop){
-    isOpenLoop = openLoop;
   }
 
   public boolean isOpenLoop(){
@@ -114,14 +102,13 @@ public class Intake extends SubsystemBase {
     return rightWrist.getClosedLoopController().isAtSetpoint();
   }
 
+  public double getOutputCurrent(){
+    return rightWrist.getOutputCurrent();
+  }
+
   public void zeroEncoders(){
     leftWrist.getEncoder().setPosition(0.0);
     rightWrist.getEncoder().setPosition(0.0);
-    
-    
-  }
-  public SparkMax getWrist(){
-    return leftWrist;
   }
 
   @Override
@@ -139,7 +126,6 @@ public class Intake extends SubsystemBase {
     // open Elastic -> Add Widget -> scroll to Intake and open the dropdown -> drag values onto dashboard
     builder.addBooleanProperty("Open Loop", this::isOpenLoop, null);
     builder.addDoubleProperty("Position", encoder::getPosition, null);
-    builder.addDoubleProperty("Motor Pos", ()->leftWrist.getEncoder().getPosition(), null);
     builder.addDoubleProperty("Target Pos", this::getTargetSetpoint, null);
     builder.addDoubleProperty("Left Wrist/Speed", leftWrist::get, null);
     builder.addDoubleProperty("Left Wrist/Output", leftWrist::getAppliedOutput, null);
