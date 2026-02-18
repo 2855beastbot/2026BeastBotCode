@@ -8,6 +8,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.MAXMotionConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -15,6 +16,7 @@ import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -46,7 +48,8 @@ public class Intake extends SubsystemBase {
     trapezoidalPID.allowedProfileError(0.1);
     //config.closedLoop.feedForward.kCos(0);
     rightWrist.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-    pidController.disableContinuousInput();
+    pidController.enableContinuousInput(0, Math.PI * 2);
+    
     
 
     
@@ -124,10 +127,18 @@ public class Intake extends SubsystemBase {
     return leftWrist;
   }
 
+  public void runPID(){
+    double angle = encoder.getPosition();
+    if(angle > 2.3){
+      angle = angle + (Math.PI * 2);
+    }
+    rightWrist.set(pidController.calculate(angle, targetSetpoint));
+  }
+
   @Override
   public void periodic() {
     if(!isOpenLoop){
-      rightWrist.set(pidController.calculate(encoder.getPosition(), targetSetpoint));
+      runPID();
     }
     
     // This method will be called once per scheduler run
