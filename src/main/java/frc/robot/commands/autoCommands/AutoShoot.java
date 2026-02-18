@@ -35,14 +35,13 @@ public class AutoShoot extends Command {
   @Override
   public void execute() {
     ballShooter.setRPMUse(true);
-    ballShooter.setTargetRPM(3000);
+    ballShooter.setTargetRPM(drivetrain.getAimingCamera().calculateRPMFromRange());
     indexer.spin(1);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    ballShooter.setTargetRPM(ballShooter.getPassiveRPM());
     indexer.spin(0);
   }
 

@@ -23,7 +23,7 @@ public class ExtendHopper extends Command {
   @Override
   public void initialize() {
     intake.setTargetSetpoint(SubsystemConstants.wristOut);
-    new RunCommand(()->intake.spin(1.0), intake);
+    intake.spin(1);
 
   }
 
