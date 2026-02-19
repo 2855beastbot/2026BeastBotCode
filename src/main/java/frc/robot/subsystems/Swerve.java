@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
@@ -21,6 +22,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
@@ -93,6 +95,16 @@ public class Swerve extends SubsystemBase {
     swerveDrive.setChassisSpeeds(speed);
   }
 
+  public double pointAtPose(Pose2d target){
+    double targetAngle = Math.atan((getPose2d().getY() - target.getY()) / (getPose2d().getX()   - target.getX()));
+    double kP = 0.017;
+    if(getPose2d().getY() > target.getY()){
+      targetAngle *= -1;
+    }
+    double targetingSpeed = targetAngle * kP * getMaxTurnSpeed();
+    return targetingSpeed;
+  }
+
   public void updatePoseWithVision(){
     
     LimelightHelpers.PoseEstimate measurement = aimingCamera.getMegaTag2();
@@ -102,6 +114,10 @@ public class Swerve extends SubsystemBase {
 
   public Vision getAimingCamera(){
     return aimingCamera;
+  }
+
+  public Optional<Alliance> getAlliance(){
+    return DriverStation.getAlliance();
   }
 
   

@@ -6,7 +6,10 @@ package frc.robot.commands;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.Constants.VisionConstants;
@@ -19,6 +22,7 @@ public class DriveWithAim extends Command {
   private DoubleSupplier xSpeed, ySpeed;
   private Vision aimingCamera;
   private Swerve drivetrain;
+  private Pose2d targetPose;
   /**
    * aims the drivetrain at valid Apriltags, driver still controls translational movement
    * @param leftY the forward speed of the robot
@@ -38,6 +42,10 @@ public class DriveWithAim extends Command {
   @Override
   public void initialize() {
     aimingCamera.setValidIDs(VisionConstants.targetingIDs);
+    var alliance = DriverStation.getAlliance();
+      if(alliance.isPresent()){
+        targetPose = (alliance.get() == Alliance.Blue) ? VisionConstants.blueHub : VisionConstants.redHub;
+      }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -47,7 +55,7 @@ public class DriveWithAim extends Command {
       new Translation2d(
         xSpeed.getAsDouble() * SwerveConstants.maxDriveSpeed * SwerveConstants.slowModeVal, 
         ySpeed.getAsDouble() * SwerveConstants.maxDriveSpeed * SwerveConstants.slowModeVal), 
-      aimingCamera.aimWithVision() * SwerveConstants.slowModeVal, 
+      drivetrain.pointAtPose(targetPose) * SwerveConstants.slowModeVal, 
       true, 
       true);
   }
