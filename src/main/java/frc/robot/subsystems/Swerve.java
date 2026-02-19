@@ -96,8 +96,9 @@ public class Swerve extends SubsystemBase {
   public void updatePoseWithVision(){
     
     LimelightHelpers.PoseEstimate measurement = aimingCamera.getMegaTag2();
-    //if(!Math.abs(gyro.getRate > 360))
-        swerveDrive.addVisionMeasurement(measurement.pose, measurement.timestampSeconds);
+    if(aimingCamera.hasValidIDs()){
+      swerveDrive.addVisionMeasurement(measurement.pose, measurement.timestampSeconds);
+    }
   }
 
   public Vision getAimingCamera(){

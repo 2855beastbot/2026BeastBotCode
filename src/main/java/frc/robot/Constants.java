@@ -15,7 +15,7 @@ public class Constants {
         public static final double maxDriveSpeed = 4.5;
         public static final double maxTurnSpeed = 4;
 
-        public static final double slowModeVal = 0.25;
+        public static final double slowModeVal = 1;
 
         public static final PPHolonomicDriveController autoController = new PPHolonomicDriveController(
             new PIDConstants(5.0, 0.0, 0.0),
@@ -68,9 +68,9 @@ public class Constants {
         public static final double aimingTagHeight = 1.12395; //meter
 
         public static final double[] aimingConfig = {
-            -0.2667, //forward (m) intake positive
-            0.2413, //side (m) left positive
-            0.2159, //up (m) 
+            -0.26, //forward (m) intake positive
+            0.24, //side (m) left positive
+            0.185, //up (m) 
             0.0, //roll (deg) around Y axis
             30.0, //pitch (deg) around X axis
             180 //yaw (deg) around Z axis

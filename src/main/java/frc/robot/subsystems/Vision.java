@@ -22,9 +22,10 @@ public class Vision extends SubsystemBase {
   }
 
   public double aimWithVision(){
-    double kP = 0.017;
+    double kP = 0.03;
     double targetingAngularVelocity = LimelightHelpers.getTX(name) * kP;
     targetingAngularVelocity *= SwerveConstants.maxTurnSpeed;
+    targetingAngularVelocity *= -1;
     return targetingAngularVelocity;
   }
 
