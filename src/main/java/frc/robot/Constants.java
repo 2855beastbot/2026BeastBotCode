@@ -7,6 +7,9 @@ package frc.robot;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+
 
 /** Add your docs here. */
 public class Constants {
@@ -60,6 +63,9 @@ public class Constants {
         public static final String locationLimelightName = "limelight-threea";
 
         public static final double idealShootingRange = 2;
+
+        public static final Pose2d blueHub = new Pose2d(4.02844, 4.11861, new Rotation2d());
+        public static final Pose2d redHub = new Pose2d(12.51204, 4.11861, new Rotation2d());
 
         /**
          * 1 meter to number of rpm
