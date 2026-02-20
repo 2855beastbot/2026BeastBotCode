@@ -104,7 +104,7 @@ public class Shooter extends SubsystemBase {
     builder.addBooleanProperty("Closed Loop", this::getRPMUse, null);
     builder.addDoubleProperty("Target RPS", () -> targetRPS, null);
     builder.addDoubleProperty("Left/Speed", left::get, null);
-    builder.addDoubleProperty("Left/RPS", () -> left.getVelocity().getValueAsDouble(), null);
+    builder.addDoubleProperty("Left/RPS", () -> left.getVelocity().getValueAsDouble(), this::setTargetRPM);
     builder.addDoubleProperty("Left/Current (A)", () -> left.getSupplyCurrent().getValueAsDouble(), null);
     builder.addDoubleProperty("Left/Temperature (C)", () -> left.getDeviceTemp().getValueAsDouble(), null);
     builder.addDoubleProperty("Right/Speed", right::get, null);

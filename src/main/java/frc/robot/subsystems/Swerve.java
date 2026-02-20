@@ -65,6 +65,13 @@ public class Swerve extends SubsystemBase {
     return SwerveConstants.maxTurnSpeed;
   }
 
+  /**
+   * 
+   * @param translation meters per second
+   * @param rotation radians per second
+   * @param fieldRelative
+   * @param isOpenLoop
+   */
   public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop){
     swerveDrive.drive(translation, rotation, fieldRelative, isOpenLoop);
   }
@@ -95,14 +102,10 @@ public class Swerve extends SubsystemBase {
     swerveDrive.setChassisSpeeds(speed);
   }
 
-  public double pointAtPose(Pose2d target){
-    double targetAngle = Math.atan((getPose2d().getY() - target.getY()) / (getPose2d().getX()   - target.getX()));
+  public double getPointAtPoseSpeed(Pose2d target){
     double kP = 0.017;
-    if(getPose2d().getY() > target.getY()){
-      targetAngle *= -1;
-    }
-    double targetingSpeed = targetAngle * kP * getMaxTurnSpeed();
-    return targetingSpeed;
+    Rotation2d targetAngle = new Rotation2d(getPose2d().getX()   - target.getX(), getPose2d().getY() - target.getY());
+    return targetAngle.minus(getPose2d().getRotation()).getRadians() * kP;
   }
 
   public void updatePoseWithVision(){

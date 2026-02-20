@@ -4,11 +4,19 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
+
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.LEDPattern;
+import edu.wpi.first.wpilibj.util.Color;
 
 
 /** Add your docs here. */
@@ -99,5 +107,15 @@ public class Constants {
         public static final int[] allIDs = {
             1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32
         };
+    }
+
+    public static class LEDConstants{
+        public static final LEDPattern green = LEDPattern.solid(Color.kGreen);
+        public static final LEDPattern red = LEDPattern.solid(Color.kRed);
+        public static final LEDPattern yellow = LEDPattern.solid(Color.kYellow);
+        public static final LEDPattern rainbow = LEDPattern.rainbow(255, 128);
+        public static final Distance ledSpacing = Meters.of(1/120.0);
+        public static final LEDPattern scrollingRainbow = rainbow.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), ledSpacing);
+        public static final LEDPattern breatheYellow = yellow.breathe(Seconds.of(2));
     }
 }
