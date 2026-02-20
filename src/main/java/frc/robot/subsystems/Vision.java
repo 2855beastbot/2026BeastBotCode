@@ -13,7 +13,7 @@ import frc.robot.Constants.VisionConstants;
 
 public class Vision extends SubsystemBase {
   /** Creates a new Vision. */
-  private double distToRPM = 750;
+  
   private String name;
   public Vision(String name, double[] config) {
     this.name = name;
@@ -30,12 +30,10 @@ public class Vision extends SubsystemBase {
   }
 
   public double getDistToRPMVal(){
-    return distToRPM;
+    return VisionConstants.distanceToRPMRatio;
   }
 
-  public void setDistToRPMVal(double rpmScaler){
-    distToRPM = rpmScaler;
-  }
+  
 
   public double rangeWithVision(double range){
     double  kP = 0.1;
@@ -59,7 +57,7 @@ public class Vision extends SubsystemBase {
     double tag_height = VisionConstants.aimingTagHeight;
     double angle = Math.toRadians(LimelightHelpers.getTY(name) + VisionConstants.aimingConfig[4]);
     double distance = (tag_height - camera_height) / Math.tan(angle);
-    return distance * distToRPM;
+    return (distance * VisionConstants.distanceToRPMRatio) + VisionConstants.baseRPM;
 
   }
 

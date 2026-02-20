@@ -64,7 +64,8 @@ public class Intake extends SubsystemBase {
    */
   public void spin(double speed){
     leftIntake.set(speed);
-    rightIntake.set(speed);
+    //if(getPose() < 1.8)
+      rightIntake.set(speed);
   }
 
   /**
@@ -82,7 +83,7 @@ public class Intake extends SubsystemBase {
 
   /**
    * gets the encoders current position
-   * @return the encoder position, converted to intake rotations
+   * @return the encoder position
    */
   public double getPose(){
     return encoder.getPosition();

@@ -26,7 +26,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-
+import frc.robot.Constants.LEDConstants;
 import frc.robot.Constants.SubsystemConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.DeployWrist;
@@ -42,6 +42,7 @@ import frc.robot.commands.WristJuggle;
 import frc.robot.commands.autoCommands.AutoShoot;
 import frc.robot.commands.autoCommands.ExtendHopper;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
@@ -53,6 +54,7 @@ public class RobotContainer {
   private Intake intake = new Intake();
   private Shooter ballShooter = new Shooter();
   private Indexer indexer = new Indexer();
+  private LED LEDstrip = new LED();
 
   private SendableChooser<String> autoChooser = new SendableChooser<>();
   private String leftAuto = "Left.auto";
@@ -77,6 +79,7 @@ public class RobotContainer {
 
     setDefaultCommands();
     configureBindings();
+    LEDstrip.setPattern(LEDConstants.yellow);
   }
 
   private void configureBindings() {

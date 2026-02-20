@@ -60,7 +60,7 @@ public class Constants {
 
         public static final double intakeWristKff = 1.33; // measured in volts
         public static final double wristOut = 0.2;
-        public static final double wristIn = 2.15; // 2 is real value
+        public static final double wristIn = 2.15; 
         public static final double wristZeroVoltage = 33.0;
 
         public static final double wristGearboxCoef = (62.0/18)*(48.0/19);  
@@ -78,7 +78,8 @@ public class Constants {
         /**
          * 1 meter to number of rpm
          */
-        //public static final double distanceToRPMRatio = 750;
+        public static final double distanceToRPMRatio = 650;
+        public static final double baseRPM = 3425;
         public static final double aimingTagHeight = 1.12395; //meter
 
         public static final double[] aimingConfig = {
