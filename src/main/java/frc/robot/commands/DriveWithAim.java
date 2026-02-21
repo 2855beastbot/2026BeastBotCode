@@ -31,8 +31,8 @@ public class DriveWithAim extends Command {
    */
   public DriveWithAim(DoubleSupplier leftY, DoubleSupplier leftX, Swerve swerve) {
     addRequirements(swerve);
-    xSpeed = leftX;
-    ySpeed = leftY;
+    xSpeed = leftY;
+    ySpeed = leftX;
     drivetrain = swerve;
     aimingCamera = swerve.getAimingCamera();
     // Use addRequirements() here to declare subsystem dependencies.
@@ -55,7 +55,7 @@ public class DriveWithAim extends Command {
       new Translation2d(
         xSpeed.getAsDouble() * SwerveConstants.maxDriveSpeed * SwerveConstants.slowModeVal, 
         ySpeed.getAsDouble() * SwerveConstants.maxDriveSpeed * SwerveConstants.slowModeVal), 
-      drivetrain.getPointAtPoseSpeed(targetPose) * drivetrain.getMaxTurnSpeed() * SwerveConstants.slowModeVal, 
+      /*drivetrain.getPointAtPoseSpeed(targetPose)*/ aimingCamera.aimWithVision() * drivetrain.getMaxTurnSpeed() * SwerveConstants.slowModeVal, 
       true, 
       true);
   }

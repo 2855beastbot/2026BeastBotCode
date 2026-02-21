@@ -40,8 +40,6 @@ public class LED extends SubsystemBase {
   @Override
   public void periodic() {
     currentPattern.applyTo(ledBuffer);
-    LEDConstants.yellow.applyTo(ledBuffer);
-    setRGB(255,255,255);
     LEDstrip.setData(ledBuffer);
     // This method will be called once per scheduler run
   }

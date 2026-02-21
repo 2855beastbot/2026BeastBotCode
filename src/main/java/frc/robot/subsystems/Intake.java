@@ -63,9 +63,9 @@ public class Intake extends SubsystemBase {
    * @param speed the percent power to the wheels, from 0-1
    */
   public void spin(double speed){
-    leftIntake.set(speed);
-    //if(getPose() < 1.8)
-      rightIntake.set(speed);
+    leftIntake.set(-speed);
+    if(getPose() < 1.8)
+      rightIntake.set(-speed);
   }
 
   /**

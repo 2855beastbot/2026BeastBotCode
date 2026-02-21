@@ -93,12 +93,12 @@ public class RobotContainer {
        new ShootWithRange(swerveDrive.getAimingCamera(), ballShooter)
        ));
       
-    
+    /* 
     new Trigger(()->driveController.getLeftBumperButton()).whileTrue(new DriveWithRange(
       ()->-MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
        swerveDrive,
         VisionConstants.idealShootingRange));
-
+    */
     new Trigger(()->driveController.getRawButton(8)).onTrue(new InstantCommand(()->swerveDrive.resetOdometry(new Pose2d())));
 
     //Operator Commands
