@@ -108,6 +108,11 @@ public class Swerve extends SubsystemBase {
     return targetAngle.minus(getPose2d().getRotation()).getRadians() * kP;
   }
 
+  public double getPointAtSpeedUsingRelative(Pose2d target){
+    double kP = 0.017;
+    double poseAngle = getPose().relativeTo(target).getRotation().getRadians();
+    return (poseAngle + getPose().getRotation().getRadians()) * kP;
+
   public void updatePoseWithVision(){
     
     LimelightHelpers.PoseEstimate measurement = aimingCamera.getMegaTag2();
