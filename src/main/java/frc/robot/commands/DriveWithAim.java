@@ -56,7 +56,8 @@ public class DriveWithAim extends Command {
         xSpeed.getAsDouble() * SwerveConstants.maxDriveSpeed * SwerveConstants.slowModeVal, 
         ySpeed.getAsDouble() * SwerveConstants.maxDriveSpeed * SwerveConstants.slowModeVal), 
         //drivetrain.getPointAtPoseSpeed(targetPose) * drivetrain.getMaxTurnSpeed() * SwerveConstants.slowModeVal, 
-        drivetrain.getPointAtSpeedUsingRelative(targetPose) * drivetrain.getMaxTurnSpeed() * SwerveConstants.slowModeVal,
+        //drivetrain.getPointAtSpeedUsingRelative(targetPose) * drivetrain.getMaxTurnSpeed() * SwerveConstants.slowModeVal,
+        drivetrain.getPointAtPoseSpeed(targetPose) * drivetrain.getMaxTurnSpeed() * SwerveConstants.slowModeVal,
       true, 
       true);
   }
