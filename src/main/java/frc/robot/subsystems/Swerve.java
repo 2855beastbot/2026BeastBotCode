@@ -38,7 +38,7 @@ public class Swerve extends SubsystemBase {
   private SwerveDrive swerveDrive;
   private RobotConfig config;
   private Vision aimingCamera = new Vision(VisionConstants.aimingLimelightName, VisionConstants.aimingConfig);
-  private final PIDController pointToPosePID() = new PIDController(0.05, 0.0, 0.002);
+  private final PIDController pointToPosePID = new PIDController(0.05, 0.0, 0.002);
   
   public Swerve() {
     double maximumSpeed = Units.feetToMeters(4.5);
@@ -56,8 +56,8 @@ public class Swerve extends SubsystemBase {
       e.printStackTrace();
     }
     swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 9999999));
-    pointToPosePID().enableContinuousInput(-180, 180);
-    pointToPosePID().setTolerance(2.0);
+    pointToPosePID.enableContinuousInput(-180, 180);
+    pointToPosePID.setTolerance(2.0);
   }
 
   public double getMaxDriveSpeed(){
@@ -110,15 +110,21 @@ public class Swerve extends SubsystemBase {
     return new Rotation2d(delta.getX(), delta.getY());
   }
 
+  public double getDistanceFromPose(Pose2d targetPose){
+    Translation2d distance = targetPose.getTranslation().minus(getPose2d().getTranslation());
+    return Math.tan(distance.getY() /  distance.getX());
+  }
+
   public double getPointAtPoseSpeed(Pose2d target){
     Rotation2d desiredAngle = getPointAtPoseAngle(target);
-    return pointToPosePID().calculate(getPose2d().getRotation().getRadians(), desiredAngle.getRadians());
+    return pointToPosePID.calculate(getPose2d().getRotation().getRadians(), desiredAngle.getRadians());
   }
 
   public double getPointAtSpeedUsingRelative(Pose2d target){
     double kP = 0.017;
-    double poseAngle = getPose().relativeTo(target).getRotation().getRadians();
-    return (poseAngle + getPose().getRotation().getRadians()) * kP;
+    double poseAngle = getPose2d().relativeTo(target).getRotation().getRadians();
+    return ((poseAngle + getPose2d().getRotation().getRadians()) * kP);
+  }
 
   public void updatePoseWithVision(){
     
@@ -172,5 +178,6 @@ public class Swerve extends SubsystemBase {
     }, null);
 
     builder.addDoubleProperty("dist to rpm val", ()->aimingCamera.getDistToRPMVal(), null);
+    
   }
 }

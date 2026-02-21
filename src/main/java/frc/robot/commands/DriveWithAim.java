@@ -41,7 +41,7 @@ public class DriveWithAim extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    aimingCamera.setValidIDs(VisionConstants.targetingIDs);
+    //aimingCamera.setValidIDs(VisionConstants.targetingIDs);
     var alliance = DriverStation.getAlliance();
       if(alliance.isPresent()){
         targetPose = (alliance.get() == Alliance.Blue) ? VisionConstants.blueHub : VisionConstants.redHub;
@@ -55,9 +55,8 @@ public class DriveWithAim extends Command {
       new Translation2d(
         xSpeed.getAsDouble() * SwerveConstants.maxDriveSpeed * SwerveConstants.slowModeVal, 
         ySpeed.getAsDouble() * SwerveConstants.maxDriveSpeed * SwerveConstants.slowModeVal), 
-        //drivetrain.getPointAtPoseSpeed(targetPose) * drivetrain.getMaxTurnSpeed() * SwerveConstants.slowModeVal, 
+        drivetrain.getPointAtPoseSpeed(targetPose) * drivetrain.getMaxTurnSpeed() * SwerveConstants.slowModeVal, 
         //drivetrain.getPointAtSpeedUsingRelative(targetPose) * drivetrain.getMaxTurnSpeed() * SwerveConstants.slowModeVal,
-        drivetrain.getPointAtPoseSpeed(targetPose) * drivetrain.getMaxTurnSpeed() * SwerveConstants.slowModeVal,
       true, 
       true);
   }
