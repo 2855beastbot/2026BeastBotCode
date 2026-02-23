@@ -48,7 +48,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 4.0
+                  "waitTime": 8.0
                 }
               }
             ]
@@ -57,7 +57,45 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Rightscore to climb"
+            "pathName": "RightScore to RightCenter"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Rightcenter to Rightscore"
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "parallel",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "AutoShoot"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "HopperJuggle"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 4.0
+                }
+              }
+            ]
           }
         }
       ]
