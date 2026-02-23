@@ -64,7 +64,7 @@ public class Intake extends SubsystemBase {
    */
   public void spin(double speed){
     leftIntake.set(-speed);
-    if(getPose() < 1.8)
+    //if(getPose() < 1.8)
       rightIntake.set(-speed);
   }
 

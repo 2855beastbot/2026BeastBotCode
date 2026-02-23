@@ -57,8 +57,8 @@ public class RobotContainer {
   private LED LEDstrip = new LED();
 
   private SendableChooser<String> autoChooser = new SendableChooser<>();
-  private String leftAuto = "Left.auto";
-  private String rightAuto = "Right.auto";
+  private String leftAuto = "Left";
+  private String rightAuto = "Right";
 
 
   public RobotContainer() {
@@ -85,8 +85,8 @@ public class RobotContainer {
   private void configureBindings() {
 
     //Driver commands
-    new Trigger(()->driveController.getAButton()).whileTrue(new RunCommand(()->swerveDrive.setXMode(), swerveDrive));
-    new Trigger(()->driveController.getRightBumperButton()).whileTrue(new ParallelCommandGroup(new DriveWithAim(
+    new Trigger(()->driveController.getYButton()).whileTrue(new RunCommand(()->swerveDrive.setXMode(), swerveDrive));
+    new Trigger(()->driveController.getRightTriggerAxis() > 0.5).whileTrue(new ParallelCommandGroup(new DriveWithAim(
       ()->-MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
       ()->-MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
        swerveDrive),
@@ -100,6 +100,12 @@ public class RobotContainer {
         VisionConstants.idealShootingRange));
     */
     new Trigger(()->driveController.getRawButton(8)).onTrue(new InstantCommand(()->swerveDrive.resetOdometry(new Pose2d())));
+    new Trigger(()->driveController.getXButton()).onTrue(new InstantCommand(()->intake.setTargetSetpoint(SubsystemConstants.wristOut)));
+    new Trigger(()->driveController.getAButton()).onTrue(new InstantCommand(()->intake.setTargetSetpoint(SubsystemConstants.wristMid)));
+    new Trigger(()->driveController.getBButton()).onTrue(new InstantCommand(()->intake.setTargetSetpoint(SubsystemConstants.wristIn)));
+    new Trigger(()->driveController.getRightBumperButton()).whileTrue(new Index(()->1, indexer));
+    new Trigger(()->driveController.getLeftTriggerAxis() > 0.3).whileTrue(new SpinIntake(()->driveController.getLeftTriggerAxis(), intake));
+    new Trigger(()->driveController.getLeftBumperButton()).whileTrue(new SpinIntake(()->-1, intake));
 
     //Operator Commands
     operatorController.rightBumper().whileTrue(new Index(()->1, indexer));

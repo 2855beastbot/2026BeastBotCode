@@ -14,6 +14,7 @@ public class ShootWithRange extends Command {
   /** Creates a new ShootWithRange. */
   private Vision aimingCamera;
   private Shooter ballShooter;
+  private double distance;
   public ShootWithRange(Vision camera, Shooter shooter) {
     addRequirements(camera, shooter);
     aimingCamera = camera;
@@ -24,7 +25,7 @@ public class ShootWithRange extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    aimingCamera.setValidIDs(VisionConstants.targetingIDs);
+    //aimingCamera.setValidIDs(VisionConstants.targetingIDs);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -37,7 +38,7 @@ public class ShootWithRange extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    aimingCamera.setValidIDs(VisionConstants.allIDs);
+    //aimingCamera.setValidIDs(VisionConstants.allIDs);
   }
 
   // Returns true when the command should end.
