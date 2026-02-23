@@ -14,6 +14,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -59,6 +60,7 @@ public class RobotContainer {
   private SendableChooser<String> autoChooser = new SendableChooser<>();
   private String leftAuto = "Left";
   private String rightAuto = "Right";
+  private Pose2d targetHub;
 
 
   public RobotContainer() {
@@ -80,6 +82,12 @@ public class RobotContainer {
     setDefaultCommands();
     configureBindings();
     LEDstrip.setPattern(LEDConstants.yellow);
+    var alliance = DriverStation.getAlliance();
+      if(alliance.isPresent()){
+        targetHub = (alliance.get() == Alliance.Blue) ? VisionConstants.blueHub : VisionConstants.redHub;
+      }else{
+        targetHub = VisionConstants.blueHub;
+      }
   }
 
   private void configureBindings() {
@@ -89,8 +97,9 @@ public class RobotContainer {
     new Trigger(()->driveController.getRightTriggerAxis() > 0.5).whileTrue(new ParallelCommandGroup(new DriveWithAim(
       ()->-MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
       ()->-MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
-       swerveDrive),
-       new ShootWithRange(swerveDrive.getAimingCamera(), ballShooter)
+       swerveDrive,
+       targetHub),
+       new ShootWithRange(()->swerveDrive.getDistanceFromPose(targetHub), ballShooter)
        ));
       
     /* 

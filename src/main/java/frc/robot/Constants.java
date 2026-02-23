@@ -80,7 +80,7 @@ public class Constants {
          * 1 meter to number of rpm
          */
         public static final double distanceToRPMRatio = 650;
-        public static final double baseRPM = 3425;
+        public static final double baseRPM = 2874;
         public static final double aimingTagHeight = 1.12395; //meter
 
         public static final double[] aimingConfig = {

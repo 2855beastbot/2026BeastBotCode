@@ -13,18 +13,20 @@ import frc.robot.Constants.LEDConstants;
 
 public class LED extends SubsystemBase {
   /** Creates a new LED. */
-  private AddressableLED LEDstrip = new AddressableLED(0);
-  private AddressableLEDBuffer ledBuffer = new AddressableLEDBuffer(3);
-  //private AddressableLEDBufferView left = ledBuffer.createView(24, 43);
-  //private AddressableLEDBufferView right = ledBuffer.createView(0, 23);
+  private AddressableLED LEDstrip;
+  private AddressableLEDBuffer ledBuffer;
+  private AddressableLEDBufferView left = ledBuffer.createView(24, 43);
+  private AddressableLEDBufferView right = ledBuffer.createView(0, 23);
   
   private LEDPattern currentPattern;
   public LED() {
-    LEDstrip.setLength(3);
+    LEDstrip = new AddressableLED(0);
+    ledBuffer = new AddressableLEDBuffer(43);
+    LEDstrip.setLength(ledBuffer.getLength());
     LEDstrip.setData(ledBuffer);
-    
     setPattern(LEDConstants.breatheYellow);
     LEDstrip.start();
+    LEDstrip.setData(ledBuffer);
   }
 
   public void setPattern(LEDPattern pattern){
@@ -39,6 +41,8 @@ public class LED extends SubsystemBase {
 
   @Override
   public void periodic() {
+    //currentPattern.applyTo(right);
+    //currentPattern.applyTo(left);
     currentPattern.applyTo(ledBuffer);
     LEDstrip.setData(ledBuffer);
     // This method will be called once per scheduler run

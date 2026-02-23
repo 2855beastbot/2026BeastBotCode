@@ -29,12 +29,13 @@ public class DriveWithAim extends Command {
    * @param leftX the sideways speed of the robot
    * @param swerve the drivetrain class
    */
-  public DriveWithAim(DoubleSupplier leftY, DoubleSupplier leftX, Swerve swerve) {
+  public DriveWithAim(DoubleSupplier leftY, DoubleSupplier leftX, Swerve swerve, Pose2d targetPose) {
     addRequirements(swerve);
     xSpeed = leftY;
     ySpeed = leftX;
     drivetrain = swerve;
     aimingCamera = swerve.getAimingCamera();
+    this.targetPose = targetPose;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -42,10 +43,7 @@ public class DriveWithAim extends Command {
   @Override
   public void initialize() {
     //aimingCamera.setValidIDs(VisionConstants.targetingIDs);
-    var alliance = DriverStation.getAlliance();
-      if(alliance.isPresent()){
-        targetPose = (alliance.get() == Alliance.Blue) ? VisionConstants.blueHub : VisionConstants.redHub;
-      }
+    
   }
 
   // Called every time the scheduler runs while the command is scheduled.

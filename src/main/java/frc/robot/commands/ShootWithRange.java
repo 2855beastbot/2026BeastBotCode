@@ -4,6 +4,8 @@
 
 package frc.robot.commands;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.Shooter;
@@ -12,12 +14,10 @@ import frc.robot.subsystems.Vision;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class ShootWithRange extends Command {
   /** Creates a new ShootWithRange. */
-  private Vision aimingCamera;
   private Shooter ballShooter;
   private double distance;
-  public ShootWithRange(Vision camera, Shooter shooter) {
-    addRequirements(camera, shooter);
-    aimingCamera = camera;
+  public ShootWithRange(DoubleSupplier distance, Shooter shooter) {
+    addRequirements(shooter);
     ballShooter = shooter;
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -31,8 +31,7 @@ public class ShootWithRange extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(aimingCamera.hasValidIDs())
-    ballShooter.setTargetRPM(aimingCamera.calculateRPMFromRange());
+    
   }
 
   // Called once the command ends or is interrupted.
