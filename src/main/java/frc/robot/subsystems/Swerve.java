@@ -55,6 +55,7 @@ public class Swerve extends SubsystemBase {
     }catch(Exception e){
       e.printStackTrace();
     }
+    configureAutoBuilder();
     swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 9999999));
     pointToPosePID.enableContinuousInput(-180, 180);
     pointToPosePID.setTolerance(2.0);

@@ -57,8 +57,8 @@ public class RobotContainer {
   private LED LEDstrip = new LED();
 
   private SendableChooser<String> autoChooser = new SendableChooser<>();
-  private String leftAuto = "Left.auto";
-  private String rightAuto = "Right.auto";
+  private String leftAuto = "Left";
+  private String rightAuto = "Right";
 
 
   public RobotContainer() {
@@ -103,7 +103,7 @@ public class RobotContainer {
     new Trigger(()->driveController.getXButton()).onTrue(new InstantCommand(()->intake.setTargetSetpoint(SubsystemConstants.wristOut)));
     new Trigger(()->driveController.getAButton()).onTrue(new InstantCommand(()->intake.setTargetSetpoint(SubsystemConstants.wristMid)));
     new Trigger(()->driveController.getBButton()).onTrue(new InstantCommand(()->intake.setTargetSetpoint(SubsystemConstants.wristIn)));
-    new Trigger(()->driveController.getRightBumperButton()).onTrue(new Index(()->1, indexer));
+    new Trigger(()->driveController.getRightBumperButton()).whileTrue(new Index(()->1, indexer));
     new Trigger(()->driveController.getLeftTriggerAxis() > 0.3).whileTrue(new SpinIntake(()->driveController.getLeftTriggerAxis(), intake));
     new Trigger(()->driveController.getLeftBumperButton()).whileTrue(new SpinIntake(()->-1, intake));
 
