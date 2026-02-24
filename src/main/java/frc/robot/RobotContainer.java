@@ -43,6 +43,7 @@ import frc.robot.commands.WristJuggle;
 import frc.robot.commands.autoCommands.AutoShoot;
 import frc.robot.commands.autoCommands.ExtendHopper;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.IntakeWrist;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Shooter;
@@ -56,6 +57,7 @@ public class RobotContainer {
   private Shooter ballShooter = new Shooter();
   private Indexer indexer = new Indexer();
   private LED LEDstrip = new LED();
+  private IntakeWrist intakeWrist = new IntakeWrist();
 
   private SendableChooser<String> autoChooser = new SendableChooser<>();
   private String leftAuto = "Left";
@@ -78,16 +80,18 @@ public class RobotContainer {
     SmartDashboard.putData(indexer);
     SmartDashboard.putData(swerveDrive);
     SmartDashboard.putData("auto selector", autoChooser);
-
-    setDefaultCommands();
-    configureBindings();
-    LEDstrip.setPattern(LEDConstants.yellow);
+    
     var alliance = DriverStation.getAlliance();
-      if(alliance.isPresent()){
+    if(alliance.isPresent()){
         targetHub = (alliance.get() == Alliance.Blue) ? VisionConstants.blueHub : VisionConstants.redHub;
       }else{
         targetHub = VisionConstants.blueHub;
       }
+    setDefaultCommands();
+    configureBindings();
+    LEDstrip.setPattern(LEDConstants.yellow);
+    
+      
   }
 
   private void configureBindings() {
@@ -109,9 +113,9 @@ public class RobotContainer {
         VisionConstants.idealShootingRange));
     */
     new Trigger(()->driveController.getRawButton(8)).onTrue(new InstantCommand(()->swerveDrive.resetOdometry(new Pose2d())));
-    new Trigger(()->driveController.getXButton()).onTrue(new InstantCommand(()->intake.setTargetSetpoint(SubsystemConstants.wristOut)));
-    new Trigger(()->driveController.getAButton()).onTrue(new InstantCommand(()->intake.setTargetSetpoint(SubsystemConstants.wristMid)));
-    new Trigger(()->driveController.getBButton()).onTrue(new InstantCommand(()->intake.setTargetSetpoint(SubsystemConstants.wristIn)));
+    new Trigger(()->driveController.getXButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristOut)));
+    new Trigger(()->driveController.getAButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristMid)));
+    new Trigger(()->driveController.getBButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristIn)));
     new Trigger(()->driveController.getRightBumperButton()).whileTrue(new Index(()->1, indexer));
     new Trigger(()->driveController.getLeftTriggerAxis() > 0.3).whileTrue(new SpinIntake(()->driveController.getLeftTriggerAxis(), intake));
     new Trigger(()->driveController.getLeftBumperButton()).whileTrue(new SpinIntake(()->-1, intake));
@@ -119,13 +123,13 @@ public class RobotContainer {
     //Operator Commands
     operatorController.rightBumper().whileTrue(new Index(()->1, indexer));
     operatorController.leftBumper().whileTrue(new SpinIntake(()->-1, intake));
-    operatorController.x().onTrue(new InstantCommand(()->intake.setTargetSetpoint(SubsystemConstants.wristOut), intake));
-    operatorController.b().onTrue(new InstantCommand(()->intake.setTargetSetpoint(SubsystemConstants.wristIn), intake));
+    operatorController.x().onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristOut), intakeWrist));
+    operatorController.b().onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristIn), intakeWrist));
     //operatorController.a().onTrue(new DeployWrist(intake));
     operatorController.axisGreaterThan(2, 0.3).whileTrue(new SpinIntake(()->operatorController.getLeftTriggerAxis(), intake));
     operatorController.axisGreaterThan(3, 0.3).whileTrue(new RunCommand(()->ballShooter.spin(operatorController.getRightTriggerAxis(), false), ballShooter));
-    operatorController.axisMagnitudeGreaterThan(1, 0.3).whileTrue(new MoveIntakeWrist(()->-operatorController.getLeftY(), intake));
-    operatorController.button(8).onTrue(new InstantCommand(()->intake.zeroEncoders(), intake));
+    operatorController.axisMagnitudeGreaterThan(1, 0.3).whileTrue(new MoveIntakeWrist(()->-operatorController.getLeftY(), intakeWrist));
+    operatorController.button(8).onTrue(new InstantCommand(()->intakeWrist.zeroEncoders(), intakeWrist));
     
   }
 
@@ -140,8 +144,8 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     NamedCommands.registerCommand("AutoShoot", new AutoShoot(ballShooter, swerveDrive, indexer));
-    NamedCommands.registerCommand("HopperJuggle", new WristJuggle(intake));
-    NamedCommands.registerCommand("ExtendHopper", new ExtendHopper(intake));
+    NamedCommands.registerCommand("HopperJuggle", new WristJuggle(intakeWrist));
+    NamedCommands.registerCommand("ExtendHopper", new ExtendHopper(intake, intakeWrist));
     return new PathPlannerAuto(autoChooser.getSelected());
   }
 }

@@ -39,7 +39,7 @@ public class Swerve extends SubsystemBase {
   private RobotConfig config;
   private Vision aimingCamera = new Vision(VisionConstants.aimingLimelightName, VisionConstants.aimingConfig);
   private final PIDController pointToPosePID = new PIDController(0.05, 0.0, 0.002);
-  
+  private Pose2d targetHub;
   public Swerve() {
     double maximumSpeed = Units.feetToMeters(4.5);
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(),"swerve");
@@ -59,6 +59,13 @@ public class Swerve extends SubsystemBase {
     swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 9999999));
     pointToPosePID.enableContinuousInput(-180, 180);
     pointToPosePID.setTolerance(2.0);
+
+    var alliance = DriverStation.getAlliance();
+    if(alliance.isPresent()){
+        targetHub = (alliance.get() == Alliance.Blue) ? VisionConstants.blueHub : VisionConstants.redHub;
+      }else{
+        targetHub = VisionConstants.blueHub;
+      }
   }
 
   public double getMaxDriveSpeed(){
@@ -116,18 +123,28 @@ public class Swerve extends SubsystemBase {
   }
 
   public double getDistanceFromHub(){
-    Pose2d targetHub;
-    var alliance = DriverStation.getAlliance();
-    if(alliance.isPresent()){
-        targetHub = (alliance.get() == Alliance.Blue) ? VisionConstants.blueHub : VisionConstants.redHub;
-      }else{
-        targetHub = VisionConstants.blueHub;
-      }
     return getDistanceFromPose(targetHub);
   }
 
+  public double getAngleFromHub(){
+    return getPointAtPoseAngle(targetHub).getDegrees();
+  }
+
+  public Pose2d getTargetHub(){
+    return targetHub;
+  }
+
+  public String getTargetHubAsString(){
+    if(targetHub.equals(VisionConstants.redHub)){
+      return "Red";
+    }
+    else{
+      return "Blue";
+    }
+  }
+
   public double getPointAtPoseSpeed(Pose2d target){
-    Rotation2d desiredAngle = getPointAtPoseAngle(target);
+    Rotation2d desiredAngle = getPointAtPoseAngle(targetHub);
     return pointToPosePID.calculate(getPose2d().getRotation().getRadians(), desiredAngle.getRadians());
   }
   /* 
@@ -190,6 +207,9 @@ public class Swerve extends SubsystemBase {
 
     builder.addDoubleProperty("dist to rpm val", ()->aimingCamera.getDistToRPMVal(), null);
     builder.addDoubleProperty("distance from hub", ()->getDistanceFromHub(), null);
+    builder.addDoubleProperty("angle to hub", ()->getAngleFromHub(), null);
+    builder.addStringProperty("target hub", ()->getTargetHubAsString(), null);
+    builder.addDoubleProperty("gyro heading", ()->swerveDrive.getGyro().getRotation3d().getAngle(), null);
     
   }
 }

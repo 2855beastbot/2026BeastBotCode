@@ -8,13 +8,14 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.IntakeWrist;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class MoveIntakeWrist extends Command {
   /** Creates a new MoveIntakeWrist. */
-  private Intake intake;
+  private IntakeWrist intake;
   private DoubleSupplier moveSpeed;
-  public MoveIntakeWrist(DoubleSupplier input, Intake intake) {
+  public MoveIntakeWrist(DoubleSupplier input, IntakeWrist intake) {
     addRequirements(intake);
     this.intake = intake;
     moveSpeed = input;

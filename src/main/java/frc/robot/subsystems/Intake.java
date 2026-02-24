@@ -29,33 +29,12 @@ public class Intake extends SubsystemBase {
   /** Creates a new intake. */
   private SparkMax leftIntake = new SparkMax(CANIDConstants.intakeLeft,  MotorType.kBrushless);
   private SparkMax rightIntake = new SparkMax(CANIDConstants.intakeRight, MotorType.kBrushless);
-  private SparkMax leftWrist = new SparkMax(CANIDConstants.intakeArmLeft, MotorType.kBrushless);
-  private SparkMax rightWrist = new SparkMax(CANIDConstants.intakeArmRight, MotorType.kBrushless);
-  private SparkMaxConfig config = new SparkMaxConfig();
-  private MAXMotionConfig trapezoidalPID = config.closedLoop.maxMotion;
-  private PIDController pidController = new PIDController(SubsystemConstants.intakeWristKp, SubsystemConstants.intakeWristKi, SubsystemConstants.intakeWristKd);
-  private SparkAbsoluteEncoder encoder;
-  private double targetSetpoint;
-  private boolean isOpenLoop;
+  
+  
+  
   
 
-  public Intake() {
-    encoder = rightWrist.getAbsoluteEncoder();
-    config.absoluteEncoder.inverted(true);
-    setTargetSetpoint(getPose());
-    config.closedLoop.pid(SubsystemConstants.intakeWristKp, SubsystemConstants.intakeWristKi, SubsystemConstants.intakeWristKd);
-    trapezoidalPID.maxAcceleration(2);
-    trapezoidalPID.cruiseVelocity(5);
-    trapezoidalPID.allowedProfileError(0.1);
-    //config.closedLoop.feedForward.kCos(0);
-    rightWrist.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-    pidController.enableContinuousInput(0, Math.PI * 2);
-    
-    
-    SmartDashboard.putData("Intake PID controller", pidController);
-    
-    // make left follow right, now everything sent to right, left will do automatically
-    leftWrist.configure(new SparkMaxConfig().follow(rightWrist, true), null, PersistMode.kNoPersistParameters);
+  public Intake() { 
   }
 
   /**
@@ -72,81 +51,29 @@ public class Intake extends SubsystemBase {
    * Sets the target angle for the intake to hold measured in radians up from horizontal ("out") position
    * @param setpoint target angle in degrees
    */
-  public void setTargetSetpoint(double setpoint){
-    isOpenLoop = false;
-    targetSetpoint = setpoint;
-  }
+  
 
-  public double getTargetSetpoint(){
-    return targetSetpoint;
-  }
+  
 
   /**
    * gets the encoders current position
    * @return the encoder position
    */
-  public double getPose(){
-    return encoder.getPosition();
-  }
+ 
 
   /**
    * open loop for both wrist motors
    * @param speed the power to feed the motors, from 0-1
    */
-  public void moveWrist(double speed){
-    isOpenLoop = true;
-    rightWrist.set(-speed);
-  }
+  
 
-  public boolean isOpenLoop(){
-    return isOpenLoop;
-  }
-
-  public boolean isAtSetpoint(){
-    return rightWrist.getClosedLoopController().isAtSetpoint();
-  }
-
-  public double getOutputCurrent(){
-    return rightWrist.getOutputCurrent();
-  }
-
-  public void zeroEncoders(){
-    leftWrist.getEncoder().setPosition(0.0);
-    rightWrist.getEncoder().setPosition(0.0);
-  }
-
-  public void runPID(){
-    double angle = encoder.getPosition();
-    if(angle > 2.15){
-      angle = angle - (Math.PI * 2);
-    }
-    rightWrist.set(-pidController.calculate(angle, targetSetpoint));
-  }
-
-  @Override
-  public void periodic() {
-    if(!isOpenLoop){
-      runPID();
-    }
-    
-    // This method will be called once per scheduler run
-  }
+ 
 
   @Override
   public void initSendable(SendableBuilder builder){
     super.initSendable(builder);
     // open Elastic -> Add Widget -> scroll to Intake and open the dropdown -> drag values onto dashboard
-    builder.addBooleanProperty("Open Loop", this::isOpenLoop, null);
-    builder.addDoubleProperty("Position", encoder::getPosition, null);
-    builder.addDoubleProperty("Target Pos", this::getTargetSetpoint, null);
-    builder.addDoubleProperty("Left Wrist/Speed", leftWrist::get, null);
-    builder.addDoubleProperty("Left Wrist/Output", leftWrist::getAppliedOutput, null);
-    builder.addDoubleProperty("Left Wrist/Current (A)", leftWrist::getOutputCurrent, null);
-    builder.addDoubleProperty("Left Wrist/Temperature (C)", leftWrist::getMotorTemperature, null);
-    builder.addDoubleProperty("Right Wrist/Speed", rightWrist::get, null);
-    builder.addDoubleProperty("Right Wrist/Output", rightWrist::getAppliedOutput, null);
-    builder.addDoubleProperty("Right Wrist/Current (A)", rightWrist::getOutputCurrent, null);
-    builder.addDoubleProperty("Right Wrist/Temperature (C)", rightWrist::getMotorTemperature, null);
+    
     builder.addDoubleProperty("Intake Speed (left)", leftIntake::get, null);
     builder.addDoubleProperty("Intake Speed (right)", rightIntake::get, null);
   }

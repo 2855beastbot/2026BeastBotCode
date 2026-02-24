@@ -8,21 +8,24 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.Constants.SubsystemConstants;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.IntakeWrist;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class ExtendHopper extends Command {
   /** Creates a new ExtendHopper. */
   private Intake intake;
-  public ExtendHopper(Intake intake) {
+  private IntakeWrist intakeWrist;
+  public ExtendHopper(Intake intake, IntakeWrist intakeWrist) {
     addRequirements(intake);
     this.intake = intake;
-    // Use addRequirements() here to declare subsystem dependencies.
+    this.intakeWrist = intakeWrist;
+    // Use addRequirements() here to declare subsystem dependencies.r
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    intake.setTargetSetpoint(SubsystemConstants.wristOut);
+    intakeWrist.setTargetSetpoint(SubsystemConstants.wristOut);
     intake.spin(1);
 
   }
@@ -38,6 +41,6 @@ public class ExtendHopper extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return intake.isAtSetpoint();
+    return intakeWrist.isAtSetpoint();
   }
 }

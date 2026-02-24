@@ -7,12 +7,13 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.SubsystemConstants;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.IntakeWrist;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class DeployWrist extends Command {
   /** Creates a new DeployWrist. */
-  private final Intake intake;
-  public DeployWrist(Intake intake) {
+  private final IntakeWrist intake;
+  public DeployWrist(IntakeWrist intake) {
     this.intake = intake;
     // Use addRequirements() here to declare subsystem dependencies.
   }
