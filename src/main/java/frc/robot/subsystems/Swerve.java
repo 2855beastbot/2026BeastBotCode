@@ -112,8 +112,7 @@ public class Swerve extends SubsystemBase {
   }
 
   public double getDistanceFromPose(Pose2d targetPose){
-    Translation2d distance = targetPose.getTranslation().minus(getPose2d().getTranslation());
-    return Math.tan(distance.getY() /  distance.getX());
+    return targetPose.getTranslation().getDistance(getPose2d().getTranslation());
   }
 
   public double getDistanceFromHub(){
@@ -131,13 +130,13 @@ public class Swerve extends SubsystemBase {
     Rotation2d desiredAngle = getPointAtPoseAngle(target);
     return pointToPosePID.calculate(getPose2d().getRotation().getRadians(), desiredAngle.getRadians());
   }
-
+  /* 
   public double getPointAtSpeedUsingRelative(Pose2d target){
     double kP = 0.017;
     double poseAngle = getPose2d().relativeTo(target).getRotation().getRadians();
     return ((poseAngle + getPose2d().getRotation().getRadians()) * kP);
   }
-
+  */
   public void updatePoseWithVision(){
     
     LimelightHelpers.PoseEstimate measurement = aimingCamera.getMegaTag2();
