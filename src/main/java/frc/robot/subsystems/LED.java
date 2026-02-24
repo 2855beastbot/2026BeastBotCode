@@ -15,13 +15,13 @@ public class LED extends SubsystemBase {
   /** Creates a new LED. */
   private AddressableLED LEDstrip;
   private AddressableLEDBuffer ledBuffer;
-  private AddressableLEDBufferView left = ledBuffer.createView(24, 43);
-  private AddressableLEDBufferView right = ledBuffer.createView(0, 23);
+  //private AddressableLEDBufferView left = ledBuffer.createView(24, 43);
+  //private AddressableLEDBufferView right = ledBuffer.createView(0, 23);
   
   private LEDPattern currentPattern;
   public LED() {
-    LEDstrip = new AddressableLED(0);
-    ledBuffer = new AddressableLEDBuffer(43);
+    LEDstrip = new AddressableLED(9);
+    ledBuffer = new AddressableLEDBuffer(6);
     LEDstrip.setLength(ledBuffer.getLength());
     LEDstrip.setData(ledBuffer);
     setPattern(LEDConstants.breatheYellow);

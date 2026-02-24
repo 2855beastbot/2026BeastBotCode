@@ -116,6 +116,17 @@ public class Swerve extends SubsystemBase {
     return Math.tan(distance.getY() /  distance.getX());
   }
 
+  public double getDistanceFromHub(){
+    Pose2d targetHub;
+    var alliance = DriverStation.getAlliance();
+    if(alliance.isPresent()){
+        targetHub = (alliance.get() == Alliance.Blue) ? VisionConstants.blueHub : VisionConstants.redHub;
+      }else{
+        targetHub = VisionConstants.blueHub;
+      }
+    return getDistanceFromPose(targetHub);
+  }
+
   public double getPointAtPoseSpeed(Pose2d target){
     Rotation2d desiredAngle = getPointAtPoseAngle(target);
     return pointToPosePID.calculate(getPose2d().getRotation().getRadians(), desiredAngle.getRadians());
@@ -179,6 +190,7 @@ public class Swerve extends SubsystemBase {
     }, null);
 
     builder.addDoubleProperty("dist to rpm val", ()->aimingCamera.getDistToRPMVal(), null);
+    builder.addDoubleProperty("distance from hub", ()->getDistanceFromHub(), null);
     
   }
 }
