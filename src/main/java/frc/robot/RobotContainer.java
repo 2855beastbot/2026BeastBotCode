@@ -89,7 +89,7 @@ public class RobotContainer {
       }
     setDefaultCommands();
     configureBindings();
-    LEDstrip.setPattern(LEDConstants.yellow);
+    
     
       
   }

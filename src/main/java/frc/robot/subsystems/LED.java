@@ -24,8 +24,9 @@ public class LED extends SubsystemBase {
     ledBuffer = new AddressableLEDBuffer(6);
     LEDstrip.setLength(ledBuffer.getLength());
     LEDstrip.setData(ledBuffer);
-    setPattern(LEDConstants.breatheYellow);
+    setPattern(LEDConstants.yellow);
     LEDstrip.start();
+    LEDConstants.yellow.applyTo(ledBuffer);
     LEDstrip.setData(ledBuffer);
   }
 
