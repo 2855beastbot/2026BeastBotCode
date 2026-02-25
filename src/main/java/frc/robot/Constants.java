@@ -59,7 +59,7 @@ public class Constants {
         public static final double intakeWristKd = 0.0;
 
         public static final double intakeWristKff = 1.33; // measured in volts
-        public static final double wristOut = 0.12;
+        public static final double wristOut = 0.07;
         public static final double wristMid = 1;
         public static final double wristIn = 2.15; 
         public static final double wristZeroVoltage = 33.0;
@@ -74,7 +74,7 @@ public class Constants {
         public static final double idealShootingRange = 2;
 
         public static final Pose2d blueHub = new Pose2d(4.52844, 4.11861, new Rotation2d());
-        public static final Pose2d redHub = new Pose2d(12.51204, 4.11861, new Rotation2d());
+        public static final Pose2d redHub = new Pose2d(12.01204, 4.11861, new Rotation2d());
 
         /**
          * 1 meter to number of rpm

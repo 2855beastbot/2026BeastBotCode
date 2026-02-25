@@ -103,7 +103,7 @@ public class RobotContainer {
       ()->-MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
        swerveDrive,
        targetHub),
-       new ShootWithRange(()->swerveDrive.getDistanceFromPose(targetHub), ballShooter)
+       new ShootWithRange(()->swerveDrive.getRPMFromRange(swerveDrive.getDistanceFromPose(targetHub)), ballShooter)
        ));
       
     /* 
@@ -113,6 +113,7 @@ public class RobotContainer {
         VisionConstants.idealShootingRange));
     */
     new Trigger(()->driveController.getRawButton(8)).onTrue(new InstantCommand(()->swerveDrive.resetOdometry(new Pose2d())));
+    new Trigger(()->driveController.getRawButton(7)).onTrue(new InstantCommand(()->swerveDrive.resetOdometry(swerveDrive.getAimingCamera().getPose())));
     new Trigger(()->driveController.getXButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristOut)));
     new Trigger(()->driveController.getAButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristMid)));
     new Trigger(()->driveController.getBButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristIn)));

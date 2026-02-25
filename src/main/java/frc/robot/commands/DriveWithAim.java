@@ -49,14 +49,11 @@ public class DriveWithAim extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    drivetrain.drive(
+    drivetrain.drivePose(
       new Translation2d(
         xSpeed.getAsDouble() * SwerveConstants.maxDriveSpeed * SwerveConstants.slowModeVal, 
-        ySpeed.getAsDouble() * SwerveConstants.maxDriveSpeed * SwerveConstants.slowModeVal), 
-        drivetrain.getPointAtPoseSpeed(targetPose) * drivetrain.getMaxTurnSpeed() * SwerveConstants.slowModeVal, 
-        //drivetrain.getPointAtSpeedUsingRelative(targetPose) * drivetrain.getMaxTurnSpeed() * SwerveConstants.slowModeVal,
-      true, 
-      true);
+        ySpeed.getAsDouble() * SwerveConstants.maxDriveSpeed * SwerveConstants.slowModeVal)
+        );
   }
 
   // Called once the command ends or is interrupted.
