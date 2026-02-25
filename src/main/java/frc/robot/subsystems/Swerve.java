@@ -105,6 +105,14 @@ public class Swerve extends SubsystemBase {
     swerveDrive.resetOdometry(pose);
   }
 
+  public void resetOdometryWithAlliance(Pose2d pose){
+    if(targetHub == VisionConstants.blueHub){
+      swerveDrive.resetOdometry(pose);
+    }else{
+      swerveDrive.resetOdometry(new Pose2d(pose.getTranslation(), new Rotation2d(pose.getRotation().getRadians() + Math.PI)));
+    }
+  }
+
   public ChassisSpeeds getChassisSpeeds(){
     return swerveDrive.getRobotVelocity();
   }
