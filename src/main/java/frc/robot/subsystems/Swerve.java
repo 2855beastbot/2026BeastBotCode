@@ -40,6 +40,7 @@ public class Swerve extends SubsystemBase {
   private Vision aimingCamera = new Vision(VisionConstants.aimingLimelightName, VisionConstants.aimingConfig);
   private final PIDController pointToPosePID = new PIDController(0.00000000005, 0.0, 0.00);
   private Pose2d targetHub;
+
   public Swerve() {
     double maximumSpeed = Units.feetToMeters(4.5);
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(),"swerve");
@@ -77,7 +78,7 @@ public class Swerve extends SubsystemBase {
   }
 
   /**
-   * 
+   * Primary method for driving robot
    * @param translation meters per second
    * @param rotation radians per second
    * @param fieldRelative
@@ -103,12 +104,6 @@ public class Swerve extends SubsystemBase {
   }
 
   public void setXMode(){
-    // SwerveModuleState[] swerveXModeStates = {
-    //   new SwerveModuleState(0, Rotation2d.fromDegrees(135)),
-    //   new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
-    //   new SwerveModuleState(0, Rotation2d.fromDegrees(135)),
-    //   new SwerveModuleState(0, Rotation2d.fromDegrees(45))};
-    // swerveDrive.setModuleStates(swerveXModeStates, false);
     swerveDrive.lockPose();
   }
 
@@ -136,11 +131,21 @@ public class Swerve extends SubsystemBase {
     swerveDrive.setChassisSpeeds(speed);
   }
 
+  /**
+   * Returns the angle of a line pointing from the robot's position to a specific position on the field
+   * @param targetPose position to point at
+   * @return angle from robot to target position
+   */
   public Rotation2d getPointAtPoseAngle(Pose2d targetPose){
     Translation2d delta = targetPose.getTranslation().minus(getPose2d().getTranslation());
     return new Rotation2d(delta.getX(), delta.getY());
   }
 
+  /**
+   * Returns the length of a line from the robot's position to a specific point on the field
+   * @param targetPose point to measure to
+   * @return distance from robot to point
+   */
   public double getDistanceFromPose(Pose2d targetPose){
     return targetPose.getTranslation().getDistance(getPose2d().getTranslation());
   }
@@ -236,15 +241,21 @@ public class Swerve extends SubsystemBase {
   @Override
   public void initSendable(SendableBuilder builder){
     super.initSendable(builder);
-    builder.addDoubleArrayProperty("SwervePoseEstimator pose", ()->new double[]{
-      getPose2d().getX(),
-      getPose2d().getY(),
-      getPose2d().getRotation().getDegrees()
-    }, null);
+    // builder.addDoubleArrayProperty("SwervePoseEstimator pose", ()->new double[]{
+    //   getPose2d().getX(),
+    //   getPose2d().getY(),
+    //   getPose2d().getRotation().getRadians()
+    // }, null);
+    builder.addDoubleProperty("Pose/X", () -> getPose2d().getX(), null);    
+    builder.addDoubleProperty("Pose/Y", () -> getPose2d().getY(), null);
+    builder.addDoubleProperty("Pose/Rotation", () -> getPose2d().getRotation().getRadians(), null);
+
+    builder.addDoubleProperty("Target/X", targetHub::getX, null);
+    builder.addDoubleProperty("Target/Y", targetHub::getY, null);
 
     builder.addDoubleProperty("dist to rpm val", ()->aimingCamera.getDistToRPMVal(), null);
     builder.addDoubleProperty("distance from hub", ()->getDistanceFromHub(), null);
-    builder.addDoubleProperty("angle to hub", ()->getAngleFromHub(), null);
+    builder.addDoubleProperty("angle from hub", ()->getAngleFromHub(), null);
     builder.addStringProperty("target hub", ()->getTargetHubAsString(), null);
     builder.addDoubleProperty("gyro heading", ()->swerveDrive.getGyro().getRotation3d().getAngle(), null);
     builder.addDoubleProperty("point at pose error", ()->getPointAtPoseError(), null);
