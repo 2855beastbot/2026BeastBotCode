@@ -59,7 +59,7 @@ public class Swerve extends SubsystemBase {
     configureAutoBuilder();
     swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(9999999, 9999999, 9999999)); // higher number means less trust
     //reiously0.7,0.7,9999999
-    pointToPosePID.enableContinuousInput(-180, 180);
+    pointToPosePID.enableContinuousInput(-Math.PI, Math.PI);
     pointToPosePID.setTolerance(2.0);
 
     var alliance = DriverStation.getAlliance();
@@ -100,7 +100,7 @@ public class Swerve extends SubsystemBase {
         translation.getY(), 
         getPointAtPoseAngle(targetHub).getRadians(),
         getPose2d().getRotation().getRadians(),
-        pointToPosePID.calculate(getAngleFromHub(), getPointAtPoseError()),
+        //pointToPosePID.calculate(getPose2d().getRotation().getRadians(), getPointAtPoseAngle(targetHub).getRadians()),
         getMaxTurnSpeed())
     );
   }
