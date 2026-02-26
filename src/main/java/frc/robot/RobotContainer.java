@@ -79,6 +79,7 @@ public class RobotContainer {
     SmartDashboard.putData(ballShooter);
     SmartDashboard.putData(indexer);
     SmartDashboard.putData(swerveDrive);
+    SmartDashboard.putData(swerveDrive.getAimingCamera());
     SmartDashboard.putData("auto selector", autoChooser);
     
     var alliance = DriverStation.getAlliance();

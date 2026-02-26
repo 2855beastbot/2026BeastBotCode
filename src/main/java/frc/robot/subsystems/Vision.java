@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
@@ -19,7 +20,10 @@ public class Vision extends SubsystemBase {
   public Vision(String name, double[] config) {
     this.name = name;
     LimelightHelpers.setCameraPose_RobotSpace(name, config[0], config[1], config[2], config[3], config[4], config[5]);
-    
+
+    // need to run this before using MegaTag2, according to docs
+    // yaw:0 is facing red alliance wall, the rest say "unnecessary" so ¯\_(ツ)_/¯
+    LimelightHelpers.SetRobotOrientation(name, 0, 0, 0, 0, 0, 0);
   }
 
   public double aimWithVision(){
@@ -71,10 +75,12 @@ public class Vision extends SubsystemBase {
   }
 
 
-
+  /**
+   * 
+   * @return
+   */
   public LimelightHelpers.PoseEstimate getMegaTag2(){
-    LimelightHelpers.PoseEstimate megaTag2 = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
-    return megaTag2;
+    return LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
   }
 
   
@@ -87,5 +93,24 @@ public class Vision extends SubsystemBase {
     }else{
       LimelightHelpers.SetThrottle(name, 0);
     }
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder){
+    super.initSendable(builder);
+
+    builder.addBooleanProperty("Has AprilTag", this::hasValidIDs, null);
+
+    builder.addDoubleProperty("MegaTag2/X", 
+      ()->LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name).pose.getX(), null);
+    builder.addDoubleProperty("MegaTag2/Y", 
+      ()->LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name).pose.getY(), null);
+    builder.addDoubleProperty("MegaTag2/Rotation (rad)", 
+      ()->LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name).pose.getRotation().getRadians(), null);
+
+    builder.addDoubleProperty("Pose/X", ()->LimelightHelpers.getBotPose2d(name).getX(), null);
+    builder.addDoubleProperty("Pose/Y", ()->LimelightHelpers.getBotPose2d(name).getY(), null);
+    builder.addDoubleProperty("Pose/Rotation (rad)", 
+      ()->LimelightHelpers.getBotPose2d(name).getRotation().getRadians(), null);
   }
 }
