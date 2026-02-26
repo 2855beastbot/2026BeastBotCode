@@ -57,7 +57,8 @@ public class Swerve extends SubsystemBase {
       e.printStackTrace();
     }
     configureAutoBuilder();
-    swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 9999999)); // higher number means less trust
+    swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(9999999, 9999999, 9999999)); // higher number means less trust
+    //reiously0.7,0.7,9999999
     pointToPosePID.enableContinuousInput(-180, 180);
     pointToPosePID.setTolerance(2.0);
 
@@ -220,6 +221,7 @@ public class Swerve extends SubsystemBase {
     if(aimingCamera.hasValidIDs()){
       swerveDrive.addVisionMeasurement(measurement.pose, measurement.timestampSeconds);
     }
+    
   }
 
   public Vision getAimingCamera(){
@@ -280,7 +282,7 @@ public class Swerve extends SubsystemBase {
     builder.addDoubleProperty("distance from hub", ()->getDistanceFromHub(), null);
     builder.addDoubleProperty("angle from hub", ()->getAngleFromHub(), null);
     builder.addStringProperty("target hub", ()->getTargetHubAsString(), null);
-    builder.addDoubleProperty("gyro heading", ()->swerveDrive.getGyro().getRotation3d().getAngle(), null);
+    builder.addDoubleProperty("gyro heading", ()->swerveDrive.getPose().getRotation().getRadians(), null);
     builder.addDoubleProperty("point at pose error", ()->getPointAtPoseError(), null);
   }
 }
