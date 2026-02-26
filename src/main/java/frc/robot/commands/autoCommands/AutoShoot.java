@@ -35,7 +35,7 @@ public class AutoShoot extends Command {
   @Override
   public void execute() {
     ballShooter.setRPMUse(true);
-    ballShooter.setTargetRPM(drivetrain.getAimingCamera().calculateRPMFromRange());
+    ballShooter.setTargetRPM(drivetrain.getDistanceFromHub());
     indexer.spin(1);
   }
 

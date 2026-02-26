@@ -38,7 +38,7 @@ public class Swerve extends SubsystemBase {
   private SwerveDrive swerveDrive;
   private RobotConfig config;
   private Vision aimingCamera = new Vision(VisionConstants.aimingLimelightName, VisionConstants.aimingConfig);
-  private final PIDController pointToPosePID = new PIDController(0.00000000005, 0.0, 0.00);
+  private final PIDController pointToPosePID = new PIDController(2.0, 0.0, 0.1);
   private Pose2d targetHub;
 
   public Swerve() {
@@ -57,7 +57,7 @@ public class Swerve extends SubsystemBase {
       e.printStackTrace();
     }
     configureAutoBuilder();
-    swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 9999999));
+    swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 9999999)); // higher number means less trust
     pointToPosePID.enableContinuousInput(-180, 180);
     pointToPosePID.setTolerance(2.0);
 
@@ -97,9 +97,10 @@ public class Swerve extends SubsystemBase {
       swerveDrive.getSwerveController().getTargetSpeeds(
         translation.getX(), 
         translation.getY(), 
-        getPointAtPoseAngle(targetHub).getRadians(), 
-        getPose2d().getRotation().getRadians(), 
-        getMaxDriveSpeed())
+        getPointAtPoseAngle(targetHub).getRadians(),
+        getPose2d().getRotation().getRadians(),
+        pointToPosePID.calculate(getAngleFromHub(), getPointAtPoseError()),
+        getMaxTurnSpeed())
     );
   }
 
@@ -113,6 +114,15 @@ public class Swerve extends SubsystemBase {
 
   public void resetOdometry(Pose2d pose){
     swerveDrive.resetOdometry(pose);
+  }
+
+  public void updateAlliance(){
+    var alliance = DriverStation.getAlliance();
+    if(alliance.isPresent()){
+        targetHub = (alliance.get() == Alliance.Blue) ? VisionConstants.blueHub : VisionConstants.redHub;
+      }else{
+        targetHub = VisionConstants.blueHub;
+      }
   }
 
   public void resetOdometryWithAlliance(Pose2d pose){
@@ -174,7 +184,7 @@ public class Swerve extends SubsystemBase {
   public double getPointAtPoseSpeed(){
     Rotation2d desiredAngle = getPointAtPoseAngle(targetHub);
     double speed = pointToPosePID.calculate(getPose2d().getRotation().getRadians(), desiredAngle.getRadians());
-    if (desiredAngle.getDegrees() < 3){
+    if (desiredAngle.getDegrees() > 3){
       return speed;
     }
     else{
@@ -234,6 +244,7 @@ public class Swerve extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     updatePoseWithVision();
+    
 
     //swerveDrive.field.getObject("Vision Pose").setPose(LimelightHelpers.getBotPose2d_wpiBlue(VisionConstants.aimingLimelightName));
   }
