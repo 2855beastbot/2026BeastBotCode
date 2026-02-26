@@ -116,6 +116,10 @@ public class Swerve extends SubsystemBase {
     swerveDrive.resetOdometry(pose);
   }
 
+
+  /**
+   * updates the target hub based on driver station
+   */
   public void updateAlliance(){
     var alliance = DriverStation.getAlliance();
     if(alliance.isPresent()){
@@ -125,6 +129,11 @@ public class Swerve extends SubsystemBase {
       }
   }
 
+
+  /**
+   * resets the pose of the robot to the passed in pose, rotating by 180  if in red alliance
+   * @param pose the pose to set to
+   */
   public void resetOdometryWithAlliance(Pose2d pose){
     if(targetHub == VisionConstants.blueHub){
       swerveDrive.resetOdometry(pose);
@@ -159,7 +168,10 @@ public class Swerve extends SubsystemBase {
   public double getDistanceFromPose(Pose2d targetPose){
     return targetPose.getTranslation().getDistance(getPose2d().getTranslation());
   }
-
+  /**
+   * gets the distance from the robot to the alliance hub
+   * @return the distance from the alliance hub
+   */
   public double getDistanceFromHub(){
     return getDistanceFromPose(targetHub);
   }
