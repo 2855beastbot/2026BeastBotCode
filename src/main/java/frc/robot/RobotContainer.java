@@ -105,7 +105,7 @@ public class RobotContainer {
      //.withControllerRotationAxis(()->driveController.getRightX())
      .deadband(0.3)
      .scaleTranslation(0.8)
-     .aim(VisionConstants.redHub)
+     .aim(targetHub)
      .aimWhile(()->true);
 
     new Trigger(()->DriverStation.isFMSAttached()).onTrue(new InstantCommand(()->swerveDrive.updateAlliance(), swerveDrive));
@@ -115,7 +115,7 @@ public class RobotContainer {
     new Trigger(()->driveController.getYButton()).whileTrue(new RunCommand(()->swerveDrive.setXMode(), swerveDrive));
     new Trigger(()->driveController.getRightTriggerAxis() > 0.5).whileTrue(new ParallelCommandGroup(
       swerveDrive.driveWithInputStream(driveWithPose),
-      new ShootWithRange(()->swerveDrive.getRPMFromRange(swerveDrive.getDistanceFromPose(targetHub)), ballShooter)
+      new ShootWithRange(()->swerveDrive.getRPMFromRange(swerveDrive.getDistanceFromHub()), ballShooter)
       ));
       
     /* 
