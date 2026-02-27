@@ -100,7 +100,8 @@ public class RobotContainer {
     new Trigger(()->DriverStation.isEnabled()).onTrue(new InstantCommand(()->swerveDrive.updateAlliance()));
 
     //Driver commands
-    new Trigger(()->driveController.getYButton()).whileTrue(new RunCommand(()->swerveDrive.setXMode(), swerveDrive));
+    new Trigger(()->driveController.getRightBumperButton()).whileTrue(new RunCommand(()->swerveDrive.setXMode(), swerveDrive));
+    /* 
     new Trigger(()->driveController.getRightTriggerAxis() > 0.5).whileTrue(new ParallelCommandGroup(new DriveWithAim(
       ()->-MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
       ()->-MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
@@ -108,6 +109,7 @@ public class RobotContainer {
        targetHub),
        new ShootWithRange(()->swerveDrive.getRPMFromRange(swerveDrive.getDistanceFromPose(targetHub)), ballShooter)
        ));
+       */
       
     /* 
     new Trigger(()->driveController.getLeftBumperButton()).whileTrue(new DriveWithRange(
@@ -117,21 +119,22 @@ public class RobotContainer {
     */
     new Trigger(()->driveController.getRawButton(8)).onTrue(new InstantCommand(()->swerveDrive.resetOdometry(new Pose2d())));
     new Trigger(()->driveController.getRawButton(7)).onTrue(new InstantCommand(()->swerveDrive.resetOdometry(swerveDrive.getAimingCamera().getPose())));
-    new Trigger(()->driveController.getXButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristOut)));
-    new Trigger(()->driveController.getAButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristMid)));
-    new Trigger(()->driveController.getBButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristIn)));
-    new Trigger(()->driveController.getRightBumperButton()).whileTrue(new Index(()->1, indexer));
-    new Trigger(()->driveController.getLeftTriggerAxis() > 0.3).whileTrue(new SpinIntake(()->driveController.getLeftTriggerAxis(), intake));
-    new Trigger(()->driveController.getLeftBumperButton()).whileTrue(new SpinIntake(()->-1, intake));
+    //new Trigger(()->driveController.getXButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristOut)));
+   // new Trigger(()->driveController.getAButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristMid)));
+    //new Trigger(()->driveController.getBButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristIn)));
+    //new Trigger(()->driveController.getRightBumperButton()).whileTrue(new Index(()->1, indexer));
+    //new Trigger(()->driveController.getLeftTriggerAxis() > 0.3).whileTrue(new SpinIntake(()->driveController.getLeftTriggerAxis(), intake));
+    //new Trigger(()->driveController.getLeftBumperButton()).whileTrue(new SpinIntake(()->-1, intake));
 
     //Operator Commands
     operatorController.rightBumper().whileTrue(new Index(()->1, indexer));
     operatorController.leftBumper().whileTrue(new SpinIntake(()->-1, intake));
     operatorController.x().onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristOut), intakeWrist));
     operatorController.b().onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristIn), intakeWrist));
+    operatorController.a().onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristMid), intakeWrist));
     //operatorController.a().onTrue(new DeployWrist(intake));
     operatorController.axisGreaterThan(2, 0.3).whileTrue(new SpinIntake(()->operatorController.getLeftTriggerAxis(), intake));
-    operatorController.axisGreaterThan(3, 0.3).whileTrue(new RunCommand(()->ballShooter.spin(operatorController.getRightTriggerAxis(), false), ballShooter));
+    operatorController.axisGreaterThan(3, 0.3).whileTrue(new ShootWithRange(()->swerveDrive.getDistanceFromHub(), ballShooter));
     operatorController.axisMagnitudeGreaterThan(1, 0.3).whileTrue(new MoveIntakeWrist(()->-operatorController.getLeftY(), intakeWrist));
     operatorController.button(8).onTrue(new InstantCommand(()->intakeWrist.zeroEncoders(), intakeWrist));
     
