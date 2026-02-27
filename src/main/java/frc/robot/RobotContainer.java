@@ -48,6 +48,7 @@ import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
+import swervelib.SwerveInputStream;
 
 public class RobotContainer {
   private Swerve swerveDrive = new Swerve();
@@ -63,7 +64,8 @@ public class RobotContainer {
   private String leftAuto = "Left";
   private String rightAuto = "Right";
   private Pose2d targetHub;
-
+   
+    
 
   public RobotContainer() {
     
@@ -96,18 +98,24 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
+    SwerveInputStream driveWithPose = SwerveInputStream.of(
+    swerveDrive.getSwerve(),
+     ()->-driveController.getLeftY(), 
+     ()->-driveController.getLeftX())
+     .withControllerRotationAxis(()->driveController.getRightX())
+     .deadband(0.3)
+     .scaleTranslation(0.8)
+     .aim(targetHub);
+
     new Trigger(()->DriverStation.isFMSAttached()).onTrue(new InstantCommand(()->swerveDrive.updateAlliance(), swerveDrive));
     new Trigger(()->DriverStation.isEnabled()).onTrue(new InstantCommand(()->swerveDrive.updateAlliance()));
 
     //Driver commands
     new Trigger(()->driveController.getYButton()).whileTrue(new RunCommand(()->swerveDrive.setXMode(), swerveDrive));
-    new Trigger(()->driveController.getRightTriggerAxis() > 0.5).whileTrue(new ParallelCommandGroup(new DriveWithAim(
-      ()->-MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
-      ()->-MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
-       swerveDrive,
-       targetHub),
-       new ShootWithRange(()->swerveDrive.getRPMFromRange(swerveDrive.getDistanceFromPose(targetHub)), ballShooter)
-       ));
+    new Trigger(()->driveController.getRightTriggerAxis() > 0.5).whileTrue(new ParallelCommandGroup(
+      swerveDrive.driveWithInputStream(driveWithPose),
+      new ShootWithRange(()->swerveDrive.getRPMFromRange(swerveDrive.getDistanceFromPose(targetHub)), ballShooter)
+      ));
       
     /* 
     new Trigger(()->driveController.getLeftBumperButton()).whileTrue(new DriveWithRange(

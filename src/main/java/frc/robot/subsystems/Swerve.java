@@ -24,11 +24,13 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.Constants.VisionConstants;
 import swervelib.SwerveDrive;
+import swervelib.SwerveInputStream;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
@@ -190,6 +192,10 @@ public class Swerve extends SubsystemBase {
     return getPointAtPoseAngle(targetHub).getRadians();
   }
 
+  public SwerveDrive getSwerve(){
+    return swerveDrive;
+  }
+
   public Pose2d getTargetHub(){
     return targetHub;
   }
@@ -244,6 +250,12 @@ public class Swerve extends SubsystemBase {
 
   public Optional<Alliance> getAlliance(){
     return DriverStation.getAlliance();
+  }
+
+  public Command driveWithInputStream(SwerveInputStream input){
+    return run(()->{
+    swerveDrive.driveFieldOriented(input.get());
+    });
   }
 
   
