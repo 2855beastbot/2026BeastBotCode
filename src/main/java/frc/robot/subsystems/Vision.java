@@ -24,6 +24,13 @@ public class Vision extends SubsystemBase {
     // need to run this before using MegaTag2, according to docs
     // yaw:0 is facing red alliance wall, the rest say "unnecessary" so ¯\_(ツ)_/¯
     LimelightHelpers.SetRobotOrientation(name, 0, 0, 0, 0, 0, 0);
+
+    LimelightHelpers.setFiducial3DOffset(name,
+    0.0,    // Forward offset
+    0.0,    // Side offset
+    0.5     // Height offset
+);
+
   }
 
   public double aimWithVision(){
