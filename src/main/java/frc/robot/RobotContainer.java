@@ -102,10 +102,11 @@ public class RobotContainer {
     swerveDrive.getSwerve(),
      ()->-driveController.getLeftY(), 
      ()->-driveController.getLeftX())
-     .withControllerRotationAxis(()->driveController.getRightX())
+     //.withControllerRotationAxis(()->driveController.getRightX())
      .deadband(0.3)
      .scaleTranslation(0.8)
-     .aim(targetHub);
+     .aim(VisionConstants.redHub)
+     .aimWhile(()->true);
 
     new Trigger(()->DriverStation.isFMSAttached()).onTrue(new InstantCommand(()->swerveDrive.updateAlliance(), swerveDrive));
     new Trigger(()->DriverStation.isEnabled()).onTrue(new InstantCommand(()->swerveDrive.updateAlliance()));

@@ -59,7 +59,7 @@ public class Swerve extends SubsystemBase {
       e.printStackTrace();
     }
     configureAutoBuilder();
-    swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 0.8)); // higher number means less trust
+    swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 0.5)); // higher number means less trust
     //reiously0.7,0.7,9999999
     pointToPosePID.enableContinuousInput(-Math.PI, Math.PI);
     pointToPosePID.setTolerance(2.0);
