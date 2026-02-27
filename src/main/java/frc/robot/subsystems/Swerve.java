@@ -38,7 +38,7 @@ public class Swerve extends SubsystemBase {
   private SwerveDrive swerveDrive;
   private RobotConfig config;
   private Vision aimingCamera = new Vision(VisionConstants.aimingLimelightName, VisionConstants.aimingConfig);
-  private final PIDController pointToPosePID = new PIDController(2.0, 0.0, 0.1);
+  private final PIDController pointToPosePID = new PIDController(0.7, 0.0, 0.1);
   private Pose2d targetHub;
 
   public Swerve() {
@@ -57,8 +57,9 @@ public class Swerve extends SubsystemBase {
       e.printStackTrace();
     }
     configureAutoBuilder();
-    swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 9999999)); // higher number means less trust
-    pointToPosePID.enableContinuousInput(-180, 180);
+    swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 0.8)); // higher number means less trust
+    //reiously0.7,0.7,9999999
+    pointToPosePID.enableContinuousInput(-Math.PI, Math.PI);
     pointToPosePID.setTolerance(2.0);
 
     var alliance = DriverStation.getAlliance();
@@ -92,6 +93,7 @@ public class Swerve extends SubsystemBase {
    * Drive robot while pointing at alliance hub
    * @param translation x and y speeds to drive at
    */
+  /* 
   public void drivePose(Translation2d translation){
     swerveDrive.drive(
       swerveDrive.getSwerveController().getTargetSpeeds(
@@ -99,10 +101,18 @@ public class Swerve extends SubsystemBase {
         translation.getY(), 
         getPointAtPoseAngle(targetHub).getRadians(),
         getPose2d().getRotation().getRadians(),
-        pointToPosePID.calculate(getAngleFromHub(), getPointAtPoseError()),
+        //pointToPosePID.calculate(getPose2d().getRotation().getRadians(), getPointAtPoseAngle(targetHub).getRadians()),
         getMaxTurnSpeed())
-    );
-  }
+    );}
+    */
+  
+    public void drivePose(Translation2d translation) { 
+      Rotation2d desiredAngle = getPointAtPoseAngle(targetHub); 
+      double rotationSpeed = pointToPosePID.calculate( 
+        getPose2d().getRotation().getRadians(), 
+        desiredAngle.getRadians()); 
+      swerveDrive.drive(translation, rotationSpeed, true, false); }
+
 
   public void setXMode(){
     swerveDrive.lockPose();
@@ -218,8 +228,10 @@ public class Swerve extends SubsystemBase {
     
     LimelightHelpers.PoseEstimate measurement = aimingCamera.getMegaTag2();
     if(aimingCamera.hasValidIDs()){
+      
       swerveDrive.addVisionMeasurement(measurement.pose, measurement.timestampSeconds);
     }
+    
   }
 
   public Vision getAimingCamera(){
@@ -280,7 +292,7 @@ public class Swerve extends SubsystemBase {
     builder.addDoubleProperty("distance from hub", ()->getDistanceFromHub(), null);
     builder.addDoubleProperty("angle from hub", ()->getAngleFromHub(), null);
     builder.addStringProperty("target hub", ()->getTargetHubAsString(), null);
-    builder.addDoubleProperty("gyro heading", ()->swerveDrive.getGyro().getRotation3d().getAngle(), null);
+    builder.addDoubleProperty("gyro heading", ()->swerveDrive.getPose().getRotation().getRadians(), null);
     builder.addDoubleProperty("point at pose error", ()->getPointAtPoseError(), null);
   }
 }
