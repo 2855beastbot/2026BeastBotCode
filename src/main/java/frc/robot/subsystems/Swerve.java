@@ -59,7 +59,7 @@ public class Swerve extends SubsystemBase {
       e.printStackTrace();
     }
     configureAutoBuilder();
-    swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 0.5)); // higher number means less trust
+    swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 9999999)); // higher number means less trust
     //reiously0.7,0.7,9999999
     pointToPosePID.enableContinuousInput(-Math.PI, Math.PI);
     pointToPosePID.setTolerance(2.0);
@@ -232,7 +232,7 @@ public class Swerve extends SubsystemBase {
   */
   public void updatePoseWithVision(){
     
-    LimelightHelpers.PoseEstimate measurement = aimingCamera.getMegaTag2(swerveDrive.getOdometryHeading().getRadians());
+    LimelightHelpers.PoseEstimate measurement = aimingCamera.getMegaTag2(swerveDrive.getPose());
     if(aimingCamera.hasValidIDs()){
       
       swerveDrive.addVisionMeasurement(measurement.pose, measurement.timestampSeconds);

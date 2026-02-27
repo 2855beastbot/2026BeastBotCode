@@ -79,8 +79,8 @@ public class Vision extends SubsystemBase {
    * 
    * @return
    */
-  public LimelightHelpers.PoseEstimate getMegaTag2(double robotYaw){
-    LimelightHelpers.SetRobotOrientation(name, robotYaw, 0, 0, 0, 0, 0);
+  public LimelightHelpers.PoseEstimate getMegaTag2(Pose2d pose){
+    LimelightHelpers.SetRobotOrientation(name, pose.getRotation().getRadians(), 0, 0, 0, 0, 0);
     return LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
   }
 
