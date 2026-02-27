@@ -232,7 +232,7 @@ public class Swerve extends SubsystemBase {
   */
   public void updatePoseWithVision(){
     
-    LimelightHelpers.PoseEstimate measurement = aimingCamera.getMegaTag2();
+    LimelightHelpers.PoseEstimate measurement = aimingCamera.getMegaTag2(swerveDrive.getOdometryHeading().getRadians());
     if(aimingCamera.hasValidIDs()){
       
       swerveDrive.addVisionMeasurement(measurement.pose, measurement.timestampSeconds);
