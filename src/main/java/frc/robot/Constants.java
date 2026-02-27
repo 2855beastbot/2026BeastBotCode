@@ -84,8 +84,8 @@ public class Constants {
         public static final double aimingTagHeight = 1.12395; //meter
 
         public static final double[] aimingConfig = {
-            -0.26, //forward (m) intake positive
-            0.24, //side (m) left positive
+            -0.2925, //forward (m) intake positive
+            0.2433, //side (m) left positive
             0.185, //up (m) 
             4.0, //roll (deg) around Y axis
             28.0, //pitch (deg) around X axis
