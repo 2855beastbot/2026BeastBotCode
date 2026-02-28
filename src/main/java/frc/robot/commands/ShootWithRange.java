@@ -15,11 +15,11 @@ import frc.robot.subsystems.Vision;
 public class ShootWithRange extends Command {
   /** Creates a new ShootWithRange. */
   private Shooter ballShooter;
-  private DoubleSupplier distance;
-  public ShootWithRange(DoubleSupplier distance, Shooter shooter) {
+  private DoubleSupplier RPM;
+  public ShootWithRange(DoubleSupplier targetRPM, Shooter shooter) {
     addRequirements(shooter);
     ballShooter = shooter;
-    this.distance = distance;
+    this.RPM = targetRPM;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -32,13 +32,13 @@ public class ShootWithRange extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    ballShooter.setTargetRPM(distance.getAsDouble());
+    ballShooter.setTargetRPM(RPM.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    ballShooter.setTargetRPM(0);    
+    ballShooter.spin(0, false); 
     //aimingCamera.setValidIDs(VisionConstants.allIDs);
   }
 
