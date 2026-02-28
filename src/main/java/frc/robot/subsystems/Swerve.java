@@ -229,42 +229,57 @@ public class Swerve extends SubsystemBase {
   }
 
 
-  double minimumXYstd = 0.3;
-  double maximumXYstd = 5.0;
-  double deviationToReject = 3.0;
+    // ...existing code...
+    double minimumXYstd = 0.3;
+    double maximumXYstd = 5.0;
+    double deviationToReject = 3.0;
 
-  public void setVisionStdDynamic(Pose2d newPose2dFromVision) {
-    RawFiducial[] tagsSeen = LimelightHelpers.getRawFiducials(aimingCamera.getName());
+    public void setVisionStdDynamic(Pose2d newPose2dFromVision) {
+      RawFiducial[] tagsSeen = LimelightHelpers.getRawFiducials(aimingCamera.getName());
 
-    if (tagsSeen == null || tagsSeen.length == 0) {
-      // No tags — don't trust vision at all
-      swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(9999999, 9999999, 9999999));
-      return;
+      if (tagsSeen == null || tagsSeen.length == 0) {
+        // No tags — don't trust vision at all
+        swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(9999999, 9999999, 9999999));
+        return;
+      }
+
+      // Find average distance to all visible tags
+      double totalDistance = 0.0;
+      for (RawFiducial tag : tagsSeen) {
+        totalDistance += tag.distToCamera;
+      }
+      double avgDistance = totalDistance / tagsSeen.length;
+
+      // When disabled, trust vision heavily so starting pose converges quickly
+      if (DriverStation.isDisabled()) {
+        // Scale lightly with distance but keep very low std devs
+        double disabledStd = 0.1 * avgDistance / tagsSeen.length;
+        disabledStd = Math.max(0.05, Math.min(disabledStd, 0.5));
+        swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(disabledStd, disabledStd, 9999999));
+        return;
+      }
+
+      // --- Normal enabled behavior below ---
+
+      // Squaring the distance better represents real-world vision noise
+      double newXYstd = (0.5 * Math.pow(avgDistance, 2)) / tagsSeen.length;
+
+      // Soft-clamp the pose jump based on tag count and distance
+      double poseJump = newPose2dFromVision.getTranslation().getDistance(getPose2d().getTranslation());
+      if (poseJump > deviationToReject) {
+        if (tagsSeen.length >= 2 && avgDistance < 2.0) {
+          // We see multiple tags up close. We probably actually got pushed.
+          // Don't penalize.
+        } else {
+          newXYstd *= 3.0; // Heavily distrust large jumps on single/far tags
+        }
+      }
+
+      // Clamp to reasonable range
+      newXYstd = Math.max(minimumXYstd, Math.min(newXYstd, maximumXYstd));
+
+      swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(newXYstd, newXYstd, 9999999));
     }
-
-    // Find average distance to all visible tags
-    double totalDistance = 0.0;
-    for (RawFiducial tag : tagsSeen) {
-      totalDistance += tag.distToCamera;
-    }
-    double avgDistance = totalDistance / tagsSeen.length;
-
-    // Base std: scales with distance, inversely with tag count
-    // More tags + closer = lower std = more trust
-    double newXYstd = (0.5 * avgDistance) / tagsSeen.length;
-
-    // Reject or penalize large jumps in position
-    double poseJump = newPose2dFromVision.getTranslation().getDistance(getPose2d().getTranslation());
-    if (poseJump > deviationToReject) {
-      newXYstd *= 3.0; // heavily distrust large jumps
-    }
-
-    // Clamp to reasonable range
-    newXYstd = Math.max(minimumXYstd, Math.min(newXYstd, maximumXYstd));
-
-    swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(newXYstd, newXYstd, 9999999));
-  }
-
 
 
   /* 
