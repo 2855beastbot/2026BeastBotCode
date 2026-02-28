@@ -38,12 +38,13 @@ public class ShootWithRange extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    ballShooter.setTargetRPM(0);    
     //aimingCamera.setValidIDs(VisionConstants.allIDs);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }

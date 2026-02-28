@@ -44,7 +44,7 @@ public class Swerve extends SubsystemBase {
   private SwerveDrive swerveDrive;
   private RobotConfig config;
   private Vision aimingCamera = new Vision(VisionConstants.aimingLimelightName, VisionConstants.aimingConfig);
-  private final PIDController pointToPosePID = new PIDController(0.7, 0.0, 0.1);
+  private final PIDController pointToPosePID = new PIDController(5.0, 0.0, 0.1);
   private Pose2d targetHub;
 
   public Swerve() {
@@ -173,7 +173,7 @@ public class Swerve extends SubsystemBase {
    */
   public Rotation2d getPointAtPoseAngle(Pose2d targetPose){
     Translation2d delta = targetPose.getTranslation().minus(getPose2d().getTranslation());
-    return new Rotation2d(delta.getX(), delta.getY());
+    return new Rotation2d(delta.getX(), delta.getY()).plus(new Rotation2d(Math.PI));
   }
 
   /**
@@ -297,7 +297,9 @@ public class Swerve extends SubsystemBase {
       ()->{var alliance = DriverStation.getAlliance();
           if(alliance.isPresent()){
             return alliance.get() == DriverStation.Alliance.Red;
-          } return true;
+          } else {
+            return true;
+          }
         }, 
       this);
   }

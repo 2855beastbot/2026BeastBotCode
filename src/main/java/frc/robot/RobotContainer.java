@@ -150,19 +150,39 @@ public class RobotContainer {
     operatorController.b().onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristIn), intakeWrist));
     //operatorController.a().onTrue(new DeployWrist(intake));
     operatorController.axisGreaterThan(2, 0.3).whileTrue(new SpinIntake(()->operatorController.getLeftTriggerAxis(), intake));
-    operatorController.axisGreaterThan(3, 0.3).whileTrue(new RunCommand(()->ballShooter.spin(operatorController.getRightTriggerAxis(), false), ballShooter));
+    // operatorController.axisGreaterThan(3, 0.3).whileTrue(new RunCommand(()->ballShooter.spin(operatorController.getRightTriggerAxis(), false), ballShooter));
     operatorController.axisMagnitudeGreaterThan(1, 0.3).whileTrue(new MoveIntakeWrist(()->-operatorController.getLeftY(), intakeWrist));
     operatorController.button(8).onTrue(new InstantCommand(()->intakeWrist.zeroEncoders(), intakeWrist));
     
   }
 
   private void setDefaultCommands(){
-    swerveDrive.setDefaultCommand(new Drive(
-      ()->-MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
-      ()->-MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
-      ()->driveController.getRightX(),
-      swerveDrive
-    ));
+      // var alliance = DriverStation.getAlliance();
+      // if(alliance.isPresent()){
+      //   if(alliance.get() == Alliance.Blue) {
+      //     swerveDrive.setDefaultCommand(new Drive(
+      //       ()->-MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
+      //       ()->-MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
+      //       ()->-driveController.getRightX(),
+      //       swerveDrive));
+      //   } else {
+      //     swerveDrive.setDefaultCommand(new Drive(
+      //       ()->MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
+      //       ()->MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
+      //       ()->-driveController.getRightX(),
+      //       swerveDrive));
+      //   }
+      // }
+
+
+        swerveDrive.setDefaultCommand(new Drive(
+          ()->-MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
+          ()->-MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
+          ()->-driveController.getRightX(),
+          swerveDrive));
+
+
+
   }
 
   public Command getAutonomousCommand() {
