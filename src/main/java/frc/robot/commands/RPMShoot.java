@@ -18,6 +18,7 @@ public class RPMShoot extends Command {
 
   public RPMShoot(DoubleSupplier speed, Shooter ballShooter) {
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(ballShooter);
     targetRPM = speed;
     shooter = ballShooter;
   }
