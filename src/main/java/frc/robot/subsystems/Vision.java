@@ -17,6 +17,11 @@ public class Vision extends SubsystemBase {
   /** Creates a new Vision. */
   
   private String name;
+
+  public String getLimelightName(){
+    return name;
+  }
+
   public Vision(String name, double[] config) {
     this.name = name;
     LimelightHelpers.setCameraPose_RobotSpace(name, config[0], config[1], config[2], config[3], config[4], config[5]);
