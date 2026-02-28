@@ -76,6 +76,7 @@ public class Shooter extends SubsystemBase {
    * @param RPM the target RPM to set
    */
   public void setTargetRPM(double RPM){
+    setRPMUse(true);
     targetRPS = RPM / 60.0;
   }
 
@@ -111,5 +112,6 @@ public class Shooter extends SubsystemBase {
     builder.addDoubleProperty("Right/RPS", () -> right.getVelocity().getValueAsDouble(), null);
     builder.addDoubleProperty("Right/Current (A)", () -> right.getSupplyCurrent().getValueAsDouble(), null);
     builder.addDoubleProperty("Right/Temperature (C)", () -> right.getDeviceTemp().getValueAsDouble(), null);
+    builder.addBooleanProperty("isUsingRPM", this::getRPMUse, null);
   }
 }

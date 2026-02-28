@@ -43,6 +43,7 @@ public class AutoShoot extends Command {
   @Override
   public void end(boolean interrupted) {
     indexer.spin(0);
+    ballShooter.spin(0, false);
   }
 
   // Returns true when the command should end.
