@@ -85,11 +85,11 @@ public class Constants {
 
         public static final double[] aimingConfig = {
             -0.2925, //forward (m) intake positive
-            0.2433, //side (m) left positive
-            0.185, //up (m) 
-            4.0, //roll (deg) around Y axis
-            28.0, //pitch (deg) around X axis
-            180 //yaw (deg) around Z axis
+            -0.2433, //side (m) left positive
+            0.15, //up (m) 
+            178, //roll (deg) around Y axis
+            38.0, //pitch (deg) around X axis
+            175 //yaw (deg) around Z axis
         };
 
         public static final double[] locationConfig = {
