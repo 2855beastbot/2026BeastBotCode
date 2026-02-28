@@ -150,9 +150,10 @@ public class RobotContainer {
     operatorController.b().onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristIn), intakeWrist));
     //operatorController.a().onTrue(new DeployWrist(intake));
     operatorController.axisGreaterThan(2, 0.3).whileTrue(new SpinIntake(()->operatorController.getLeftTriggerAxis(), intake));
-    // operatorController.axisGreaterThan(3, 0.3).whileTrue(new RunCommand(()->ballShooter.spin(operatorController.getRightTriggerAxis(), false), ballShooter));
+    operatorController.axisGreaterThan(3, 0.3).whileTrue(new RunCommand(()->ballShooter.spin(operatorController.getRightTriggerAxis(), false), ballShooter));
     operatorController.axisMagnitudeGreaterThan(1, 0.3).whileTrue(new MoveIntakeWrist(()->-operatorController.getLeftY(), intakeWrist));
     operatorController.button(8).onTrue(new InstantCommand(()->intakeWrist.zeroEncoders(), intakeWrist));
+    operatorController.y().whileTrue(new RunCommand(()->ballShooter.spin(4000, true), ballShooter));
     
   }
 

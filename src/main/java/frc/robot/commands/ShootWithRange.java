@@ -32,7 +32,7 @@ public class ShootWithRange extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    ballShooter.setTargetRPM(RPM.getAsDouble());
+    ballShooter.spin(RPM.getAsDouble(), true);
   }
 
   // Called once the command ends or is interrupted.
