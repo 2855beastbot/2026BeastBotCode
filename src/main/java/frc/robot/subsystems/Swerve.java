@@ -229,26 +229,44 @@ public class Swerve extends SubsystemBase {
   }
 
 
-  double baseXYstd = 1.5;
-  double minimumXYstd = 1.0;
-  double deviationToReject = 2.0;
-  //assumes you can see at least 1 tag
+  double minimumXYstd = 0.3;
+  double maximumXYstd = 5.0;
+  double deviationToReject = 3.0;
+
   public void setVisionStdDynamic(Pose2d newPose2dFromVision) {
     RawFiducial[] tagsSeen = LimelightHelpers.getRawFiducials(aimingCamera.getName());
-    double distanceToNearestTag = tagsSeen[0].distToCamera;
-    for(RawFiducial tag : tagsSeen) {
-      if(tag.distToCamera < distanceToNearestTag) {
-        distanceToNearestTag = tag.distToCamera;
-      }
-    }
-    double newXYstd = baseXYstd * distanceToNearestTag;
-    newXYstd = (newXYstd < minimumXYstd) ? minimumXYstd : newXYstd;
 
-    if(newPose2dFromVision.getTranslation().getDistance(getPose2d().getTranslation()) > deviationToReject) {
-      newXYstd *= 2; //trust data two times less if the robot position instantly jumps really quickly
+    if (tagsSeen == null || tagsSeen.length == 0) {
+      // No tags — don't trust vision at all
+      swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(9999999, 9999999, 9999999));
+      return;
     }
+
+    // Find average distance to all visible tags
+    double totalDistance = 0.0;
+    for (RawFiducial tag : tagsSeen) {
+      totalDistance += tag.distToCamera;
+    }
+    double avgDistance = totalDistance / tagsSeen.length;
+
+    // Base std: scales with distance, inversely with tag count
+    // More tags + closer = lower std = more trust
+    double newXYstd = (0.5 * avgDistance) / tagsSeen.length;
+
+    // Reject or penalize large jumps in position
+    double poseJump = newPose2dFromVision.getTranslation().getDistance(getPose2d().getTranslation());
+    if (poseJump > deviationToReject) {
+      newXYstd *= 3.0; // heavily distrust large jumps
+    }
+
+    // Clamp to reasonable range
+    newXYstd = Math.max(minimumXYstd, Math.min(newXYstd, maximumXYstd));
+
     swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(newXYstd, newXYstd, 9999999));
   }
+
+
+
   /* 
   public double getPointAtSpeedUsingRelative(Pose2d target){
     double kP = 0.017;
@@ -260,7 +278,7 @@ public class Swerve extends SubsystemBase {
     
     LimelightHelpers.PoseEstimate measurement = aimingCamera.getMegaTag2(swerveDrive.getPose());
     if(aimingCamera.hasValidIDs()){
-      // setVisionStdDynamic(measurement.pose);
+      setVisionStdDynamic(measurement.pose);
       swerveDrive.addVisionMeasurement(measurement.pose, measurement.timestampSeconds);
     }
     
