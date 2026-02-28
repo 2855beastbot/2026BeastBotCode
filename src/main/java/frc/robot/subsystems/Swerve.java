@@ -234,27 +234,73 @@ public class Swerve extends SubsystemBase {
     double maximumXYstd = 5.0;
     double deviationToReject = 3.0;
 
+    // Debug tracking variables for Elastic telemetry
+    private double debugXYstd = 9999999;
+    private int debugTagCount = 0;
+    private double debugAvgTagDist = 0;
+    private double debugPoseJump = 0;
+    private String debugTagIDs = "none";
+    private String debugTagDistances = "none";
+    private String debugTagAmbiguities = "none";
+    private double debugVisionPoseX = 0;
+    private double debugVisionPoseY = 0;
+    private double debugVisionPoseRot = 0;
+    private boolean debugHasValidIDs = false;
+    private String debugStdReason = "no tags";
+    private double debugTimestamp = 0;
+    private int debugMT2TagCount = 0;
+    private double debugMT2AvgTagDist = 0;
+
     public void setVisionStdDynamic(Pose2d newPose2dFromVision) {
-      RawFiducial[] tagsSeen = LimelightHelpers.getRawFiducials(aimingCamera.getName());
+      RawFiducial[] tagsSeen = LimelightHelpers.getRawFiducials(aimingCamera.getLimelightName());
+
+      // Update vision pose debug
+      debugVisionPoseX = newPose2dFromVision.getX();
+      debugVisionPoseY = newPose2dFromVision.getY();
+      debugVisionPoseRot = newPose2dFromVision.getRotation().getDegrees();
 
       if (tagsSeen == null || tagsSeen.length == 0) {
         // No tags — don't trust vision at all
+        debugTagCount = 0;
+        debugAvgTagDist = 0;
+        debugXYstd = 9999999;
+        debugPoseJump = 0;
+        debugTagIDs = "none";
+        debugTagDistances = "none";
+        debugTagAmbiguities = "none";
+        debugStdReason = "NO TAGS SEEN";
         swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(9999999, 9999999, 9999999));
         return;
       }
 
-      // Find average distance to all visible tags
+      // Populate per-tag debug info
+      debugTagCount = tagsSeen.length;
+      StringBuilder ids = new StringBuilder();
+      StringBuilder dists = new StringBuilder();
+      StringBuilder ambigs = new StringBuilder();
       double totalDistance = 0.0;
-      for (RawFiducial tag : tagsSeen) {
+      for (int i = 0; i < tagsSeen.length; i++) {
+        RawFiducial tag = tagsSeen[i];
         totalDistance += tag.distToCamera;
+        if (i > 0) { ids.append(", "); dists.append(", "); ambigs.append(", "); }
+        ids.append(tag.id);
+        dists.append(String.format("%.2f", tag.distToCamera));
+        ambigs.append(String.format("%.3f", tag.ambiguity));
       }
       double avgDistance = totalDistance / tagsSeen.length;
+      debugAvgTagDist = avgDistance;
+      debugTagIDs = ids.toString();
+      debugTagDistances = dists.toString();
+      debugTagAmbiguities = ambigs.toString();
 
       // When disabled, trust vision heavily so starting pose converges quickly
       if (DriverStation.isDisabled()) {
         // Scale lightly with distance but keep very low std devs
         double disabledStd = 0.1 * avgDistance / tagsSeen.length;
         disabledStd = Math.max(0.05, Math.min(disabledStd, 0.5));
+        debugXYstd = disabledStd;
+        debugPoseJump = 0;
+        debugStdReason = "DISABLED (trusting vision)";
         swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(disabledStd, disabledStd, 9999999));
         return;
       }
@@ -266,17 +312,22 @@ public class Swerve extends SubsystemBase {
 
       // Soft-clamp the pose jump based on tag count and distance
       double poseJump = newPose2dFromVision.getTranslation().getDistance(getPose2d().getTranslation());
+      debugPoseJump = poseJump;
+
       if (poseJump > deviationToReject) {
         if (tagsSeen.length >= 2 && avgDistance < 2.0) {
-          // We see multiple tags up close. We probably actually got pushed.
-          // Don't penalize.
+          debugStdReason = String.format("JUMP %.2fm but multi-tag close (kept)", poseJump);
         } else {
           newXYstd *= 3.0; // Heavily distrust large jumps on single/far tags
+          debugStdReason = String.format("JUMP %.2fm PENALIZED x3", poseJump);
         }
+      } else {
+        debugStdReason = String.format("Normal (jump=%.2fm)", poseJump);
       }
 
       // Clamp to reasonable range
       newXYstd = Math.max(minimumXYstd, Math.min(newXYstd, maximumXYstd));
+      debugXYstd = newXYstd;
 
       swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(newXYstd, newXYstd, 9999999));
     }
@@ -292,7 +343,19 @@ public class Swerve extends SubsystemBase {
   public void updatePoseWithVision(){
     
     LimelightHelpers.PoseEstimate measurement = aimingCamera.getMegaTag2(swerveDrive.getPose());
-    if(aimingCamera.hasValidIDs()){
+    debugHasValidIDs = aimingCamera.hasValidIDs();
+
+    if (measurement != null) {
+      debugMT2TagCount = measurement.tagCount;
+      debugMT2AvgTagDist = measurement.avgTagDist;
+      debugTimestamp = measurement.timestampSeconds;
+    } else {
+      debugMT2TagCount = 0;
+      debugMT2AvgTagDist = 0;
+      debugTimestamp = 0;
+    }
+
+    if(debugHasValidIDs && measurement != null){
       setVisionStdDynamic(measurement.pose);
       swerveDrive.addVisionMeasurement(measurement.pose, measurement.timestampSeconds);
     }
@@ -370,5 +433,35 @@ public class Swerve extends SubsystemBase {
     builder.addStringProperty("target hub", ()->getTargetHubAsString(), null);
     builder.addDoubleProperty("gyro heading", ()->swerveDrive.getPose().getRotation().getRadians(), null);
     builder.addDoubleProperty("point at pose error", ()->getPointAtPoseError(), null);
+
+    // ===== Vision Debug Telemetry =====
+    // Tag detection
+    builder.addBooleanProperty("Vision/HasValidIDs", () -> debugHasValidIDs, null);
+    builder.addIntegerProperty("Vision/RawFiducial TagCount", () -> debugTagCount, null);
+    builder.addStringProperty("Vision/Tag IDs", () -> debugTagIDs, null);
+    builder.addStringProperty("Vision/Tag Distances", () -> debugTagDistances, null);
+    builder.addStringProperty("Vision/Tag Ambiguities", () -> debugTagAmbiguities, null);
+    builder.addDoubleProperty("Vision/Avg Tag Distance", () -> debugAvgTagDist, null);
+
+    // MegaTag2 info
+    builder.addIntegerProperty("Vision/MT2 TagCount", () -> debugMT2TagCount, null);
+    builder.addDoubleProperty("Vision/MT2 AvgTagDist", () -> debugMT2AvgTagDist, null);
+    builder.addDoubleProperty("Vision/MT2 Timestamp", () -> debugTimestamp, null);
+
+    // Std deviation info
+    builder.addDoubleProperty("Vision/XY StdDev", () -> debugXYstd, null);
+    builder.addStringProperty("Vision/StdDev Reason", () -> debugStdReason, null);
+    builder.addDoubleProperty("Vision/Pose Jump (m)", () -> debugPoseJump, null);
+
+    // Vision pose estimate
+    builder.addDoubleProperty("Vision/VisionPose X", () -> debugVisionPoseX, null);
+    builder.addDoubleProperty("Vision/VisionPose Y", () -> debugVisionPoseY, null);
+    builder.addDoubleProperty("Vision/VisionPose Rot (deg)", () -> debugVisionPoseRot, null);
+
+    // Odometry vs Vision comparison
+    builder.addDoubleProperty("Vision/OdoPose X", () -> getPose2d().getX(), null);
+    builder.addDoubleProperty("Vision/OdoPose Y", () -> getPose2d().getY(), null);
+    builder.addDoubleProperty("Vision/Odo-Vision DeltaX", () -> getPose2d().getX() - debugVisionPoseX, null);
+    builder.addDoubleProperty("Vision/Odo-Vision DeltaY", () -> getPose2d().getY() - debugVisionPoseY, null);
   }
 }
