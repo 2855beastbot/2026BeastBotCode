@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.MessageDigest;
 import java.util.Optional;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -23,12 +24,15 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.LimelightHelpers.RawFiducial;
 import swervelib.SwerveDrive;
 import swervelib.SwerveInputStream;
 import swervelib.parser.SwerveParser;
@@ -59,7 +63,7 @@ public class Swerve extends SubsystemBase {
       e.printStackTrace();
     }
     configureAutoBuilder();
-    swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 0.8)); // higher number means less trust
+    swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(1.5, 1.5, 9999999)); // higher number means less trust
     //reiously0.7,0.7,9999999
     pointToPosePID.enableContinuousInput(-Math.PI, Math.PI);
     pointToPosePID.setTolerance(2.0);
@@ -223,6 +227,28 @@ public class Swerve extends SubsystemBase {
   public double getPointAtPoseError(){
     return getAngleFromHub() - getPose2d().getRotation().getRadians();
   }
+
+
+  double baseXYstd = 1.5;
+  double minimumXYstd = 1.0;
+  double deviationToReject = 2.0;
+  //assumes you can see at least 1 tag
+  public void setVisionStdDynamic(Pose2d newPose2dFromVision) {
+    RawFiducial[] tagsSeen = LimelightHelpers.getRawFiducials(aimingCamera.getName());
+    double distanceToNearestTag = tagsSeen[0].distToCamera;
+    for(RawFiducial tag : tagsSeen) {
+      if(tag.distToCamera < distanceToNearestTag) {
+        distanceToNearestTag = tag.distToCamera;
+      }
+    }
+    double newXYstd = baseXYstd * distanceToNearestTag;
+    newXYstd = (newXYstd < minimumXYstd) ? minimumXYstd : newXYstd;
+
+    if(newPose2dFromVision.getTranslation().getDistance(getPose2d().getTranslation()) > deviationToReject) {
+      newXYstd *= 2; //trust data two times less if the robot position instantly jumps really quickly
+    }
+    swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(newXYstd, newXYstd, 9999999));
+  }
   /* 
   public double getPointAtSpeedUsingRelative(Pose2d target){
     double kP = 0.017;
@@ -234,7 +260,7 @@ public class Swerve extends SubsystemBase {
     
     LimelightHelpers.PoseEstimate measurement = aimingCamera.getMegaTag2(swerveDrive.getPose());
     if(aimingCamera.hasValidIDs()){
-      
+      // setVisionStdDynamic(measurement.pose);
       swerveDrive.addVisionMeasurement(measurement.pose, measurement.timestampSeconds);
     }
     
@@ -293,6 +319,9 @@ public class Swerve extends SubsystemBase {
     //   getPose2d().getY(),
     //   getPose2d().getRotation().getRadians()
     // }, null);
+
+    
+    // Field2d theField(Field2d) Shuffleboard.getTab("field").
     builder.addDoubleProperty("Pose/X", () -> getPose2d().getX(), null);    
     builder.addDoubleProperty("Pose/Y", () -> getPose2d().getY(), null);
     builder.addDoubleProperty("Pose/Rotation", () -> getPose2d().getRotation().getRadians(), null);

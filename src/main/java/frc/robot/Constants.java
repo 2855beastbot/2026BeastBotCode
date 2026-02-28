@@ -74,7 +74,7 @@ public class Constants {
         public static final double idealShootingRange = 2;
 
         public static final Pose2d blueHub = new Pose2d(4.52844, 4.11861, new Rotation2d());
-        public static final Pose2d redHub = new Pose2d(12.01204, 3.61861, new Rotation2d());//ws4.11861
+        public static final Pose2d redHub = new Pose2d(12.01204, 4.111861, new Rotation2d());//ws4.11861
 
         /**
          * 1 meter to number of rpm
