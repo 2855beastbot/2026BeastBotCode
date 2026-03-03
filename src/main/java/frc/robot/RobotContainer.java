@@ -26,7 +26,9 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.LEDConstants;
@@ -67,7 +69,7 @@ public class RobotContainer {
   private String rightAuto = "Right";
   private Pose2d targetHub;
    
-    
+  private SequentialCommandGroup wristJuggle = new SequentialCommandGroup(new WristJuggle(intakeWrist, SubsystemConstants.wristMid), new WristJuggle(intakeWrist, SubsystemConstants.wristIn));   
 
   public RobotContainer() {
     
@@ -85,6 +87,7 @@ public class RobotContainer {
     SmartDashboard.putData(swerveDrive);
     SmartDashboard.putData(swerveDrive.getAimingCamera());
     SmartDashboard.putData("auto selector", autoChooser);
+    SmartDashboard.putData(intakeWrist);
     
     var alliance = DriverStation.getAlliance();
     if(alliance.isPresent()){
@@ -111,8 +114,8 @@ public class RobotContainer {
     .aimWhile(()->true);
 
 
-    new Trigger(()->DriverStation.isFMSAttached()).onTrue(new InstantCommand(()->swerveDrive.updateAlliance(), swerveDrive));
-    new Trigger(()->DriverStation.isEnabled()).onTrue(new InstantCommand(()->swerveDrive.updateAlliance()));
+    new Trigger(()->DriverStation.isFMSAttached()).onTrue(new InstantCommand(()->swerveDrive.updateAlliance(), swerveDrive).alongWith(new InstantCommand(()->setDefaultCommands())));
+    new Trigger(()->DriverStation.isEnabled()).onTrue(new InstantCommand(()->swerveDrive.updateAlliance()).alongWith(new InstantCommand(()->setDefaultCommands())));
 
     //Driver commands
     new Trigger(()->driveController.getYButton()).whileTrue(new RunCommand(()->swerveDrive.setXMode(), swerveDrive));
@@ -133,7 +136,7 @@ public class RobotContainer {
     */
     new Trigger(()->driveController.getRawButton(8)).onTrue(new InstantCommand(()->swerveDrive.resetOdometryWithAlliance(new Pose2d(swerveDrive.getPose2d().getX(), swerveDrive.getPose2d().getX(), new Rotation2d()))));
     new Trigger(()->driveController.getRawButton(7)).onTrue(new InstantCommand(()->swerveDrive.resetOdometryWithAlliance(swerveDrive.getAimingCamera().getPose())));
-    new Trigger(()->driveController.getXButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristOut)));
+    new Trigger(()->driveController.getXButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristOut)).alongWith(new PrintCommand("intake out")));
     new Trigger(()->driveController.getAButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristMid)));
     new Trigger(()->driveController.getBButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristIn)));
     // new Trigger(()->driveController.getRightBumperButton()).whileTrue(new Index(()->1, indexer));
@@ -141,7 +144,7 @@ public class RobotContainer {
     new Trigger(()->driveController.getLeftBumperButton()).whileTrue(new SpinIntake(()->-1, intake));
 
 
-    new Trigger(()->driveController.getRightBumperButton()).whileTrue(new ParallelCommandGroup(new Index(()->1, indexer), new WristJuggle(intakeWrist)));
+    new Trigger(()->driveController.getRightBumperButton()).whileTrue(new ParallelCommandGroup(new Index(()->1, indexer), wristJuggle));
 
     //Operator Commands
     operatorController.rightBumper().whileTrue(new Index(()->1, indexer));
@@ -158,37 +161,32 @@ public class RobotContainer {
   }
 
   private void setDefaultCommands(){
-      // var alliance = DriverStation.getAlliance();
-      // if(alliance.isPresent()){
-      //   if(alliance.get() == Alliance.Blue) {
-      //     swerveDrive.setDefaultCommand(new Drive(
-      //       ()->-MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
-      //       ()->-MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
-      //       ()->-driveController.getRightX(),
-      //       swerveDrive));
-      //   } else {
-      //     swerveDrive.setDefaultCommand(new Drive(
-      //       ()->MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
-      //       ()->MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
-      //       ()->-driveController.getRightX(),
-      //       swerveDrive));
-      //   }
-      // }
+      var alliance = DriverStation.getAlliance();
+      if(alliance.isPresent()){
+        if(alliance.get() == Alliance.Blue) {
+          swerveDrive.setDefaultCommand(new Drive(
+            ()->-MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
+            ()->-MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
+            ()->-driveController.getRightX(),
+            swerveDrive));
+        } else {
+          swerveDrive.setDefaultCommand(new Drive(
+            ()->-MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
+            ()->-MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
+            ()->-driveController.getRightX(),
+            swerveDrive));
+        }
+      }
 
 
-        swerveDrive.setDefaultCommand(new Drive(
-          ()->-MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
-          ()->-MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
-          ()->-driveController.getRightX(),
-          swerveDrive));
-
+    
 
 
   }
 
   public Command getAutonomousCommand() {
     NamedCommands.registerCommand("AutoShoot", new AutoShoot(ballShooter, swerveDrive, indexer));
-    NamedCommands.registerCommand("HopperJuggle", new WristJuggle(intakeWrist));
+    NamedCommands.registerCommand("HopperJuggle", wristJuggle);
     NamedCommands.registerCommand("ExtendHopper", new ExtendHopper(intake, intakeWrist));
     return new PathPlannerAuto(autoChooser.getSelected());
   }

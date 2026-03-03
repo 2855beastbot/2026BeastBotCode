@@ -55,6 +55,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "ExtendHopper"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "LeftScore to LeftCenter"

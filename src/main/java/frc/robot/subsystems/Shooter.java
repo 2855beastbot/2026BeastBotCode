@@ -26,7 +26,7 @@ public class Shooter extends SubsystemBase {
   public Shooter() {
     setRPMUse(true);
     spin(0);
-    config.Slot0.kP = 0.1;
+    config.Slot0.kP = 0.06;
     config.Slot0.kI = 0.0;
     config.Slot0.kD = 0.0;
     left.getConfigurator().apply(config);

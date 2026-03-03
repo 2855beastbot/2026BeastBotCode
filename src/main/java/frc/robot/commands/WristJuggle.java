@@ -13,34 +13,36 @@ import frc.robot.subsystems.IntakeWrist;
 public class WristJuggle extends Command {
   /** Creates a new WristJuggle. */
   private IntakeWrist intake;
-  public int i;
-  public WristJuggle(IntakeWrist intake) {
+  public double target;
+  public WristJuggle(IntakeWrist intake, double setpoint) {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(intake);
     this.intake = intake;
+    target = setpoint;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    intake.setTargetSetpoint(target);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    intake.moveWrist(0.5);
+  
   }
   
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    intake.setTargetSetpoint(SubsystemConstants.wristOut);
+    
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return(intake.getPose() > (SubsystemConstants.wristIn - 0.0125));
+    return intake.isAtSetpoint();
   }
 }

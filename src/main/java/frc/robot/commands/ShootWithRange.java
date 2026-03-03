@@ -38,7 +38,7 @@ public class ShootWithRange extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    ballShooter.spin(0, true); 
+    ballShooter.spin(0, false); 
     //aimingCamera.setValidIDs(VisionConstants.allIDs);
   }
 
