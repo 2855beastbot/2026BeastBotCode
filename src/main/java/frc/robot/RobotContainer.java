@@ -59,11 +59,12 @@ public class RobotContainer {
   private Swerve swerveDrive = new Swerve();
   private XboxController driveController = new XboxController(0);
   private CommandXboxController operatorController = new CommandXboxController(1);
-  private Intake intake = new Intake();
+  private IntakeWrist intakeWrist = new IntakeWrist();
+  private Intake intake = new Intake(intakeWrist);
   private Shooter ballShooter = new Shooter();
   private Indexer indexer = new Indexer();
   private LED LEDstrip = new LED();
-  private IntakeWrist intakeWrist = new IntakeWrist();
+  
 
   private SendableChooser<String> autoChooser = new SendableChooser<>();
   private String leftAuto = "Left";

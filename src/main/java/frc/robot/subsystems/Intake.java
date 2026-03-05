@@ -33,8 +33,9 @@ public class Intake extends SubsystemBase {
   
   
   
-
-  public Intake() { 
+  private IntakeWrist intakeWrist;
+  public Intake(IntakeWrist wrist) {
+    intakeWrist = wrist; 
   }
 
   /**
@@ -42,9 +43,11 @@ public class Intake extends SubsystemBase {
    * @param speed the percent power to the wheels, from 0-1
    */
   public void spin(double speed){
-    leftIntake.set(-speed);
-    //if(getPose() < 1.8)
+    if(intakeWrist.getPose() < 1.8) {
+      leftIntake.set(-speed);
       rightIntake.set(-speed);
+    }
+      
   }
 
   /**
