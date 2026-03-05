@@ -68,6 +68,7 @@ public class RobotContainer {
   private SendableChooser<String> autoChooser = new SendableChooser<>();
   private String leftAuto = "Left";
   private String rightAuto = "Right";
+  private String centerAuto = "center";
   private Pose2d targetHub;
    
   private RepeatCommand wristJuggle = new RepeatCommand(new SequentialCommandGroup(new WristJuggle(intakeWrist, SubsystemConstants.wristMid), new WristJuggle(intakeWrist, SubsystemConstants.wristIn)));   
@@ -76,6 +77,7 @@ public class RobotContainer {
     
     autoChooser.addOption("Right auto", rightAuto);
     autoChooser.addOption("Left auto", leftAuto);
+    autoChooser.addOption("Center auto", centerAuto);
     DataLogManager.start(); //logs everything in Network Tables
     DriverStation.startDataLog(DataLogManager.getLog());  //logs joystick values
 
