@@ -172,8 +172,8 @@ public class RobotContainer {
             swerveDrive));
         } else {
           swerveDrive.setDefaultCommand(new Drive(
-            ()->-MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
-            ()->-MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
+            ()->MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
+            ()->MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
             ()->-driveController.getRightX(),
             swerveDrive));
         }

@@ -333,7 +333,7 @@ public class Swerve extends SubsystemBase {
           if(alliance.isPresent()){
             return alliance.get() == DriverStation.Alliance.Red;
           } else {
-            return true;
+            return false;
           }
         }, 
       this);
