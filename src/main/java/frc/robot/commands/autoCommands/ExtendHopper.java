@@ -26,13 +26,15 @@ public class ExtendHopper extends Command {
   @Override
   public void initialize() {
     intakeWrist.setTargetSetpoint(SubsystemConstants.wristOut);
-    intake.spin(1);
+    
 
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    
+  }
 
   // Called once the command ends or is interrupted.
   @Override

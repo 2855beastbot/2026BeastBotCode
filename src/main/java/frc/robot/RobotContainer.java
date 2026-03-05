@@ -160,7 +160,7 @@ public class RobotContainer {
     operatorController.axisGreaterThan(3, 0.3).whileTrue(new RunCommand(()->ballShooter.spin(operatorController.getRightTriggerAxis(), false), ballShooter));
     operatorController.axisMagnitudeGreaterThan(1, 0.3).whileTrue(new MoveIntakeWrist(()->-operatorController.getLeftY(), intakeWrist));
     operatorController.button(8).onTrue(new InstantCommand(()->intakeWrist.zeroEncoders(), intakeWrist));
-    operatorController.y().whileTrue(new RunCommand(()->ballShooter.spin(4000, true), ballShooter));
+    operatorController.y().whileTrue(new RunCommand(()->ballShooter.spin(5000, true), ballShooter));
     
   }
 
@@ -198,6 +198,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("AutoShoot", new AutoShoot(ballShooter, swerveDrive, indexer));
     NamedCommands.registerCommand("HopperJuggle", wristJuggle);
     NamedCommands.registerCommand("ExtendHopper", new ExtendHopper(intake, intakeWrist));
+    NamedCommands.registerCommand("StartWheels", new RunCommand(()->intake.spin(1), intake));
     return new PathPlannerAuto(autoChooser.getSelected());
   }
 }
