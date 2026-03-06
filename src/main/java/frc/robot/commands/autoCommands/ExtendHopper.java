@@ -13,11 +13,11 @@ import frc.robot.subsystems.IntakeWrist;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class ExtendHopper extends Command {
   /** Creates a new ExtendHopper. */
-  private Intake intake;
+ 
   private IntakeWrist intakeWrist;
-  public ExtendHopper(Intake intake, IntakeWrist intakeWrist) {
-    addRequirements(intake);
-    this.intake = intake;
+  public ExtendHopper( IntakeWrist intakeWrist) {
+    addRequirements();
+   
     this.intakeWrist = intakeWrist;
     // Use addRequirements() here to declare subsystem dependencies.r
   }

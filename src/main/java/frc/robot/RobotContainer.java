@@ -93,6 +93,11 @@ public class RobotContainer {
     SmartDashboard.putData(swerveDrive.getAimingCamera());
     SmartDashboard.putData("auto selector", autoChooser);
     SmartDashboard.putData(intakeWrist);
+
+    NamedCommands.registerCommand("AutoShoot", new AutoShoot(ballShooter, swerveDrive, indexer));
+    NamedCommands.registerCommand("HopperJuggle", wristJuggle);
+    NamedCommands.registerCommand("ExtendHopper", new ExtendHopper(intakeWrist));
+    NamedCommands.registerCommand("StartWheels", new RunCommand(()->intake.spin(1), intake).asProxy());
     
     var alliance = DriverStation.getAlliance();
     if(alliance.isPresent()){
@@ -196,10 +201,7 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    NamedCommands.registerCommand("AutoShoot", new AutoShoot(ballShooter, swerveDrive, indexer));
-    NamedCommands.registerCommand("HopperJuggle", wristJuggle);
-    NamedCommands.registerCommand("ExtendHopper", new ExtendHopper(intake, intakeWrist));
-    NamedCommands.registerCommand("StartWheels", new RunCommand(()->intake.spin(1), intake).asProxy());
+   
     return new PathPlannerAuto(autoChooser.getSelected());
   }
 }

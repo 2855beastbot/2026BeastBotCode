@@ -23,14 +23,14 @@ import edu.wpi.first.wpilibj.util.Color;
 public class Constants {
 
     public static class SwerveConstants{
-        public static final double maxDriveSpeed = 4;
-        public static final double maxTurnSpeed = 6;
+        public static final double maxDriveSpeed = 3;
+        public static final double maxTurnSpeed = 4;
 
         public static final double slowModeVal = 1;
 
         public static final PPHolonomicDriveController autoController = new PPHolonomicDriveController(
             new PIDConstants(5.0, 0.0, 0.0),
-            new PIDConstants(5.0, 0.0, 0.0));
+            new PIDConstants(5.0, 0.0, 0.1));
         /* 
         public static final HolonomicPathFollowerConfig autoBuilderPathConfig = new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
             new PIDConstants(8, 0.0 ,0), //original p = 5, 1st attempt: p = 5, d = 0.5, 2nd attempt: p= 5, d = 0.5, 3rd attempt: p = 5, d = 3 this caused the wheels to shutter

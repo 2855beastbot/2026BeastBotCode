@@ -7,12 +7,6 @@
         {
           "type": "named",
           "data": {
-            "name": "StartWheels"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "ExtendHopper"
           }
         },
