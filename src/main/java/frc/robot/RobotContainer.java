@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -198,7 +199,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("AutoShoot", new AutoShoot(ballShooter, swerveDrive, indexer));
     NamedCommands.registerCommand("HopperJuggle", wristJuggle);
     NamedCommands.registerCommand("ExtendHopper", new ExtendHopper(intake, intakeWrist));
-    NamedCommands.registerCommand("StartWheels", new RunCommand(()->intake.spin(1), intake));
+    NamedCommands.registerCommand("StartWheels", new RunCommand(()->intake.spin(1), intake).asProxy());
     return new PathPlannerAuto(autoChooser.getSelected());
   }
 }
