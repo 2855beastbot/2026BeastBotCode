@@ -80,6 +80,9 @@ public class RobotContainer {
     autoChooser.addOption("Right auto", rightAuto);
     autoChooser.addOption("Left auto", leftAuto);
     autoChooser.addOption("Center auto", centerAuto);
+    autoChooser.addOption("Race Center Right", "RaceCenterRight");
+    autoChooser.addOption("Race Center Left", "RaceCenterLeft");
+    //autoChooser.addOption("LeftTest", "LeftTest");
     DataLogManager.start(); //logs everything in Network Tables
     DriverStation.startDataLog(DataLogManager.getLog());  //logs joystick values
 
@@ -94,10 +97,10 @@ public class RobotContainer {
     SmartDashboard.putData("auto selector", autoChooser);
     SmartDashboard.putData(intakeWrist);
 
-    NamedCommands.registerCommand("AutoShoot", new AutoShoot(ballShooter, swerveDrive, indexer));
+    NamedCommands.registerCommand("AutoShoot", new AutoShoot(ballShooter, swerveDrive, indexer).asProxy());
     NamedCommands.registerCommand("HopperJuggle", wristJuggle);
-    NamedCommands.registerCommand("ExtendHopper", new ExtendHopper(intakeWrist));
-    NamedCommands.registerCommand("StartWheels", new RunCommand(()->intake.spin(1), intake).asProxy());
+    NamedCommands.registerCommand("ExtendHopper", new ExtendHopper(intakeWrist).asProxy());
+    NamedCommands.registerCommand("StartWheels", new RepeatCommand(new InstantCommand(()->intake.spin(1)).asProxy()));
     
     var alliance = DriverStation.getAlliance();
     if(alliance.isPresent()){

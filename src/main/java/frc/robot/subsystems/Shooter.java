@@ -24,6 +24,8 @@ public class Shooter extends SubsystemBase {
   private TalonFXConfiguration config = new TalonFXConfiguration();
 
   public Shooter() {
+    config.CurrentLimits.SupplyCurrentLowerLimit = 35;
+    config.CurrentLimits.SupplyCurrentLimit = 30;
     setRPMUse(true);
     spin(0);
     config.Slot0.kP = 0.06;
