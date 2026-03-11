@@ -93,11 +93,11 @@ public class Constants {
         };
 
         public static final double[] locationConfig = {
-            0.0, //forward
-            0.0, //side
-            0.0, //up
+            -0.2925, //forward
+            -2.377, //side
+            0.15, //up
             0.0, //roll
-            0.0, // pitch
+            23.0, // pitch
             0.0 //yaw
         };
 

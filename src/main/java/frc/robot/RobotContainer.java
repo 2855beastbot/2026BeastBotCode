@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.LEDConstants;
@@ -149,7 +150,7 @@ public class RobotContainer {
     */
     new Trigger(()->driveController.getRawButton(8)).onTrue(new InstantCommand(()->swerveDrive.resetOdometryWithAlliance(new Pose2d(swerveDrive.getPose2d().getX(), swerveDrive.getPose2d().getX(), new Rotation2d()))));
     new Trigger(()->driveController.getRawButton(7)).onTrue(new InstantCommand(()->swerveDrive.resetOdometryWithAlliance(swerveDrive.getAimingCamera().getPose())));
-    new Trigger(()->driveController.getXButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristOut)).alongWith(new PrintCommand("intake out")));
+    new Trigger(()->driveController.getXButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristOut)));
     new Trigger(()->driveController.getAButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristMid)));
     new Trigger(()->driveController.getBButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristIn)));
     // new Trigger(()->driveController.getRightBumperButton()).whileTrue(new Index(()->1, indexer));
@@ -157,7 +158,12 @@ public class RobotContainer {
     new Trigger(()->driveController.getLeftBumperButton()).whileTrue(new SpinIntake(()->-1, intake));
 
 
-    new Trigger(()->driveController.getRightBumperButton()).whileTrue(new ParallelCommandGroup(new Index(()->1, indexer), wristJuggle));
+    new Trigger(()->driveController.getRightBumperButton()).whileTrue(new ParallelCommandGroup(
+      new Index(()->1, indexer),
+      new SequentialCommandGroup(
+        new WaitCommand(1),
+        wristJuggle
+      )));
 
     //Operator Commands
     operatorController.rightBumper().whileTrue(new Index(()->1, indexer));

@@ -8,6 +8,8 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.MAXMotionConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
@@ -27,10 +29,13 @@ import frc.robot.Constants.SubsystemConstants;
 
 public class Intake extends SubsystemBase {
   /** Creates a new intake. */
+  /* 
   private SparkMax leftIntake = new SparkMax(CANIDConstants.intakeLeft,  MotorType.kBrushless);
   private SparkMax rightIntake = new SparkMax(CANIDConstants.intakeRight, MotorType.kBrushless);
+  */
   
-  
+  private TalonFX leftIntake = new TalonFX(CANIDConstants.intakeLeft);
+  private TalonFX rightIntake = new TalonFX(CANIDConstants.intakeRight);
   
   
   private IntakeWrist intakeWrist;
@@ -44,8 +49,10 @@ public class Intake extends SubsystemBase {
    */
   public void spin(double speed){
     if(intakeWrist.getPose() < 1.8) {
-      leftIntake.set(-speed);
-      rightIntake.set(-speed);
+      //leftIntake.set(-speed);
+      //rightIntake.set(-speed);
+      leftIntake.set(speed);
+      rightIntake.set(speed);
     }
       
   }
