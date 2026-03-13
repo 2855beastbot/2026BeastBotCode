@@ -124,8 +124,8 @@ public class RobotContainer {
     .aimWhile(()->true);
 
 
-    new Trigger(()->DriverStation.isFMSAttached()).onTrue(new InstantCommand(()->swerveDrive.updateAlliance(), swerveDrive).alongWith(new InstantCommand(()->setDefaultCommands())));
-    new Trigger(()->DriverStation.isEnabled()).onTrue(new InstantCommand(()->swerveDrive.updateAlliance()).alongWith(new InstantCommand(()->setDefaultCommands())));
+    new Trigger(()->DriverStation.isFMSAttached()).onTrue(new InstantCommand(()->swerveDrive.updateTargetHub(), swerveDrive).alongWith(new InstantCommand(()->setDefaultCommands())));
+    new Trigger(()->DriverStation.isEnabled()).onTrue(new InstantCommand(()->swerveDrive.updateTargetHub()).alongWith(new InstantCommand(()->setDefaultCommands())));
 
     //Driver commands
     new Trigger(()->driveController.getYButton()).whileTrue(new RunCommand(()->swerveDrive.setXMode(), swerveDrive));

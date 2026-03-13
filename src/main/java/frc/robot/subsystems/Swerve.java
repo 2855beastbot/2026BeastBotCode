@@ -22,11 +22,12 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
@@ -48,10 +49,19 @@ public class Swerve extends SubsystemBase {
   private Pose2d targetHub;
 
   public Swerve() {
+    updateTargetHub();
+  
+    //chooses default side based on chosen target hub
+    Pose2d startingPose = targetHub == VisionConstants.blueHub ? 
+                                    new Pose2d(new Translation2d(3, 4),
+                                                Rotation2d.fromDegrees(0))
+                                  : new Pose2d(new Translation2d(13, 4),
+                                                Rotation2d.fromDegrees(180));
+
     double maximumSpeed = Units.feetToMeters(4.5);
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(),"swerve");
     try{
-      swerveDrive = new SwerveParser(swerveJsonDirectory).createSwerveDrive(maximumSpeed);
+      swerveDrive = new SwerveParser(swerveJsonDirectory).createSwerveDrive(maximumSpeed, startingPose);
       SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     }catch(IOException e){
       throw new RuntimeException(e);
@@ -60,6 +70,7 @@ public class Swerve extends SubsystemBase {
     try{
       config = RobotConfig.fromGUISettings();
     }catch(Exception e){
+      DataLogManager.log("Could not read PathPlanner config file.");
       e.printStackTrace();
     }
     configureAutoBuilder();
@@ -67,13 +78,6 @@ public class Swerve extends SubsystemBase {
     //reiously0.7,0.7,9999999
     pointToPosePID.enableContinuousInput(-Math.PI, Math.PI);
     pointToPosePID.setTolerance(2.0);
-
-    var alliance = DriverStation.getAlliance();
-    if(alliance.isPresent()){
-        targetHub = (alliance.get() == Alliance.Blue) ? VisionConstants.blueHub : VisionConstants.redHub;
-      }else{
-        targetHub = VisionConstants.blueHub;
-      }
   }
 
   public double getMaxDriveSpeed(){
@@ -136,7 +140,7 @@ public class Swerve extends SubsystemBase {
   /**
    * updates the target hub based on driver station
    */
-  public void updateAlliance(){
+  public void updateTargetHub(){
     var alliance = DriverStation.getAlliance();
     if(alliance.isPresent()){
         targetHub = (alliance.get() == Alliance.Blue) ? VisionConstants.blueHub : VisionConstants.redHub;
@@ -315,7 +319,7 @@ public class Swerve extends SubsystemBase {
 
   public Command driveWithInputStream(SwerveInputStream input){
     return run(()->{
-    swerveDrive.driveFieldOriented(input.get());
+      swerveDrive.driveFieldOriented(input.get());
     });
   }
 

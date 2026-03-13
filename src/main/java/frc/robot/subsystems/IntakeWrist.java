@@ -27,8 +27,9 @@ public class IntakeWrist extends SubsystemBase {
   private double targetSetpoint;
   private boolean isOpenLoop;
   private PIDController pidController = new PIDController(SubsystemConstants.intakeWristKp, SubsystemConstants.intakeWristKi, SubsystemConstants.intakeWristKd);
+  
   public IntakeWrist() {
-     encoder = rightWrist.getAbsoluteEncoder();
+    encoder = rightWrist.getAbsoluteEncoder();
     config.absoluteEncoder.inverted(true);
     setTargetSetpoint(getPose());
     config.closedLoop.pid(SubsystemConstants.intakeWristKp, SubsystemConstants.intakeWristKi, SubsystemConstants.intakeWristKd);
