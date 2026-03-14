@@ -51,12 +51,17 @@ public class Swerve extends SubsystemBase {
   public Swerve() {
     updateTargetHub();
   
-    //chooses default side based on chosen target hub
-    Pose2d startingPose = targetHub == VisionConstants.blueHub ? 
+    Pose2d startingPose;
+    if(RobotBase.isSimulation()){
+      //chooses default position based on chosen target hub, vision should override this
+      startingPose = targetHub == VisionConstants.blueHub ? 
                                     new Pose2d(new Translation2d(3, 4),
                                                 Rotation2d.fromDegrees(0))
                                   : new Pose2d(new Translation2d(13, 4),
                                                 Rotation2d.fromDegrees(180));
+    }else{
+      startingPose = new Pose2d();
+    }
 
     double maximumSpeed = Units.feetToMeters(4.5);
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(),"swerve");
