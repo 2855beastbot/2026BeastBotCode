@@ -8,6 +8,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.MAXMotionConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.AbsoluteEncoder;
@@ -36,10 +37,14 @@ public class Intake extends SubsystemBase {
   
   private TalonFX leftIntake = new TalonFX(CANIDConstants.intakeLeft);
   private TalonFX rightIntake = new TalonFX(CANIDConstants.intakeRight);
+  private TalonFXConfiguration config = new TalonFXConfiguration();
   
   
   private IntakeWrist intakeWrist;
   public Intake(IntakeWrist wrist) {
+    config.MotorOutput.Inverted = config.MotorOutput.Inverted.Clockwise_Positive;
+    leftIntake.getConfigurator().apply(config);
+    rightIntake.getConfigurator().apply(config);
     intakeWrist = wrist; 
   }
 
@@ -48,11 +53,15 @@ public class Intake extends SubsystemBase {
    * @param speed the percent power to the wheels, from 0-1
    */
   public void spin(double speed){
-    if(intakeWrist.getPose() < 1.8) {
+    if(intakeWrist.getPose() < 0.5) {
       //leftIntake.set(-speed);
       //rightIntake.set(-speed);
       leftIntake.set(speed);
       rightIntake.set(speed);
+    }
+    else{
+      
+      rightIntake.set(0);
     }
       
   }

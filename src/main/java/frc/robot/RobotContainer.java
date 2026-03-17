@@ -74,8 +74,10 @@ public class RobotContainer {
   private String centerAuto = "center";
   private Pose2d targetHub;
    
-  private RepeatCommand wristJuggle = new RepeatCommand(new SequentialCommandGroup(new WristJuggle(intakeWrist, SubsystemConstants.wristMid), new WristJuggle(intakeWrist, SubsystemConstants.wristIn)));   
+  private SequentialCommandGroup wristJuggle = new SequentialCommandGroup(new WristJuggle(intakeWrist, SubsystemConstants.wristMid),new WaitCommand(1), new WristJuggle(intakeWrist, SubsystemConstants.wristIn), new WaitCommand(0.5));   
 
+
+  
   public RobotContainer() {
     
     autoChooser.addOption("Right auto", rightAuto);
@@ -137,10 +139,15 @@ public class RobotContainer {
     //   swerveDrive.driveWithInputStream(driveWithPose),
     //   new ShootWithRange(()->swerveDrive.getRPMFromRange(swerveDrive.getDistanceFromHub()), ballShooter)
     //   ));
-        new Trigger(()->driveController.getRightTriggerAxis() > 0.5).whileTrue(new ParallelCommandGroup(
-      new RunCommand(()->swerveDrive.drivePose(new Translation2d(-driveController.getLeftY(), -driveController.getLeftX()))),
+    new Trigger(()->driveController.getRightTriggerAxis() > 0.5).whileTrue(new ParallelCommandGroup(
+      new RunCommand(()->swerveDrive.drivePose(new Translation2d(-driveController.getLeftY(), -driveController.getLeftX()), targetHub)),
       new ShootWithRange(()->swerveDrive.getRPMFromRange(swerveDrive.getDistanceFromHub()), ballShooter)
       ));
+
+    new Trigger(()->driveController.getLeftBumperButton()).whileTrue(new RunCommand(()->swerveDrive.drivePose(
+      new Translation2d(-driveController.getLeftY(), -driveController.getLeftX()),
+      swerveDrive.determineFeedPose()),
+      swerveDrive));
       
     /* 
     new Trigger(()->driveController.getLeftBumperButton()).whileTrue(new DriveWithRange(
@@ -155,14 +162,15 @@ public class RobotContainer {
     new Trigger(()->driveController.getBButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristIn)));
     // new Trigger(()->driveController.getRightBumperButton()).whileTrue(new Index(()->1, indexer));
     new Trigger(()->driveController.getLeftTriggerAxis() > 0.3).whileTrue(new SpinIntake(()->driveController.getLeftTriggerAxis(), intake));
-    new Trigger(()->driveController.getLeftBumperButton()).whileTrue(new SpinIntake(()->-1, intake));
+    //new Trigger(driveController.povDown()).whileTrue(new SpinIntake(()->-1, intake));
+
 
 
     new Trigger(()->driveController.getRightBumperButton()).whileTrue(new ParallelCommandGroup(
       new Index(()->1, indexer),
       new SequentialCommandGroup(
         new WaitCommand(1),
-        wristJuggle
+        wristJuggle.repeatedly()
       )));
 
     //Operator Commands
@@ -176,6 +184,7 @@ public class RobotContainer {
     operatorController.axisMagnitudeGreaterThan(1, 0.3).whileTrue(new MoveIntakeWrist(()->-operatorController.getLeftY(), intakeWrist));
     operatorController.button(8).onTrue(new InstantCommand(()->intakeWrist.zeroEncoders(), intakeWrist));
     operatorController.y().whileTrue(new RunCommand(()->ballShooter.spin(5000, true), ballShooter));
+    operatorController.a().whileTrue(new RunCommand(()->ballShooter.spin(1000, true), ballShooter));
     
   }
 

@@ -61,10 +61,10 @@ public class Constants {
         public static final double intakeWristKff = 1.33; // measured in volts
         public static final double wristOut = 0.10;
         public static final double wristMid = 1;
-        public static final double wristIn = 2; 
+        public static final double wristIn = 1.7; 
         public static final double wristZeroVoltage = 33.0;
 
-        public static final double wristGearboxCoef = (62.0/18)*(48.0/19);  
+        public static final double wristGearboxCoef = (62.0/18)*(49.0/18);  
     }
 
     public static class VisionConstants{
@@ -74,7 +74,12 @@ public class Constants {
         public static final double idealShootingRange = 2;
 
         public static final Pose2d blueHub = new Pose2d(4.52844, 4.11861, new Rotation2d());
-        public static final Pose2d redHub = new Pose2d(12.01204, 4.111861, new Rotation2d());//ws4.11861
+        public static final Pose2d redHub = new Pose2d(12.01204, 4.111861, new Rotation2d());//was 4.11861
+
+        public static final Pose2d leftRedFeed = new Pose2d(14.0, 1.5, new Rotation2d());
+        public static final Pose2d rightRedFeed = new Pose2d(14.0, 6.5, new Rotation2d());
+        public static final Pose2d leftBlueFeed = new Pose2d(1.0, 6.5, new Rotation2d());
+        public static final Pose2d rightBlueFeed = new Pose2d(1.0, 1.5, new Rotation2d());
 
         /**
          * 1 meter to number of rpm

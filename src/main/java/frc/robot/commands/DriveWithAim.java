@@ -52,7 +52,8 @@ public class DriveWithAim extends Command {
     drivetrain.drivePose(
       new Translation2d(
         xSpeed.getAsDouble() * SwerveConstants.maxDriveSpeed * SwerveConstants.slowModeVal, 
-        ySpeed.getAsDouble() * SwerveConstants.maxDriveSpeed * SwerveConstants.slowModeVal)
+        ySpeed.getAsDouble() * SwerveConstants.maxDriveSpeed * SwerveConstants.slowModeVal),
+        drivetrain.getTargetHub()
         );
   }
 

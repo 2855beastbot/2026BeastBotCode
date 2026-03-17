@@ -44,14 +44,15 @@ public class Swerve extends SubsystemBase {
   private SwerveDrive swerveDrive;
   private RobotConfig config;
   private Vision aimingCamera = new Vision(VisionConstants.aimingLimelightName, VisionConstants.aimingConfig);
-  private final PIDController pointToPosePID = new PIDController(20.0, 0.0, 0.5);
+  private Vision locationCamera = new Vision(VisionConstants.locationLimelightName, VisionConstants.locationConfig);
+  private final PIDController pointToPosePID = new PIDController(5.0, 0.0, 0.5);
   private Pose2d targetHub;
 
   public Swerve() {
-    double maximumSpeed = Units.feetToMeters(4.5);
+    double maximumSpeed = Units.feetToMeters(3);
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(),"swerve");
     try{
-      swerveDrive = new SwerveParser(swerveJsonDirectory).createSwerveDrive(maximumSpeed);
+      swerveDrive = new SwerveParser(swerveJsonDirectory).createSwerveDrive(SwerveConstants.maxDriveSpeed);
       SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     }catch(IOException e){
       throw new RuntimeException(e);
@@ -112,8 +113,8 @@ public class Swerve extends SubsystemBase {
     );}
     */
   
-    public void drivePose(Translation2d translation) { 
-      Rotation2d desiredAngle = getPointAtPoseAngle(targetHub); 
+    public void drivePose(Translation2d translation, Pose2d target) { 
+      Rotation2d desiredAngle = getPointAtPoseAngle(target); 
       double rotationSpeed = pointToPosePID.calculate( 
         getPose2d().getRotation().getRadians(), 
         desiredAngle.getRadians()); 
@@ -281,6 +282,22 @@ public class Swerve extends SubsystemBase {
       swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(newXYstd, newXYstd, 9999999));
     }
 
+  public Pose2d determineFeedPose(){
+    if(targetHub == VisionConstants.blueHub){
+      if(getPose2d().getY() > 4.0){
+        return VisionConstants.leftBlueFeed;
+      }else{
+        return VisionConstants.rightBlueFeed;
+      }
+    }else{
+      if(getPose2d().getY() > 4.0){
+        return VisionConstants.rightRedFeed;
+      }else{
+        return VisionConstants.leftRedFeed;
+      }
+    }
+  }
+
 
   /* 
   public double getPointAtSpeedUsingRelative(Pose2d target){
@@ -292,10 +309,11 @@ public class Swerve extends SubsystemBase {
   public void updatePoseWithVision(){
     
     LimelightHelpers.PoseEstimate measurement = aimingCamera.getMegaTag2(swerveDrive.getPose());
+    LimelightHelpers.PoseEstimate locationPoseEstimate = locationCamera.getMegaTag2(swerveDrive.getPose());
     if(aimingCamera.hasValidIDs()){
       // setVisionStdDynamic(measurement.pose);
       swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
-
+      //swerveDrive.addVisionMeasurement(locationPoseEstimate.pose, locationPoseEstimate.timestampSeconds);
       swerveDrive.addVisionMeasurement(measurement.pose, measurement.timestampSeconds);
     }
     
