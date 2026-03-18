@@ -25,7 +25,7 @@
                           {
                             "type": "path",
                             "data": {
-                              "pathName": "start to Leftcenter"
+                              "pathName": "start to Rightcenter"
                             }
                           }
                         ]
@@ -34,7 +34,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "Leftcenter to Leftscore"
+                        "pathName": "Rightcenter to Rightscore"
                       }
                     },
                     {
@@ -72,45 +72,13 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "LeftScore to LeftCenter"
+                        "pathName": "Rightscore to farRightcenter"
                       }
                     },
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "Leftcenter to Leftscore"
-                      }
-                    },
-                    {
-                      "type": "race",
-                      "data": {
-                        "commands": [
-                          {
-                            "type": "wait",
-                            "data": {
-                              "waitTime": 4.0
-                            }
-                          },
-                          {
-                            "type": "parallel",
-                            "data": {
-                              "commands": [
-                                {
-                                  "type": "named",
-                                  "data": {
-                                    "name": "AutoShoot"
-                                  }
-                                },
-                                {
-                                  "type": "named",
-                                  "data": {
-                                    "name": "HopperJuggle"
-                                  }
-                                }
-                              ]
-                            }
-                          }
-                        ]
+                        "pathName": "farRightcenter to Rightscore"
                       }
                     }
                   ]
@@ -129,6 +97,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Left",
+  "folder": "Right",
   "choreoAuto": false
 }

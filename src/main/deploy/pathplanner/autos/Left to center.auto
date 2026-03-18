@@ -72,13 +72,13 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "LeftScore to LeftCenter"
+                        "pathName": "Leftscore to CenterLeftCenter"
                       }
                     },
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "Leftcenter to Leftscore"
+                        "pathName": "CenterLeftCenter to Leftscore"
                       }
                     },
                     {

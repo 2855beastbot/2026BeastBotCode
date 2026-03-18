@@ -13,15 +13,22 @@
                 "data": {
                   "commands": [
                     {
-                      "type": "named",
+                      "type": "parallel",
                       "data": {
-                        "name": "ExtendHopper"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "start to Rightcenter"
+                        "commands": [
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "ExtendHopper"
+                            }
+                          },
+                          {
+                            "type": "path",
+                            "data": {
+                              "pathName": "start to Rightcenter"
+                            }
+                          }
+                        ]
                       }
                     },
                     {
@@ -31,7 +38,7 @@
                       }
                     },
                     {
-                      "type": "deadline",
+                      "type": "race",
                       "data": {
                         "commands": [
                           {
@@ -90,6 +97,6 @@
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Right",
   "choreoAuto": false
 }

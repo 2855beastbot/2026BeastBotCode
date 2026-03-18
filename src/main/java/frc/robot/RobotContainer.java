@@ -72,6 +72,7 @@ public class RobotContainer {
   private String leftAuto = "Left";
   private String rightAuto = "Right";
   private String centerAuto = "center";
+
   private Pose2d targetHub;
    
   private SequentialCommandGroup wristJuggle = new SequentialCommandGroup(new WristJuggle(intakeWrist, SubsystemConstants.wristMid),new WaitCommand(1), new WristJuggle(intakeWrist, SubsystemConstants.wristIn), new WaitCommand(0.5));   
@@ -81,7 +82,13 @@ public class RobotContainer {
   public RobotContainer() {
     
     autoChooser.addOption("Right auto", rightAuto);
+    autoChooser.addOption("Right center auto", "Right to center");
+    autoChooser.addOption("Right far auto", "Right to far");
+
     autoChooser.addOption("Left auto", leftAuto);
+    autoChooser.addOption("Left center auto", "Left to center");
+    autoChooser.addOption("Left far auto", "Left to far");
+
     autoChooser.addOption("Center auto", centerAuto);
     autoChooser.addOption("Race Center Right", "RaceCenterRight");
     autoChooser.addOption("Race Center Left", "RaceCenterLeft");
