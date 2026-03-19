@@ -49,7 +49,7 @@ public class Swerve extends SubsystemBase {
   private Pose2d targetHub;
 
   public Swerve() {
-    double maximumSpeed = Units.feetToMeters(3);
+    
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(),"swerve");
     try{
       swerveDrive = new SwerveParser(swerveJsonDirectory).createSwerveDrive(SwerveConstants.maxDriveSpeed);
@@ -310,11 +310,15 @@ public class Swerve extends SubsystemBase {
     
     LimelightHelpers.PoseEstimate measurement = aimingCamera.getMegaTag2(swerveDrive.getPose());
     LimelightHelpers.PoseEstimate locationPoseEstimate = locationCamera.getMegaTag2(swerveDrive.getPose());
+    swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(1.0, 1.0, 9999999));
     if(aimingCamera.hasValidIDs()){
-      // setVisionStdDynamic(measurement.pose);
-      swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
-      //swerveDrive.addVisionMeasurement(locationPoseEstimate.pose, locationPoseEstimate.timestampSeconds);
       swerveDrive.addVisionMeasurement(measurement.pose, measurement.timestampSeconds);
+      // setVisionStdDynamic(measurement.pose);
+      
+    if(locationCamera.hasValidIDs()){
+      swerveDrive.addVisionMeasurement(locationPoseEstimate.pose, locationPoseEstimate.timestampSeconds);
+    }
+      
     }
     
   }

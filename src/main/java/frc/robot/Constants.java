@@ -59,9 +59,9 @@ public class Constants {
         public static final double intakeWristKd = 0.0;
 
         public static final double intakeWristKff = 1.33; // measured in volts
-        public static final double wristOut = 0.10;
+        public static final double wristOut = 0.07;
         public static final double wristMid = 1;
-        public static final double wristIn = 1.7; 
+        public static final double wristIn = 2.07; 
         public static final double wristZeroVoltage = 33.0;
 
         public static final double wristGearboxCoef = (62.0/18)*(49.0/18);  

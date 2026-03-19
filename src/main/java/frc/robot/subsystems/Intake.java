@@ -43,6 +43,7 @@ public class Intake extends SubsystemBase {
   private IntakeWrist intakeWrist;
   public Intake(IntakeWrist wrist) {
     config.MotorOutput.Inverted = config.MotorOutput.Inverted.Clockwise_Positive;
+    config.CurrentLimits.SupplyCurrentLimit = 30.0;
     leftIntake.getConfigurator().apply(config);
     rightIntake.getConfigurator().apply(config);
     intakeWrist = wrist; 
