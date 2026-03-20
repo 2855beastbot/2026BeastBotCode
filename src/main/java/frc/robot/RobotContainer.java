@@ -76,7 +76,7 @@ public class RobotContainer {
   private Pose2d targetHub;
    
   private SequentialCommandGroup wristJuggle = new SequentialCommandGroup(new WristJuggle(intakeWrist, SubsystemConstants.wristMid),new WaitCommand(1), new WristJuggle(intakeWrist, SubsystemConstants.wristIn), new WaitCommand(0.5));   
-
+  
 
   
   public RobotContainer() {
@@ -151,10 +151,14 @@ public class RobotContainer {
       new ShootWithRange(()->swerveDrive.getRPMFromRange(swerveDrive.getDistanceFromHub()), ballShooter)
       ));
 
-    new Trigger(()->driveController.getLeftBumperButton()).whileTrue(new RunCommand(()->swerveDrive.drivePose(
-      new Translation2d(-driveController.getLeftY(), -driveController.getLeftX()),
-      swerveDrive.determineFeedPose()),
-      swerveDrive));
+    new Trigger(()->driveController.getLeftBumperButton()).whileTrue(
+      new ParallelCommandGroup(
+        new RunCommand(()->swerveDrive.drivePose(
+        new Translation2d(-driveController.getLeftY(), -driveController.getLeftX()),
+        swerveDrive.determineFeedPose()),
+        swerveDrive),
+        new ShootWithRange(()->swerveDrive.getRPMFromRange(swerveDrive.getDistanceFromPose(swerveDrive.determineFeedPose())), ballShooter)
+        ));
       
     /* 
     new Trigger(()->driveController.getLeftBumperButton()).whileTrue(new DriveWithRange(
