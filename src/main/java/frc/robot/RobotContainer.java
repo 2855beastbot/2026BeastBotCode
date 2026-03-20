@@ -173,7 +173,7 @@ public class RobotContainer {
     new Trigger(()->driveController.getBButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristIn)));
     // new Trigger(()->driveController.getRightBumperButton()).whileTrue(new Index(()->1, indexer));
     new Trigger(()->driveController.getLeftTriggerAxis() > 0.3).whileTrue(new SpinIntake(()->driveController.getLeftTriggerAxis(), intake));
-    //new Trigger(driveController.povDown()).whileTrue(new SpinIntake(()->-1, intake));
+    //driveController.povDown(new SpinIntake(null, intake));
 
 
 

@@ -316,7 +316,7 @@ public class Swerve extends SubsystemBase {
       // setVisionStdDynamic(measurement.pose);
       
     if(locationCamera.hasValidIDs()){
-      swerveDrive.addVisionMeasurement(locationPoseEstimate.pose, locationPoseEstimate.timestampSeconds);
+      //swerveDrive.addVisionMeasurement(locationPoseEstimate.pose, locationPoseEstimate.timestampSeconds);
     }
       
     }

@@ -57,13 +57,14 @@ public class Intake extends SubsystemBase {
     if(intakeWrist.getPose() < 0.5) {
       //leftIntake.set(-speed);
       //rightIntake.set(-speed);
-      leftIntake.set(speed);
+      
       rightIntake.set(speed);
     }
     else{
       
       rightIntake.set(0);
     }
+    leftIntake.set(speed);
       
   }
 
