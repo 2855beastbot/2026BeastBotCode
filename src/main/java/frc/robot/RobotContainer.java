@@ -107,7 +107,7 @@ public class RobotContainer {
     SmartDashboard.putData("auto selector", autoChooser);
     SmartDashboard.putData(intakeWrist);
 
-    NamedCommands.registerCommand("AutoShoot", new AutoShoot(ballShooter, swerveDrive, indexer).asProxy());
+    NamedCommands.registerCommand("AutoShoot", new AutoShoot(ballShooter, swerveDrive, indexer));
     NamedCommands.registerCommand("HopperJuggle", wristJuggle);
     NamedCommands.registerCommand("ExtendHopper", new ExtendHopper(intakeWrist).asProxy());
     NamedCommands.registerCommand("StartWheels", new RepeatCommand(new InstantCommand(()->intake.spin(1)).asProxy()));
