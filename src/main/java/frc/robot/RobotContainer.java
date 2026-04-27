@@ -7,6 +7,8 @@ package frc.robot;
 
 
 
+import java.util.function.BooleanSupplier;
+
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
@@ -45,6 +47,7 @@ import frc.robot.commands.Index;
 import frc.robot.commands.MoveIntakeWrist;
 import frc.robot.commands.RPMShoot;
 import frc.robot.commands.ShootWithRange;
+import frc.robot.commands.SpeedUP;
 import frc.robot.commands.SpinIntake;
 import frc.robot.commands.WristJuggle;
 import frc.robot.commands.autoCommands.AutoShoot;
@@ -74,8 +77,13 @@ public class RobotContainer {
   private String centerAuto = "center";
 
   private Pose2d targetHub;
+  
    
-  private SequentialCommandGroup wristJuggle = new SequentialCommandGroup(new WristJuggle(intakeWrist, SubsystemConstants.wristMid),new WaitCommand(0.5), new WristJuggle(intakeWrist, SubsystemConstants.wristIn), new WaitCommand(0.5));   
+  private SequentialCommandGroup wristJuggle = new SequentialCommandGroup(
+    new WristJuggle(intakeWrist, SubsystemConstants.wristMid), new WaitCommand(0.3),
+    new WristJuggle(intakeWrist, SubsystemConstants.wristOut), new WaitCommand(0.25),
+    new WristJuggle(intakeWrist, SubsystemConstants.wristIn), new WaitCommand(0.5), 
+    new WristJuggle(intakeWrist, SubsystemConstants.wristOut), new WaitCommand(0.25));
   
 
   
@@ -164,6 +172,9 @@ public class RobotContainer {
         swerveDrive),
         new ShootWithRange(()->swerveDrive.getRPMFromRange(swerveDrive.getDistanceFromPose(swerveDrive.determineFeedPose())), ballShooter)
         ));
+
+    //new Trigger(()->driveController.getPOV(0) == 180).onTrue(new InstantCommand(()->swerveDrive.setMaxDriveSpeedMult(1)));
+    //new Trigger(()->driveController.getPOV(0) == 180).onFalse(new InstantCommand(()->swerveDrive.setMaxDriveSpeedMult(0.8)));
       
     /* 
     new Trigger(()->driveController.getLeftBumperButton()).whileTrue(new DriveWithRange(
@@ -183,7 +194,9 @@ public class RobotContainer {
 
 
     new Trigger(()->driveController.getRightBumperButton()).whileTrue(new ParallelCommandGroup(
-      new Index(()->1, indexer),
+      new SequentialCommandGroup(
+        new WaitCommand(0.1),
+        new Index(()->1, indexer)),
       new SequentialCommandGroup(
         new WaitCommand(0.25),
         wristJuggle.repeatedly()

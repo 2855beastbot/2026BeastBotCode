@@ -47,6 +47,7 @@ public class Swerve extends SubsystemBase {
   private Vision locationCamera = new Vision(VisionConstants.locationLimelightName, VisionConstants.locationConfig);
   private final PIDController pointToPosePID = new PIDController(5.0, 0.0, 0.5);
   private Pose2d targetHub;
+  private double slowModeVal = 0.8;
 
   public Swerve() {
     
@@ -64,6 +65,7 @@ public class Swerve extends SubsystemBase {
       e.printStackTrace();
     }
     configureAutoBuilder();
+    setMaxDriveSpeedMult(0.80);
     swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(1.5, 1.5, 9999999)); // higher number means less trust
     //reiously0.7,0.7,9999999
     pointToPosePID.enableContinuousInput(-Math.PI, Math.PI);
@@ -79,6 +81,14 @@ public class Swerve extends SubsystemBase {
 
   public double getMaxDriveSpeed(){
     return SwerveConstants.maxDriveSpeed;
+  }
+
+  public double getMaxDriveSpeedMult(){
+    return slowModeVal;
+  }
+
+  public void setMaxDriveSpeedMult(double newSpeed){
+    slowModeVal = newSpeed;
   }
 
   public double getMaxTurnSpeed(){

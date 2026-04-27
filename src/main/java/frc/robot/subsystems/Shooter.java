@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
@@ -22,13 +24,14 @@ public class Shooter extends SubsystemBase {
   private double targetRPS; // making this RPS instead of RPM for better internal consistency, everything outside the class is still RPM
   private boolean isUsingRPM;
   private TalonFXConfiguration config = new TalonFXConfiguration();
+  private boolean canIndex;
 
   public Shooter() {
     config.CurrentLimits.SupplyCurrentLowerLimit = 35;
     config.CurrentLimits.SupplyCurrentLimit = 30;
     setRPMUse(true);
     spin(0);
-    config.Slot0.kP = 0.06;
+    config.Slot0.kP = 0.04;
     config.Slot0.kI = 0.0;
     config.Slot0.kD = 0.0;
     left.getConfigurator().apply(config);
@@ -82,6 +85,8 @@ public class Shooter extends SubsystemBase {
     targetRPS = RPM / 60.0;
   }
 
+  //public void check
+
 
   /**
    * gets the RPM of the shooters passive state
@@ -97,6 +102,8 @@ public class Shooter extends SubsystemBase {
       left.setControl(new VelocityDutyCycle(targetRPS));
       right.setControl(new VelocityDutyCycle(targetRPS));
     }
+
+    //if(left.getVelocity() < )
     // This method will be called once per scheduler run
   }
 

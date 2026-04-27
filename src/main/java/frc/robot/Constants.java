@@ -26,7 +26,7 @@ public class Constants {
         public static final double maxDriveSpeed = 3;
         public static final double maxTurnSpeed = 4;
 
-        public static final double slowModeVal = 1.0;
+        public static final double slowModeVal = 0.75;
 
         public static final PPHolonomicDriveController autoController = new PPHolonomicDriveController(
             new PIDConstants(5.0, 0.0, 0.0),
@@ -59,7 +59,8 @@ public class Constants {
         public static final double intakeWristKd = 0.0;
 
         public static final double intakeWristKff = 1.33; // measured in volts
-        public static final double wristOut = 0.07;
+        public static final double wristOut = 0.09
+        ;
         public static final double wristMid = 1;
         public static final double wristIn = 1.75; 
         public static final double wristZeroVoltage = 33.0;
@@ -84,8 +85,8 @@ public class Constants {
         /**
          * 1 meter to number of rpm
          */
-        public static final double distanceToRPMRatio = 650;
-        public static final double baseRPM = 2874;
+        public static final double distanceToRPMRatio = 715;
+        public static final double baseRPM = 3000;
         public static final double aimingTagHeight = 1.12395; //meter
 
         public static final double[] aimingConfig = {

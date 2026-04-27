@@ -17,7 +17,7 @@ public class Drive extends Command {
   /** Creates a new Drive. */
   private DoubleSupplier translationX, translationY, angularRotationX;
   private Swerve swerveDrive;
-  private double slowModeVal = SwerveConstants.slowModeVal;
+  private double slowModeVal;
   public Drive(DoubleSupplier xSpeed, DoubleSupplier ySpeed, DoubleSupplier rot, Swerve drivetrain) {
     // Use addRequirements() here to declare subsystem dependencies.
     swerveDrive = drivetrain;
@@ -25,6 +25,7 @@ public class Drive extends Command {
     translationY = ySpeed;
     angularRotationX = rot;
     addRequirements(drivetrain);
+    slowModeVal = swerveDrive.getMaxDriveSpeedMult();
     
 
   }

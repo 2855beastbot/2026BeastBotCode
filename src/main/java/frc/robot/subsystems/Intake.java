@@ -8,6 +8,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.MAXMotionConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -37,15 +38,21 @@ public class Intake extends SubsystemBase {
   
   private TalonFX leftIntake = new TalonFX(CANIDConstants.intakeLeft);
   private TalonFX rightIntake = new TalonFX(CANIDConstants.intakeRight);
-  private TalonFXConfiguration config = new TalonFXConfiguration();
+  private TalonFXConfiguration leftConfig = new TalonFXConfiguration();
+  private TalonFXConfiguration rightConfig = new TalonFXConfiguration();
   
   
   private IntakeWrist intakeWrist;
   public Intake(IntakeWrist wrist) {
-    config.MotorOutput.Inverted = config.MotorOutput.Inverted.Clockwise_Positive;
-    config.CurrentLimits.SupplyCurrentLimit = 30.0;
-    leftIntake.getConfigurator().apply(config);
-    rightIntake.getConfigurator().apply(config);
+
+    leftConfig.MotorOutput.Inverted = leftConfig.MotorOutput.Inverted.Clockwise_Positive;
+    leftConfig.CurrentLimits.SupplyCurrentLimit = 30.0;
+
+    
+    rightConfig.CurrentLimits.SupplyCurrentLimit = 30.0;
+
+    leftIntake.getConfigurator().apply(leftConfig);
+    rightIntake.getConfigurator().apply(rightConfig);
     intakeWrist = wrist; 
   }
 
@@ -58,13 +65,13 @@ public class Intake extends SubsystemBase {
       //leftIntake.set(-speed);
       //rightIntake.set(-speed);
       
-      rightIntake.set(speed);
+      rightIntake.set(-speed);
     }
     else{
       
       rightIntake.set(0);
     }
-    leftIntake.set(speed);
+    leftIntake.set(-speed);
       
   }
 
