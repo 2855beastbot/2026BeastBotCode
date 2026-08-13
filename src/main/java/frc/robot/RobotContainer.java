@@ -56,6 +56,7 @@ import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
+import swervelib.SwerveDrive;
 import swervelib.SwerveInputStream;
 
 public class RobotContainer {
@@ -208,5 +209,29 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
    
     return new PathPlannerAuto(autoChooser.getSelected());
+  }
+
+  public Swerve getSwerve(){
+    return swerveDrive;
+  }
+
+  public IntakeWrist getIntakeWrist(){
+    return intakeWrist;
+  }
+
+  public Intake getIntake(){
+    return intake;
+  }
+
+  public Shooter getShooter(){
+    return ballShooter;
+  }
+
+  public Indexer getIndexer(){
+    return indexer;
+  }
+
+  public LED getLEDStrip(){
+    return LEDstrip;
   }
 }
