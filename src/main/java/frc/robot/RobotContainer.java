@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -48,6 +49,7 @@ import frc.robot.commands.SpinIntake;
 import frc.robot.commands.WristJuggle;
 import frc.robot.commands.autoCommands.AutoShoot;
 import frc.robot.commands.autoCommands.ExtendHopper;
+import frc.robot.simutils.RobotSim;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeWrist;
 import frc.robot.subsystems.LED;
@@ -57,6 +59,7 @@ import frc.robot.subsystems.Swerve;
 import swervelib.SwerveInputStream;
 
 public class RobotContainer {
+  private RobotSim robotSim;
   private Swerve swerveDrive = new Swerve();
   private XboxController driveController = new XboxController(0);
   private CommandXboxController operatorController = new CommandXboxController(1);
@@ -109,7 +112,9 @@ public class RobotContainer {
     configureBindings();
     LEDstrip.setPattern(LEDConstants.yellow);
     
-      
+    if(RobotBase.isSimulation()){
+      robotSim = new RobotSim();
+    }
   }
 
   private void configureBindings() {
