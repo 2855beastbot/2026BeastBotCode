@@ -68,7 +68,7 @@ public class Superstructure extends SubsystemBase {
           wrist.setTargetSetpoint(SubsystemConstants.wristMid);
         },
         () -> {
-          shooter.setTargetRPM(swerve.getRPMFromRange(swerve.getDistanceFromHub()));
+          shooter.setTargetRPM(swerve.inScoringArea() ? swerve.getRPMFromRange(swerve.getDistanceFromHub()) : 5000);
           indexer.spin(shooter.isAtSpeed() ? 1 : 0); // should this be debounced, or otherwise smoothed out somehow?
           if (wrist.isAtSetpoint()){
             wrist.setTargetSetpoint(wrist.getTargetSetpoint() == SubsystemConstants.wristMid ? 
