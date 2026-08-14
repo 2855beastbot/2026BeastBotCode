@@ -285,15 +285,7 @@ public class Swerve extends SubsystemBase {
     swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(newXYstd, newXYstd, 9999999));
   }
 
-  /*
-   * public double getPointAtSpeedUsingRelative(Pose2d target){
-   * double kP = 0.017;
-   * double poseAngle = getPose2d().relativeTo(target).getRotation().getRadians();
-   * return ((poseAngle + getPose2d().getRotation().getRadians()) * kP);
-   * }
-   */
   public void updatePoseWithVision() {
-
     LimelightHelpers.PoseEstimate measurement = aimingCamera.getMegaTag2(swerveDrive.getPose());
     if (aimingCamera.hasValidIDs()) {
       // setVisionStdDynamic(measurement.pose);
@@ -301,7 +293,6 @@ public class Swerve extends SubsystemBase {
 
       swerveDrive.addVisionMeasurement(measurement.pose, measurement.timestampSeconds);
     }
-
   }
 
   public Vision getAimingCamera() {
@@ -314,6 +305,14 @@ public class Swerve extends SubsystemBase {
 
   public Optional<Alliance> getAlliance() {
     return DriverStation.getAlliance();
+  }
+
+  public boolean inScoringArea(){
+    if(targetHub == VisionConstants.blueHub){
+      return getPose2d().getX() < VisionConstants.blueHub.getX();
+    }else{
+      return getPose2d().getX() > VisionConstants.redHub.getX();
+    }
   }
 
   public Command driveWithInputStream(SwerveInputStream input) {
