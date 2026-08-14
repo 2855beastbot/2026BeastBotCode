@@ -8,6 +8,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.ControlModeValue;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -19,7 +20,8 @@ public class Shooter extends SubsystemBase {
   private TalonFX left = new TalonFX(CANIDConstants.shooterLeft);
   private TalonFX right = new TalonFX(CANIDConstants.shooterRight);
   private final double passiveTargetRPM = SubsystemConstants.maxShooterRPM / 30;
-  private double targetRPS; // making this RPS instead of RPM for better internal consistency, everything outside the class is still RPM
+  private double targetRPS; // making this RPS instead of RPM for better internal consistency, everything
+                            // outside the class is still RPM
   private boolean isUsingRPM;
   private TalonFXConfiguration config = new TalonFXConfiguration();
 
@@ -31,67 +33,87 @@ public class Shooter extends SubsystemBase {
     config.Slot0.kD = 0.0;
     left.getConfigurator().apply(config);
     right.getConfigurator().apply(config);
-    
   }
 
-  public void spin(double speed, boolean isUsingRPM){
+  public void spin(double speed, boolean isUsingRPM) {
     setRPMUse(isUsingRPM);
     spin(speed);
   }
 
   /**
    * sets the speed of the Shooter
-   * @param speed either a traget RPM or percent power output, dependant on whether using RPM
+   * 
+   * @param speed either a traget RPM or percent power output, dependant on
+   *              whether using RPM
    */
-  private void spin(double speed){
-    if(!isUsingRPM){
+  private void spin(double speed) {
+    if (!isUsingRPM) {
       left.setControl(new DutyCycleOut(speed));
       right.setControl(new DutyCycleOut(speed));
-    }else{
+    } else {
       setTargetRPM(speed);
     }
-
-
   }
 
   /**
    * determines whether the shooter uses RPM or percent power
+   * 
    * @param useRPM true uses RPM, false uses percent power
    */
-  public void setRPMUse(boolean useRPM){
+  public void setRPMUse(boolean useRPM) {
     isUsingRPM = useRPM;
 
   }
 
   /**
    * gets whether the shooter is using RPM
+   * 
    * @return true for RPM use, false for percent power use
    */
-  public boolean getRPMUse(){
+  public boolean getRPMUse() {
     return isUsingRPM;
   }
 
   /**
    * sets the target RPM for the shooter
+   * 
    * @param RPM the target RPM to set
    */
-  public void setTargetRPM(double RPM){
+  public void setTargetRPM(double RPM) {
     setRPMUse(true);
     targetRPS = RPM / 60.0;
   }
 
-
   /**
    * gets the RPM of the shooters passive state
+   * 
    * @return the value of passive target RPM
    */
-  public double getPassiveRPM(){
+  public double getPassiveRPM() {
     return passiveTargetRPM;
+  }
+
+  public boolean isClosedLoop() {
+    return left.getControlMode().getValue() == ControlModeValue.VelocityDutyCycle
+        && right.getControlMode().getValue() == ControlModeValue.VelocityDutyCycle;
+  }
+
+  /**
+   * Whether or not all Shooter motors spinning fast enough for shooting.
+   * This method will return false if the shooter is not operating in closed-loop
+   * mode.
+   * 
+   * @return
+   */
+  public boolean isAtSpeed() {
+    return isClosedLoop()
+        && left.getClosedLoopError().isNear(0, targetRPS * 0.1)
+        && right.getClosedLoopError().isNear(0, targetRPS * 0.1);
   }
 
   @Override
   public void periodic() {
-    if(isUsingRPM){
+    if (isUsingRPM) {
       left.setControl(new VelocityDutyCycle(targetRPS));
       right.setControl(new VelocityDutyCycle(targetRPS));
     }
@@ -99,9 +121,10 @@ public class Shooter extends SubsystemBase {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder){
+  public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
-    // open Elastic -> Add Widget -> scroll to Shooter and open the dropdown -> drag values onto dashboard
+    // open Elastic -> Add Widget -> scroll to Shooter and open the dropdown -> drag
+    // values onto dashboard
     builder.addBooleanProperty("Closed Loop", this::getRPMUse, null);
     builder.addDoubleProperty("Target RPS", () -> targetRPS, null);
     builder.addDoubleProperty("Left/Speed", left::get, null);
