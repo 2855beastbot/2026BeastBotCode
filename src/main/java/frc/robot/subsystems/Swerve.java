@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
+import frc.robot.Constants.AllianceInfo;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.LimelightHelpers.RawFiducial;
@@ -40,21 +41,25 @@ import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 public class Swerve extends SubsystemBase {
+  public enum DrivingStates{
+    FREE,
+    AIMING
+  }
+
   /** Creates a new Swerve. */
   private SwerveDrive swerveDrive;
   private RobotConfig config;
   private Vision aimingCamera = new Vision(VisionConstants.aimingLimelightName, VisionConstants.aimingConfig);
   private final PIDController pointToPosePID = new PIDController(20.0, 0.0, 0.5);
-  private Pose2d targetHub;
+  private DrivingStates currentState;
 
   public Swerve() {
-    updateTargetHub();
 
     Pose2d startingPose;
     if (RobotBase.isSimulation()) {
       // chooses default position based on chosen target hub, vision should override
       // this
-      startingPose = targetHub == VisionConstants.blueHub ? new Pose2d(new Translation2d(3, 4),
+      startingPose = AllianceInfo.getAlliance() == Alliance.Blue ? new Pose2d(new Translation2d(3, 4),
           Rotation2d.fromDegrees(0))
           : new Pose2d(new Translation2d(13, 4),
               Rotation2d.fromDegrees(180));
@@ -85,6 +90,8 @@ public class Swerve extends SubsystemBase {
     // reiously0.7,0.7,9999999
     pointToPosePID.enableContinuousInput(-Math.PI, Math.PI);
     pointToPosePID.setTolerance(2.0);
+
+    currentState = DrivingStates.FREE;
   }
 
   public double getMaxDriveSpeed() {
@@ -113,7 +120,7 @@ public class Swerve extends SubsystemBase {
    * @param translation x and y speeds to drive at
    */
   public void drivePose(Translation2d translation) {
-    Rotation2d desiredAngle = getPointAtPoseAngle(targetHub);
+    Rotation2d desiredAngle = getPointAtPoseAngle(AllianceInfo.getTargetHubPos());
     double rotationSpeed = pointToPosePID.calculate(
         getPose2d().getRotation().getRadians(),
         desiredAngle.getRadians());
@@ -133,25 +140,13 @@ public class Swerve extends SubsystemBase {
   }
 
   /**
-   * updates the target hub based on driver station
-   */
-  public void updateTargetHub() {
-    var alliance = DriverStation.getAlliance();
-    if (alliance.isPresent()) {
-      targetHub = (alliance.get() == Alliance.Blue) ? VisionConstants.blueHub : VisionConstants.redHub;
-    } else {
-      targetHub = VisionConstants.blueHub;
-    }
-  }
-
-  /**
    * resets the pose of the robot to the passed in pose, rotating by 180 if in red
    * alliance
    * 
    * @param pose the pose to set to
    */
   public void resetOdometryWithAlliance(Pose2d pose) {
-    if (targetHub == VisionConstants.blueHub) {
+    if (AllianceInfo.isBlue()) {
       swerveDrive.resetOdometry(pose);
     } else {
       swerveDrive
@@ -196,31 +191,19 @@ public class Swerve extends SubsystemBase {
    * @return the distance from the alliance hub
    */
   public double getDistanceFromHub() {
-    return getDistanceFromPose(targetHub);
+    return getDistanceFromPose(AllianceInfo.getTargetHubPos());
   }
 
   public double getAngleFromHub() {
-    return getPointAtPoseAngle(targetHub).getRadians();
+    return getPointAtPoseAngle(AllianceInfo.getTargetHubPos()).getRadians();
   }
 
   public SwerveDrive getSwerve() {
     return swerveDrive;
   }
 
-  public Pose2d getTargetHub() {
-    return targetHub;
-  }
-
-  public String getTargetHubAsString() {
-    if (targetHub.equals(VisionConstants.redHub)) {
-      return "Red";
-    } else {
-      return "Blue";
-    }
-  }
-
   public double getPointAtPoseSpeed() {
-    Rotation2d desiredAngle = getPointAtPoseAngle(targetHub);
+    Rotation2d desiredAngle = getPointAtPoseAngle(AllianceInfo.getTargetHubPos());
     double speed = pointToPosePID.calculate(getPose2d().getRotation().getRadians(), desiredAngle.getRadians());
     if (desiredAngle.getDegrees() > 3) {
       return speed;
@@ -308,7 +291,7 @@ public class Swerve extends SubsystemBase {
   }
 
   public boolean inScoringArea(){
-    if(targetHub == VisionConstants.blueHub){
+    if(AllianceInfo.isBlue()){
       return getPose2d().getX() < VisionConstants.blueHub.getX();
     }else{
       return getPose2d().getX() > VisionConstants.redHub.getX();
@@ -329,14 +312,7 @@ public class Swerve extends SubsystemBase {
         this::setRobotRelativeSpeeds,
         SwerveConstants.autoController,
         config,
-        () -> {
-          var alliance = DriverStation.getAlliance();
-          if (alliance.isPresent()) {
-            return alliance.get() == DriverStation.Alliance.Red;
-          } else {
-            return false;
-          }
-        },
+        AllianceInfo::isRed,
         this);
   }
 
@@ -363,13 +339,13 @@ public class Swerve extends SubsystemBase {
     builder.addDoubleProperty("Pose/Y", () -> getPose2d().getY(), null);
     builder.addDoubleProperty("Pose/Rotation", () -> getPose2d().getRotation().getRadians(), null);
 
-    builder.addDoubleProperty("Target/X", targetHub::getX, null);
-    builder.addDoubleProperty("Target/Y", targetHub::getY, null);
+    builder.addDoubleProperty("Target/X", () -> AllianceInfo.getTargetHubPos().getX(), null);
+    builder.addDoubleProperty("Target/Y", () -> AllianceInfo.getTargetHubPos().getY(), null);
 
     builder.addDoubleProperty("dist to rpm val", () -> aimingCamera.getDistToRPMVal(), null);
     builder.addDoubleProperty("distance from hub", () -> getDistanceFromHub(), null);
     builder.addDoubleProperty("angle from hub", () -> getAngleFromHub(), null);
-    builder.addStringProperty("target hub", () -> getTargetHubAsString(), null);
+    builder.addStringProperty("target hub", () -> AllianceInfo.getAlliance().toString(), null);
     builder.addDoubleProperty("gyro heading", () -> swerveDrive.getPose().getRotation().getRadians(), null);
     builder.addDoubleProperty("point at pose error", () -> getPointAtPoseError(), null);
   }

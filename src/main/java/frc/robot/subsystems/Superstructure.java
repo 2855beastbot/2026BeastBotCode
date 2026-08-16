@@ -76,6 +76,6 @@ public class Superstructure extends SubsystemBase {
           }
           // TODO make robot point at hub if in scoring area, also change rpm to only calculate when aiming at hub and not when feeding
         },
-        this);
+        this).withName("Shooting Superstructure State");
   }
 }

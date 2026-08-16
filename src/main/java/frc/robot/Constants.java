@@ -15,12 +15,33 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
 
 
 /** Add your docs here. */
-public class Constants {
+public final class Constants {
+    private Constants(){}
+
+    public static class AllianceInfo{
+        public static Alliance getAlliance(){
+            return DriverStation.getAlliance().orElseGet(() -> Alliance.Blue);
+        }
+
+        public static boolean isBlue(){
+            return getAlliance() == Alliance.Blue;
+        }
+
+        public static boolean isRed(){
+            return getAlliance() == Alliance.Red;
+        }
+
+        public static Pose2d getTargetHubPos(){
+            return getAlliance() == Alliance.Blue ? VisionConstants.blueHub : VisionConstants.redHub;
+        }
+    }
 
     public static class SwerveConstants{
         public static final double maxDriveSpeed = 3;
