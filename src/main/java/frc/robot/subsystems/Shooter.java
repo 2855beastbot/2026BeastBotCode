@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ControlModeValue;
 
@@ -14,6 +15,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CANIDConstants;
 import frc.robot.Constants.SubsystemConstants;
+import frc.robot.Constants.VisionConstants;
 
 public class Shooter extends SubsystemBase {
   /** Creates a new Shooter. */
@@ -25,42 +27,45 @@ public class Shooter extends SubsystemBase {
   private boolean isUsingRPM;
   private TalonFXConfiguration config = new TalonFXConfiguration();
 
+  private final DutyCycleOut leftDutyCycle = new DutyCycleOut(0.0);
+  private final DutyCycleOut rightDutyCycle = new DutyCycleOut(0.0);
+  private final VelocityVoltage leftVelocity = new VelocityVoltage(passiveTargetRPM);
+  private final VelocityVoltage rightVelocity = new VelocityVoltage(passiveTargetRPM);
+
+
   public Shooter() {
-    setRPMUse(true);
-    spin(0);
     config.Slot0.kP = 0.06;
     config.Slot0.kI = 0.0;
     config.Slot0.kD = 0.0;
     left.getConfigurator().apply(config);
     right.getConfigurator().apply(config);
+
+    spin(0.0, false);
   }
 
+  /**
+   * Sets the speed of the Shooter.  If isUsingRPM is set to true, the value of speed will be
+   * treated as a velocity in RPM, if false, it will be treated as duty cycle.
+   * 
+   * @param speed either a traget RPM or percent power output, dependant on
+   *              whether using RPM
+   * @param isUsingRpm whether to use closed loop velocity control
+   */
   public void spin(double speed, boolean isUsingRPM) {
     setRPMUse(isUsingRPM);
     spin(speed);
   }
 
-  /**
-   * sets the speed of the Shooter
-   * 
-   * @param speed either a traget RPM or percent power output, dependant on
-   *              whether using RPM
-   */
   private void spin(double speed) {
     if (!isUsingRPM) {
-      left.setControl(new DutyCycleOut(speed));
-      right.setControl(new DutyCycleOut(speed));
+      left.setControl(leftDutyCycle.withOutput(speed));
+      right.setControl(rightDutyCycle.withOutput(speed));
     } else {
       setTargetRPM(speed);
     }
   }
 
-  /**
-   * determines whether the shooter uses RPM or percent power
-   * 
-   * @param useRPM true uses RPM, false uses percent power
-   */
-  public void setRPMUse(boolean useRPM) {
+  private void setRPMUse(boolean useRPM) {
     isUsingRPM = useRPM;
 
   }
@@ -84,6 +89,10 @@ public class Shooter extends SubsystemBase {
     targetRPS = RPM / 60.0;
   }
 
+  public void shootForDistance(double meters){
+    setTargetRPM((VisionConstants.distanceToRPMRatio * meters) + VisionConstants.baseRPM);
+  }
+
   /**
    * gets the RPM of the shooters passive state
    * 
@@ -94,8 +103,8 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean isClosedLoop() {
-    return left.getControlMode().getValue() == ControlModeValue.VelocityDutyCycle
-        && right.getControlMode().getValue() == ControlModeValue.VelocityDutyCycle;
+    return left.getControlMode().getValue() == ControlModeValue.VelocityVoltage
+        && right.getControlMode().getValue() == ControlModeValue.VelocityVoltage;
   }
 
   /**
@@ -107,15 +116,15 @@ public class Shooter extends SubsystemBase {
    */
   public boolean isAtSpeed() {
     return isClosedLoop()
-        && left.getClosedLoopError().isNear(0, targetRPS * 0.1)
-        && right.getClosedLoopError().isNear(0, targetRPS * 0.1);
+        && left.getClosedLoopError().isNear(0, targetRPS * 0.05)
+        && right.getClosedLoopError().isNear(0, targetRPS * 0.05);
   }
 
   @Override
   public void periodic() {
     if (isUsingRPM) {
-      left.setControl(new VelocityDutyCycle(targetRPS));
-      right.setControl(new VelocityDutyCycle(targetRPS));
+      left.setControl(leftVelocity.withVelocity(targetRPS));
+      right.setControl(rightVelocity.withVelocity(targetRPS));
     }
     // This method will be called once per scheduler run
   }

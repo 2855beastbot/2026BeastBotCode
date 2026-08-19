@@ -28,6 +28,10 @@ public class Superstructure extends SubsystemBase {
   private Shooter shooter;
   private Indexer indexer;
 
+  private final Command idleState;
+  private final Command pickingUpState;
+  private final Command shootingState;
+
   /** Creates a new Superstructure. */
   public Superstructure(RobotContainer container) {
     this.container = container;
@@ -36,53 +40,62 @@ public class Superstructure extends SubsystemBase {
     intake = container.getIntake();
     shooter = container.getShooter();
     indexer = container.getIndexer();
-  }
 
-  public Command idleState() {
-    return Commands.startRun(
+    idleState = Commands.startRun(
       () -> swerve.cancelAiming(),
-      // leave the intakeWrist where it is
       () -> {
+      // leave the intakeWrist where it is
       indexer.spin(0);
       shooter.spin(0, false);
       intake.spin(0);
       },
       this)
-      .withName("Idle Superstructure State");
+      .withName("Idle Superstate");
+
+    pickingUpState = Commands.startRun(
+      () -> {
+        wrist.setTargetSetpoint(SubsystemConstants.wristOut);
+        swerve.cancelAiming();
+      },
+      () -> {
+        indexer.spin(0);
+        shooter.spin(0, false);
+        intake.spin(wrist.getPose() < 1.8 ? 1 : 0);
+      },
+      this)
+      .withName("Picking Up Balls Superstate");
+
+    shootingState = Commands.startRun(
+    () -> {
+      wrist.setTargetSetpoint(SubsystemConstants.wristMid);
+      swerve.startAiming();
+    },
+    () -> {
+      if(swerve.inScoringArea()){
+        shooter.shootForDistance(swerve.getDistanceFromHub());
+      } else {
+        shooter.setTargetRPM(5000);
+      }
+      indexer.spin(shooter.isAtSpeed() && swerve.pointedAtTarget() ? 1 : 0); // should this be debounced, or otherwise smoothed out somehow?
+      if (wrist.isAtSetpoint()) {
+        wrist
+            .setTargetSetpoint(wrist.getTargetSetpoint() == SubsystemConstants.wristMid ? SubsystemConstants.wristIn
+                : SubsystemConstants.wristMid);
+      }
+    },
+    this)
+    .withName("Shooting Superstate");
+  }
+
+  public Command idleState() {
+    return idleState;
   }
 
   public Command pickingUpState() {
-    return Commands.startRun(
-        () -> {
-          wrist.setTargetSetpoint(SubsystemConstants.wristOut);
-          swerve.cancelAiming();
-        },
-        () -> {
-          indexer.spin(0);
-          shooter.spin(0, false);
-          intake.spin(wrist.getPose() < 1.8 ? 1 : 0);
-          swerve.cancelAiming();
-        },
-        this)
-        .withName("Picking Up Balls Superstructure State");
+    return pickingUpState;
   }
 
   public Command shootingState() {
-    return Commands.startRun(
-        () -> {
-          wrist.setTargetSetpoint(SubsystemConstants.wristMid);
-          swerve.startAiming();
-        },
-        () -> {
-          shooter.setTargetRPM(swerve.inScoringArea() ? swerve.getRPMFromRange(swerve.getDistanceFromHub()) : 5000);
-          indexer.spin(shooter.isAtSpeed() ? 1 : 0); // should this be debounced, or otherwise smoothed out somehow?
-          if (wrist.isAtSetpoint()) {
-            wrist
-                .setTargetSetpoint(wrist.getTargetSetpoint() == SubsystemConstants.wristMid ? SubsystemConstants.wristIn
-                    : SubsystemConstants.wristMid);
-          }
-        },
-        this)
-        .withName("Shooting Superstructure State");
+    return shootingState;
   }
 }

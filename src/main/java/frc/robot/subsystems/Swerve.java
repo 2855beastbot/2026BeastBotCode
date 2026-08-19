@@ -56,7 +56,6 @@ public class Swerve extends SubsystemBase {
   private TeleopState currentState;
 
   public Swerve() {
-
     Pose2d startingPose;
     if (RobotBase.isSimulation()) {
       // chooses default position based on chosen target hub, vision should override
@@ -337,6 +336,17 @@ public class Swerve extends SubsystemBase {
 
   public boolean isAiming() {
     return currentState == TeleopState.AIMING;
+  }
+
+  /**
+   * Returns true if the robot is pointed at its desired shooting target.
+   * IMPORTANT: Will also return true if there is no target, such as when the
+   * robot is not in the scoring area.
+   * 
+   * @return true if pointed at target, or if there is no target selected
+   */
+  public boolean pointedAtTarget() {
+    return !inScoringArea() || pointToPosePID.atSetpoint();
   }
 
   public void configureAutoBuilder() {
