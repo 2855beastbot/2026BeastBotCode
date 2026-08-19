@@ -62,9 +62,11 @@ import swervelib.SwerveInputStream;
 
 public class RobotContainer {
   private RobotSim robotSim;
-  private Swerve swerveDrive = new Swerve();
-  private XboxController driveController = new XboxController(0);
+  
+  private CommandXboxController driveController = new CommandXboxController(0);
   private CommandXboxController operatorController = new CommandXboxController(1);
+
+  private Swerve swerveDrive = new Swerve();
   private IntakeWrist intakeWrist = new IntakeWrist();
   private Intake intake = new Intake(intakeWrist);
   private Shooter ballShooter = new Shooter();
@@ -112,6 +114,28 @@ public class RobotContainer {
     }
   }
 
+  private void setDefaultCommands(){
+    // contains all driving logic and state handling for teleop, it will get overridden by pathplanner's
+    // path follow commands during auto
+    swerveDrive.setDefaultCommand(swerveDrive.run(() -> 
+        swerveDrive.teleopDrive(driveController.getLeftY(), 
+        driveController.getLeftX(), driveController.getRightX())));
+
+    // if(AllianceInfo.isBlue()){
+    //   swerveDrive.setDefaultCommand(new Drive(
+    //         ()->-MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
+    //         ()->-MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
+    //         ()->-driveController.getRightX(),
+    //         swerveDrive));
+    // } else {
+    //   swerveDrive.setDefaultCommand(new Drive(
+    //         ()->MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
+    //         ()->MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
+    //         ()->-driveController.getRightX(),
+    //         swerveDrive));
+    // }
+  }
+
   private void configureBindings() {
     // SwerveInputStream driveWithPose = SwerveInputStream.of(
     // swerveDrive.getSwerve(),
@@ -124,15 +148,15 @@ public class RobotContainer {
     // .aimWhile(()->true);
 
     //Driver commands
-    new Trigger(()->driveController.getYButton()).whileTrue(new RunCommand(()->swerveDrive.setXMode(), swerveDrive));
+    // new Trigger(()->driveController.getYButton()).whileTrue(new RunCommand(()->swerveDrive.setXMode(), swerveDrive));
     // new Trigger(()->driveController.getRightTriggerAxis() > 0.5).whileTrue(new ParallelCommandGroup(
     //   swerveDrive.driveWithInputStream(driveWithPose),
     //   new ShootWithRange(()->swerveDrive.getRPMFromRange(swerveDrive.getDistanceFromHub()), ballShooter)
     //   ));
-        new Trigger(()->driveController.getRightTriggerAxis() > 0.5).whileTrue(new ParallelCommandGroup(
-      new RunCommand(()->swerveDrive.drivePose(new Translation2d(-driveController.getLeftY(), -driveController.getLeftX()))),
-      new ShootWithRange(()->swerveDrive.getRPMFromRange(swerveDrive.getDistanceFromHub()), ballShooter)
-      ));
+      //   new Trigger(()->driveController.getRightTriggerAxis() > 0.5).whileTrue(new ParallelCommandGroup(
+      // new RunCommand(()->swerveDrive.drivePose(new Translation2d(-driveController.getLeftY(), -driveController.getLeftX()))),
+      // new ShootWithRange(()->swerveDrive.getRPMFromRange(swerveDrive.getDistanceFromHub()), ballShooter)
+      // ));
       
     /* 
     new Trigger(()->driveController.getLeftBumperButton()).whileTrue(new DriveWithRange(
@@ -140,46 +164,30 @@ public class RobotContainer {
        swerveDrive,
         VisionConstants.idealShootingRange));
     */
-    new Trigger(()->driveController.getRawButton(8)).onTrue(new InstantCommand(()->swerveDrive.resetOdometryWithAlliance(new Pose2d(swerveDrive.getPose2d().getX(), swerveDrive.getPose2d().getX(), new Rotation2d()))));
-    new Trigger(()->driveController.getRawButton(7)).onTrue(new InstantCommand(()->swerveDrive.resetOdometryWithAlliance(swerveDrive.getAimingCamera().getPose())));
-    new Trigger(()->driveController.getXButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristOut)).alongWith(new PrintCommand("intake out")));
-    new Trigger(()->driveController.getAButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristMid)));
-    new Trigger(()->driveController.getBButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristIn)));
-    // new Trigger(()->driveController.getRightBumperButton()).whileTrue(new Index(()->1, indexer));
-    new Trigger(()->driveController.getLeftTriggerAxis() > 0.3).whileTrue(new SpinIntake(()->driveController.getLeftTriggerAxis(), intake));
-    new Trigger(()->driveController.getLeftBumperButton()).whileTrue(new SpinIntake(()->-1, intake));
+    // new Trigger(()->driveController.getRawButton(8)).onTrue(new InstantCommand(()->swerveDrive.resetOdometryWithAlliance(new Pose2d(swerveDrive.getPose2d().getX(), swerveDrive.getPose2d().getX(), new Rotation2d()))));
+    // new Trigger(()->driveController.getRawButton(7)).onTrue(new InstantCommand(()->swerveDrive.resetOdometryWithAlliance(swerveDrive.getAimingCamera().getPose())));
+    // new Trigger(()->driveController.getXButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristOut)).alongWith(new PrintCommand("intake out")));
+    // new Trigger(()->driveController.getAButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristMid)));
+    // new Trigger(()->driveController.getBButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristIn)));
+    // // new Trigger(()->driveController.getRightBumperButton()).whileTrue(new Index(()->1, indexer));
+    // new Trigger(()->driveController.getLeftTriggerAxis() > 0.3).whileTrue(new SpinIntake(()->driveController.getLeftTriggerAxis(), intake));
+    // new Trigger(()->driveController.getLeftBumperButton()).whileTrue(new SpinIntake(()->-1, intake));
 
 
-    new Trigger(()->driveController.getRightBumperButton()).whileTrue(new ParallelCommandGroup(new Index(()->1, indexer), wristJuggle));
+    // new Trigger(()->driveController.getRightBumperButton()).whileTrue(new ParallelCommandGroup(new Index(()->1, indexer), wristJuggle));
 
     //Operator Commands
-    operatorController.rightBumper().whileTrue(new Index(()->1, indexer));
-    operatorController.leftBumper().whileTrue(new SpinIntake(()->-1, intake));
-    operatorController.x().onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristOut), intakeWrist));
-    operatorController.b().onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristIn), intakeWrist));
-    //operatorController.a().onTrue(new DeployWrist(intake));
-    operatorController.axisGreaterThan(2, 0.3).whileTrue(new SpinIntake(()->operatorController.getLeftTriggerAxis(), intake));
-    operatorController.axisGreaterThan(3, 0.3).whileTrue(new RunCommand(()->ballShooter.spin(operatorController.getRightTriggerAxis(), false), ballShooter));
-    operatorController.axisMagnitudeGreaterThan(1, 0.3).whileTrue(new MoveIntakeWrist(()->-operatorController.getLeftY(), intakeWrist));
-    operatorController.button(8).onTrue(new InstantCommand(()->intakeWrist.zeroEncoders(), intakeWrist));
-    operatorController.y().whileTrue(new RunCommand(()->ballShooter.spin(5000, true), ballShooter));
+    // operatorController.rightBumper().whileTrue(new Index(()->1, indexer));
+    // operatorController.leftBumper().whileTrue(new SpinIntake(()->-1, intake));
+    // operatorController.x().onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristOut), intakeWrist));
+    // operatorController.b().onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristIn), intakeWrist));
+    // //operatorController.a().onTrue(new DeployWrist(intake));
+    // operatorController.axisGreaterThan(2, 0.3).whileTrue(new SpinIntake(()->operatorController.getLeftTriggerAxis(), intake));
+    // operatorController.axisGreaterThan(3, 0.3).whileTrue(new RunCommand(()->ballShooter.spin(operatorController.getRightTriggerAxis(), false), ballShooter));
+    // operatorController.axisMagnitudeGreaterThan(1, 0.3).whileTrue(new MoveIntakeWrist(()->-operatorController.getLeftY(), intakeWrist));
+    // operatorController.button(8).onTrue(new InstantCommand(()->intakeWrist.zeroEncoders(), intakeWrist));
+    // operatorController.y().whileTrue(new RunCommand(()->ballShooter.spin(5000, true), ballShooter));
     
-  }
-
-  private void setDefaultCommands(){
-    if(AllianceInfo.isBlue()){
-      swerveDrive.setDefaultCommand(new Drive(
-            ()->-MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
-            ()->-MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
-            ()->-driveController.getRightX(),
-            swerveDrive));
-    } else {
-      swerveDrive.setDefaultCommand(new Drive(
-            ()->MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
-            ()->MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
-            ()->-driveController.getRightX(),
-            swerveDrive));
-    }
   }
 
   public Command getAutonomousCommand() {

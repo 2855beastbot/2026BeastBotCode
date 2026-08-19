@@ -12,6 +12,7 @@ import java.util.Optional;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -28,6 +29,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
 import frc.robot.Constants.AllianceInfo;
@@ -41,7 +43,7 @@ import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 public class Swerve extends SubsystemBase {
-  public enum DrivingStates{
+  private enum TeleopState {
     FREE,
     AIMING
   }
@@ -51,7 +53,7 @@ public class Swerve extends SubsystemBase {
   private RobotConfig config;
   private Vision aimingCamera = new Vision(VisionConstants.aimingLimelightName, VisionConstants.aimingConfig);
   private final PIDController pointToPosePID = new PIDController(20.0, 0.0, 0.5);
-  private DrivingStates currentState;
+  private TeleopState currentState;
 
   public Swerve() {
 
@@ -59,7 +61,7 @@ public class Swerve extends SubsystemBase {
     if (RobotBase.isSimulation()) {
       // chooses default position based on chosen target hub, vision should override
       // this
-      startingPose = AllianceInfo.getAlliance() == Alliance.Blue ? new Pose2d(new Translation2d(3, 4),
+      startingPose = AllianceInfo.isBlue() ? new Pose2d(new Translation2d(3, 4),
           Rotation2d.fromDegrees(0))
           : new Pose2d(new Translation2d(13, 4),
               Rotation2d.fromDegrees(180));
@@ -91,7 +93,7 @@ public class Swerve extends SubsystemBase {
     pointToPosePID.enableContinuousInput(-Math.PI, Math.PI);
     pointToPosePID.setTolerance(2.0);
 
-    currentState = DrivingStates.FREE;
+    currentState = TeleopState.FREE;
   }
 
   public double getMaxDriveSpeed() {
@@ -112,6 +114,34 @@ public class Swerve extends SubsystemBase {
    */
   public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
     swerveDrive.drive(translation, rotation, fieldRelative, isOpenLoop);
+  }
+
+  /**
+   * Method for driving based on controller inputs. Values are processed under the
+   * assumption that they
+   * come from a gamepad and may not function correctly when coming from other
+   * sources.
+   * 
+   * @param controllerX
+   * @param controllerY
+   * @param controllerRotation
+   */
+  public void teleopDrive(double controllerX, double controllerY, double controllerRotation) {
+    double rotationSpeed = isAiming() && inScoringArea() ? getPointAtPoseSpeed()
+        : controllerRotation * getMaxTurnSpeed() * -1 * SwerveConstants.slowModeVal;
+
+    int flipCoeff = AllianceInfo.isBlue() ? -1 : 1; // position inputs need to be reversed depending on which side of
+                                                    // the field the alliance is on
+    swerveDrive
+        .drive(
+            new Translation2d(
+                MathUtil.applyDeadband(controllerX, 0.1) * getMaxDriveSpeed() * flipCoeff
+                    * SwerveConstants.slowModeVal,
+                MathUtil.applyDeadband(controllerY, 0.1) * getMaxDriveSpeed() * flipCoeff
+                    * SwerveConstants.slowModeVal),
+            rotationSpeed,
+            true,
+            true);
   }
 
   /**
@@ -286,22 +316,24 @@ public class Swerve extends SubsystemBase {
     return (VisionConstants.distanceToRPMRatio * range) + VisionConstants.baseRPM;
   }
 
-  public Optional<Alliance> getAlliance() {
-    return DriverStation.getAlliance();
-  }
-
-  public boolean inScoringArea(){
-    if(AllianceInfo.isBlue()){
+  public boolean inScoringArea() {
+    if (AllianceInfo.isBlue()) {
       return getPose2d().getX() < VisionConstants.blueHub.getX();
-    }else{
+    } else {
       return getPose2d().getX() > VisionConstants.redHub.getX();
     }
   }
 
-  public Command driveWithInputStream(SwerveInputStream input) {
-    return run(() -> {
-      swerveDrive.driveFieldOriented(input.get());
-    });
+  public void startAiming() {
+    currentState = TeleopState.AIMING;
+  }
+
+  public void cancelAiming() {
+    currentState = TeleopState.FREE;
+  }
+
+  public boolean isAiming() {
+    return currentState == TeleopState.AIMING;
   }
 
   public void configureAutoBuilder() {

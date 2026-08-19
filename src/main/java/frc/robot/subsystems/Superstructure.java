@@ -20,7 +20,7 @@ import frc.robot.Constants.SubsystemConstants;
  */
 public class Superstructure extends SubsystemBase {
   private RobotContainer container;
-  // saving commonly referenced subsystems cuts down on verbosity
+  // saving commonly referenced subsystems cuts down on typing
   private Swerve swerve;
   private IntakeWrist wrist;
   private Intake intake;
@@ -40,11 +40,10 @@ public class Superstructure extends SubsystemBase {
   public Command getIdleState() {
     return Commands.run(() -> {
       // leave the intakeWrist where it is
-      shooter.spin(0, false);
       indexer.spin(0);
+      shooter.spin(0, false);
       intake.spin(0);
-      // TODO stop drive from aiming if it is, otherwise let it keep doing what it's
-      // doing (pathplanner path or teleop driving)
+      swerve.cancelAiming();
     }).withName("Idle Superstructure State");
   }
 
@@ -54,10 +53,8 @@ public class Superstructure extends SubsystemBase {
         () -> {
           indexer.spin(0);
           shooter.spin(0, false);
-          if (wrist.getPose() < 1.8)
-            intake.spin(1);
-          else
-            intake.spin(0);
+          intake.spin(wrist.getPose() < 1.8 ? 1 : 0);
+          swerve.cancelAiming();
         },
         this).withName("Picking Up Balls Superstructure State");
   }
@@ -74,7 +71,7 @@ public class Superstructure extends SubsystemBase {
             wrist.setTargetSetpoint(wrist.getTargetSetpoint() == SubsystemConstants.wristMid ? 
               SubsystemConstants.wristIn : SubsystemConstants.wristMid);
           }
-          // TODO make robot point at hub if in scoring area, also change rpm to only calculate when aiming at hub and not when feeding
+          swerve.startAiming();
         },
         this).withName("Shooting Superstructure State");
   }
