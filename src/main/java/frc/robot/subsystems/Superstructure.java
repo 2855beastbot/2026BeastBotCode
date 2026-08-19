@@ -14,9 +14,10 @@ import frc.robot.Constants.SubsystemConstants;
 
 /**
  * Controls every part of the robot except the wheels. All robot actions except
- * those that
- * involve only the wheels should be handled as Commands to the
- * Superstructure and not to the robot's individual subsystems.
+ * driving should be handled as Commands to the Superstructure and not to the
+ * robot's individual subsystems. Driving is handled by PathPlanner during auto 
+ * and the drive's own commands during teleop, but the Superstructure may request 
+ * actions of the Swervedrive via methods like startAiming() and cancelAiming().
  */
 public class Superstructure extends SubsystemBase {
   private RobotContainer container;
@@ -37,42 +38,51 @@ public class Superstructure extends SubsystemBase {
     indexer = container.getIndexer();
   }
 
-  public Command getIdleState() {
-    return Commands.run(() -> {
+  public Command idleState() {
+    return Commands.startRun(
+      () -> swerve.cancelAiming(),
       // leave the intakeWrist where it is
+      () -> {
       indexer.spin(0);
       shooter.spin(0, false);
       intake.spin(0);
-      swerve.cancelAiming();
-    }).withName("Idle Superstructure State");
+      },
+      this)
+      .withName("Idle Superstructure State");
   }
 
-  public Command getPickingUpState() {
+  public Command pickingUpState() {
     return Commands.startRun(
-        () -> wrist.setTargetSetpoint(SubsystemConstants.wristOut),
+        () -> {
+          wrist.setTargetSetpoint(SubsystemConstants.wristOut);
+          swerve.cancelAiming();
+        },
         () -> {
           indexer.spin(0);
           shooter.spin(0, false);
           intake.spin(wrist.getPose() < 1.8 ? 1 : 0);
           swerve.cancelAiming();
         },
-        this).withName("Picking Up Balls Superstructure State");
+        this)
+        .withName("Picking Up Balls Superstructure State");
   }
 
-  public Command getShootingState() {
+  public Command shootingState() {
     return Commands.startRun(
         () -> {
           wrist.setTargetSetpoint(SubsystemConstants.wristMid);
+          swerve.startAiming();
         },
         () -> {
           shooter.setTargetRPM(swerve.inScoringArea() ? swerve.getRPMFromRange(swerve.getDistanceFromHub()) : 5000);
           indexer.spin(shooter.isAtSpeed() ? 1 : 0); // should this be debounced, or otherwise smoothed out somehow?
-          if (wrist.isAtSetpoint()){
-            wrist.setTargetSetpoint(wrist.getTargetSetpoint() == SubsystemConstants.wristMid ? 
-              SubsystemConstants.wristIn : SubsystemConstants.wristMid);
+          if (wrist.isAtSetpoint()) {
+            wrist
+                .setTargetSetpoint(wrist.getTargetSetpoint() == SubsystemConstants.wristMid ? SubsystemConstants.wristIn
+                    : SubsystemConstants.wristMid);
           }
-          swerve.startAiming();
         },
-        this).withName("Shooting Superstructure State");
+        this)
+        .withName("Shooting Superstructure State");
   }
 }

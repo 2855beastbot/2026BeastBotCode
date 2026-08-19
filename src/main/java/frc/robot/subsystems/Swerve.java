@@ -118,16 +118,18 @@ public class Swerve extends SubsystemBase {
 
   /**
    * Method for driving based on controller inputs. Values are processed under the
-   * assumption that they
-   * come from a gamepad and may not function correctly when coming from other
-   * sources.
+   * assumption that they come from a gamepad and may not function correctly when
+   * coming from other sources.
    * 
-   * @param controllerX
-   * @param controllerY
-   * @param controllerRotation
+   * @param controllerX        value for movement along the field's X axis,
+   *                           usually the Y axis of the left stick
+   * @param controllerY        value for movement along the field's Y axis,
+   *                           usually the X axis of the left stick
+   * @param controllerRotation value for robot's rotation, usually the X axis on
+   *                           the right stick
    */
   public void teleopDrive(double controllerX, double controllerY, double controllerRotation) {
-    double rotationSpeed = isAiming() && inScoringArea() ? getPointAtPoseSpeed()
+    double rotationSpeed = (isAiming() && inScoringArea()) ? getPointAtPoseSpeed()
         : controllerRotation * getMaxTurnSpeed() * -1 * SwerveConstants.slowModeVal;
 
     int flipCoeff = AllianceInfo.isBlue() ? -1 : 1; // position inputs need to be reversed depending on which side of
@@ -193,18 +195,6 @@ public class Swerve extends SubsystemBase {
   }
 
   /**
-   * Returns the angle of a line pointing from the robot's position to a specific
-   * position on the field
-   * 
-   * @param targetPose position to point at
-   * @return angle from robot to target position
-   */
-  public Rotation2d getPointAtPoseAngle(Pose2d targetPose) {
-    Translation2d delta = targetPose.getTranslation().minus(getPose2d().getTranslation());
-    return new Rotation2d(delta.getX(), delta.getY()).plus(new Rotation2d(Math.PI));
-  }
-
-  /**
    * Returns the length of a line from the robot's position to a specific point on
    * the field
    * 
@@ -228,18 +218,27 @@ public class Swerve extends SubsystemBase {
     return getPointAtPoseAngle(AllianceInfo.getTargetHubPos()).getRadians();
   }
 
-  public SwerveDrive getSwerve() {
-    return swerveDrive;
+  /**
+   * Returns the angle of a line pointing from the robot's position to a specific
+   * position on the field
+   * 
+   * @param targetPose position to point at
+   * @return angle from robot to target position
+   */
+  public Rotation2d getPointAtPoseAngle(Pose2d targetPose) {
+    Translation2d delta = targetPose.getTranslation().minus(getPose2d().getTranslation());
+    return new Rotation2d(delta.getX(), delta.getY()).plus(new Rotation2d(Math.PI));
   }
 
   public double getPointAtPoseSpeed() {
     Rotation2d desiredAngle = getPointAtPoseAngle(AllianceInfo.getTargetHubPos());
     double speed = pointToPosePID.calculate(getPose2d().getRotation().getRadians(), desiredAngle.getRadians());
-    if (desiredAngle.getDegrees() > 3) {
-      return speed;
-    } else {
-      return 0.0;
-    }
+    return speed;
+    // if (desiredAngle.getDegrees() > 3) { // PIDControllers already do this
+    //   return speed;
+    // } else {
+    //   return 0.0;
+    // }
   }
 
   public double getPointAtPoseError() {
@@ -355,6 +354,11 @@ public class Swerve extends SubsystemBase {
 
     // swerveDrive.field.getObject("Vision
     // Pose").setPose(LimelightHelpers.getBotPose2d_wpiBlue(VisionConstants.aimingLimelightName));
+
+    // DataLogManager.log("Swerve state: " + currentState + ", in scoring area: " +
+    // inScoringArea());
+    // DataLogManager.log("Robot pose: " + getPose2d().getX() + ", " +
+    // getPose2d().getY());
   }
 
   @Override
@@ -380,5 +384,7 @@ public class Swerve extends SubsystemBase {
     builder.addStringProperty("target hub", () -> AllianceInfo.getAlliance().toString(), null);
     builder.addDoubleProperty("gyro heading", () -> swerveDrive.getPose().getRotation().getRadians(), null);
     builder.addDoubleProperty("point at pose error", () -> getPointAtPoseError(), null);
+
+    builder.addBooleanProperty("in scoring area", this::inScoringArea, null);
   }
 }

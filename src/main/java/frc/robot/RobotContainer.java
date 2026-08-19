@@ -10,43 +10,20 @@ package frc.robot;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
-import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.AllianceInfo;
 import frc.robot.Constants.LEDConstants;
 import frc.robot.Constants.SubsystemConstants;
-import frc.robot.Constants.VisionConstants;
-import frc.robot.commands.DeployWrist;
-import frc.robot.commands.Drive;
-import frc.robot.commands.DriveWithAim;
-import frc.robot.commands.DriveWithRange;
-import frc.robot.commands.Index;
-import frc.robot.commands.MoveIntakeWrist;
-import frc.robot.commands.RPMShoot;
-import frc.robot.commands.ShootWithRange;
-import frc.robot.commands.SpinIntake;
 import frc.robot.commands.WristJuggle;
 import frc.robot.commands.autoCommands.AutoShoot;
 import frc.robot.commands.autoCommands.ExtendHopper;
@@ -56,9 +33,8 @@ import frc.robot.subsystems.IntakeWrist;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.Swerve;
-import swervelib.SwerveDrive;
-import swervelib.SwerveInputStream;
 
 public class RobotContainer {
   private RobotSim robotSim;
@@ -68,11 +44,12 @@ public class RobotContainer {
 
   private Swerve swerveDrive = new Swerve();
   private IntakeWrist intakeWrist = new IntakeWrist();
-  private Intake intake = new Intake(intakeWrist);
+  private Intake intake = new Intake();
   private Shooter ballShooter = new Shooter();
   private Indexer indexer = new Indexer();
   private LED LEDstrip = new LED();
-  
+
+  private Superstructure superstructure = new Superstructure(this);
 
   private SendableChooser<String> autoChooser = new SendableChooser<>();
   private String leftAuto = "Left";
@@ -121,6 +98,8 @@ public class RobotContainer {
         swerveDrive.teleopDrive(driveController.getLeftY(), 
         driveController.getLeftX(), driveController.getRightX())));
 
+    superstructure.setDefaultCommand(superstructure.idleState());
+
     // if(AllianceInfo.isBlue()){
     //   swerveDrive.setDefaultCommand(new Drive(
     //         ()->-MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
@@ -137,6 +116,12 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
+    driveController.a()
+      .whileTrue(superstructure.pickingUpState());
+
+    driveController.x()
+      .whileTrue(superstructure.shootingState());
+    
     // SwerveInputStream driveWithPose = SwerveInputStream.of(
     // swerveDrive.getSwerve(),
     //  ()->-driveController.getLeftY(), 
