@@ -130,20 +130,24 @@ public class Swerve extends SubsystemBase {
    */
   public void teleopDrive(double controllerX, double controllerY, double controllerRotation) {
     double rotationSpeed = (isAiming() && inScoringArea()) ? getPointAtPoseSpeed()
-        : controllerRotation * getMaxTurnSpeed() * -1 * SwerveConstants.slowModeVal;
+        : MathUtil.applyDeadband(controllerRotation, 0.1) * getMaxTurnSpeed() * -1 * SwerveConstants.slowModeVal;
 
     int flipCoeff = AllianceInfo.isBlue() ? -1 : 1; // position inputs need to be reversed depending on which side of
                                                     // the field the alliance is on
-    swerveDrive
-        .drive(
-            new Translation2d(
-                MathUtil.applyDeadband(controllerX, 0.1) * getMaxDriveSpeed() * flipCoeff
-                    * SwerveConstants.slowModeVal,
-                MathUtil.applyDeadband(controllerY, 0.1) * getMaxDriveSpeed() * flipCoeff
-                    * SwerveConstants.slowModeVal),
-            rotationSpeed,
-            true,
-            true);
+
+    double xSpeed = MathUtil.applyDeadband(controllerX, 0.1) * getMaxDriveSpeed() * flipCoeff
+        * SwerveConstants.slowModeVal;
+    double ySpeed = MathUtil.applyDeadband(controllerY, 0.1) * getMaxDriveSpeed() * flipCoeff
+        * SwerveConstants.slowModeVal;
+
+    if (isAiming()
+        && xSpeed == 0
+        && ySpeed == 0
+        && rotationSpeed == 0) {
+      setXMode();
+    } else {
+      swerveDrive.drive(new Translation2d(xSpeed, ySpeed), rotationSpeed, true, true);
+    }
   }
 
   /**
@@ -235,9 +239,9 @@ public class Swerve extends SubsystemBase {
     double speed = pointToPosePID.calculate(getPose2d().getRotation().getRadians(), desiredAngle.getRadians());
     return speed;
     // if (desiredAngle.getDegrees() > 3) { // PIDControllers already do this
-    //   return speed;
+    // return speed;
     // } else {
-    //   return 0.0;
+    // return 0.0;
     // }
   }
 
