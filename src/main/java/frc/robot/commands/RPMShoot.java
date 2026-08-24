@@ -26,7 +26,7 @@ public class RPMShoot extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    shooter.setRPMUse(true);
+    // shooter.setRPMUse(true);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -39,7 +39,8 @@ public class RPMShoot extends Command {
   @Override
   public void end(boolean interrupted) {
     //shooter.setTargetRPM(shooter.getPassiveRPM());
-    shooter.setRPMUse(false);
+    // shooter.setRPMUse(false);
+    shooter.spin(0, false);
   }
 
   // Returns true when the command should end.
