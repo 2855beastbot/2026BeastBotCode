@@ -44,10 +44,10 @@ public class Superstructure extends SubsystemBase {
     idleState = Commands.startRun(
       () -> swerve.cancelAiming(),
       () -> {
-      // leave the intakeWrist where it is
-      indexer.spin(0);
-      shooter.spin(0, false);
-      intake.spin(0);
+        // leave the intakeWrist where it is
+        indexer.spin(0);
+        shooter.spin(0, false);
+        intake.spin(0);
       },
       this)
       .withName("Idle Superstate");
