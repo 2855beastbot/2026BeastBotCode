@@ -6,9 +6,6 @@ package frc.robot.subsystems;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.util.Optional;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
 
@@ -19,17 +16,12 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
 import frc.robot.Constants.AllianceInfo;
@@ -37,12 +29,13 @@ import frc.robot.Constants.SwerveConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.LimelightHelpers.RawFiducial;
 import swervelib.SwerveDrive;
-import swervelib.SwerveInputStream;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 public class Swerve extends SubsystemBase {
+  // Aiming is controlled as a substate rather than a command so that it does not
+  // interfere with pathplanner path following
   private enum TeleopState {
     FREE,
     AIMING
@@ -116,9 +109,16 @@ public class Swerve extends SubsystemBase {
   }
 
   /**
+   * <p>
    * Method for driving based on controller inputs. Values are processed under the
    * assumption that they come from a gamepad and may not function correctly when
    * coming from other sources.
+   * </p>
+   * <p>
+   * This method handles both regular teleop driving and driving while aimed at
+   * the target hub. Use <code>startAiming()<code> and <code>cancelAiming()<code>
+   * to control when the robot should aim at the hub or not.
+   * </p>
    * 
    * @param controllerX        value for movement along the field's X axis,
    *                           usually the Y axis of the left stick
