@@ -35,7 +35,7 @@ public class Vision extends SubsystemBase {
     0.0,    // Side offset
     0.5     // Height offset
 );
-
+    setValidIDs(VisionConstants.targetingIDs);
   }
 
   public double aimWithVision(){

@@ -47,7 +47,7 @@ public class Swerve extends SubsystemBase {
   private Vision locationCamera = new Vision(VisionConstants.locationLimelightName, VisionConstants.locationConfig);
   private final PIDController pointToPosePID = new PIDController(5.0, 0.0, 0.5);
   private Pose2d targetHub;
-  private double slowModeVal = 0.8;
+  private double slowModeVal = 0.125;
 
   public Swerve() {
     
@@ -77,6 +77,7 @@ public class Swerve extends SubsystemBase {
       }else{
         targetHub = VisionConstants.blueHub;
       }
+      
   }
 
   public double getMaxDriveSpeed(){
