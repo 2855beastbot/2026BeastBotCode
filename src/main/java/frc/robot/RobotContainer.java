@@ -48,10 +48,7 @@ import frc.robot.commands.MoveIntakeWrist;
 import frc.robot.commands.RPMShoot;
 import frc.robot.commands.ShootWithRange;
 import frc.robot.commands.SpeedUP;
-import frc.robot.commands.SpinIntake;
-import frc.robot.commands.WristJuggle;
 import frc.robot.commands.autoCommands.AutoShoot;
-import frc.robot.commands.autoCommands.ExtendHopper;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeWrist;
 import frc.robot.subsystems.LED;
@@ -62,7 +59,7 @@ import swervelib.SwerveInputStream;
 
 public class RobotContainer {
   private Swerve swerveDrive = new Swerve();
-  private XboxController driveController = new XboxController(0);
+  private CommandXboxController driveController = new CommandXboxController(0);
   private CommandXboxController operatorController = new CommandXboxController(1);
   private IntakeWrist intakeWrist = new IntakeWrist();
   private Intake intake = new Intake(intakeWrist);
@@ -79,11 +76,11 @@ public class RobotContainer {
   private Pose2d targetHub;
   
    
-  private SequentialCommandGroup wristJuggle = new SequentialCommandGroup(
-    new WristJuggle(intakeWrist, SubsystemConstants.wristMid), new WaitCommand(0.3),
-    new WristJuggle(intakeWrist, SubsystemConstants.wristOut), new WaitCommand(0.25),
-    new WristJuggle(intakeWrist, SubsystemConstants.wristIn), new WaitCommand(0.5), 
-    new WristJuggle(intakeWrist, SubsystemConstants.wristOut), new WaitCommand(0.25));
+  // private SequentialCommandGroup wristJuggle = new SequentialCommandGroup(
+  //   new WristJuggle(intakeWrist, SubsystemConstants.wristMid), new WaitCommand(0.3),
+  //   new WristJuggle(intakeWrist, SubsystemConstants.wristOut), new WaitCommand(0.25),
+  //   new WristJuggle(intakeWrist, SubsystemConstants.wristIn), new WaitCommand(0.5), 
+  //   new WristJuggle(intakeWrist, SubsystemConstants.wristOut), new WaitCommand(0.25));
   
 
   
@@ -116,8 +113,8 @@ public class RobotContainer {
     SmartDashboard.putData(intakeWrist);
 
     NamedCommands.registerCommand("AutoShoot", new AutoShoot(ballShooter, swerveDrive, indexer));
-    NamedCommands.registerCommand("HopperJuggle", wristJuggle);
-    NamedCommands.registerCommand("ExtendHopper", new ExtendHopper(intakeWrist).asProxy());
+    NamedCommands.registerCommand("HopperJuggle", intakeWrist.juggle());
+    NamedCommands.registerCommand("ExtendHopper", intakeWrist.goToPosition(SubsystemConstants.wristOut).asProxy());
     NamedCommands.registerCommand("StartWheels", new RepeatCommand(new InstantCommand(()->intake.spin(1)).asProxy()));
     
     var alliance = DriverStation.getAlliance();
@@ -149,7 +146,7 @@ public class RobotContainer {
     new Trigger(()->DriverStation.isEnabled()).onTrue(new InstantCommand(()->swerveDrive.updateAlliance()).alongWith(new InstantCommand(()->setDefaultCommands())));
 
     //Driver commands
-    new Trigger(()->driveController.getYButton()).whileTrue(new RunCommand(()->swerveDrive.setXMode(), swerveDrive));
+    driveController.y().whileTrue(new RunCommand(()->swerveDrive.setXMode(), swerveDrive));
     // new Trigger(()->driveController.getRightTriggerAxis() > 0.5).whileTrue(new ParallelCommandGroup(
     //   swerveDrive.driveWithInputStream(driveWithPose),
     //   new ShootWithRange(()->swerveDrive.getRPMFromRange(swerveDrive.getDistanceFromHub()), ballShooter)
@@ -162,7 +159,7 @@ public class RobotContainer {
       new ShootWithRange(()->swerveDrive.getRPMFromRange(swerveDrive.getDistanceFromHub()), ballShooter)
       ));
 
-    new Trigger(()->driveController.getLeftBumperButton()).whileTrue(
+    driveController.leftBumper().whileTrue(
       new ParallelCommandGroup(
         new RunCommand(()->swerveDrive.drivePose(
         new Translation2d(
@@ -182,33 +179,34 @@ public class RobotContainer {
        swerveDrive,
         VisionConstants.idealShootingRange));
     */
-    new Trigger(()->driveController.getRawButton(8)).onTrue(new InstantCommand(()->swerveDrive.resetOdometryWithAlliance(new Pose2d(swerveDrive.getPose2d().getX(), swerveDrive.getPose2d().getX(), new Rotation2d()))));
-    new Trigger(()->driveController.getRawButton(7)).onTrue(new InstantCommand(()->swerveDrive.resetOdometryWithAlliance(swerveDrive.getAimingCamera().getPose())));
-    new Trigger(()->driveController.getXButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristOut)));
-    new Trigger(()->driveController.getAButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristMid)));
-    new Trigger(()->driveController.getBButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristIn)));
+    
+    driveController.button(8).onTrue(new InstantCommand(()->swerveDrive.resetOdometryWithAlliance(new Pose2d(swerveDrive.getPose2d().getX(), swerveDrive.getPose2d().getX(), new Rotation2d()))));
+    driveController.button(7).onTrue(new InstantCommand(()->swerveDrive.resetOdometryWithAlliance(swerveDrive.getAimingCamera().getPose())));
+    driveController.x().onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristOut)));
+    driveController.a().onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristMid)));
+    driveController.b().onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristIn)));
     // new Trigger(()->driveController.getRightBumperButton()).whileTrue(new Index(()->1, indexer));
-    new Trigger(()->driveController.getLeftTriggerAxis() > 0.3).whileTrue(new SpinIntake(()->driveController.getLeftTriggerAxis(), intake));
-    new Trigger(()->driveController.getPOV(0) == 0).whileTrue(new SpinIntake(()->-1, intake));
+    driveController.axisGreaterThan(2, 0.3).whileTrue(intake.intake(()->driveController.getLeftTriggerAxis()));
+    driveController.povUp().whileTrue(intake.intake(() -> -1));
 
 
 
-    new Trigger(()->driveController.getRightBumperButton()).whileTrue(new ParallelCommandGroup(
+    driveController.rightBumper().whileTrue(new ParallelCommandGroup(
       new SequentialCommandGroup(
         new WaitCommand(0.1),
         new Index(()->1, indexer)),
       new SequentialCommandGroup(
         new WaitCommand(0.25),
-        wristJuggle.repeatedly()
+        intakeWrist.juggle().repeatedly()
       )));
 
     //Operator Commands
     operatorController.rightBumper().whileTrue(new Index(()->1, indexer));
-    operatorController.leftBumper().whileTrue(new SpinIntake(()->-1, intake));
+    operatorController.leftBumper().whileTrue(intake.intake(()->-1));
     operatorController.x().onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristOut), intakeWrist));
     operatorController.b().onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristIn), intakeWrist));
     //operatorController.a().onTrue(new DeployWrist(intake));
-    operatorController.axisGreaterThan(2, 0.3).whileTrue(new SpinIntake(()->operatorController.getLeftTriggerAxis(), intake));
+    operatorController.axisGreaterThan(2, 0.3).whileTrue(intake.intake(()->operatorController.getLeftTriggerAxis()));
     operatorController.axisGreaterThan(3, 0.3).whileTrue(new RunCommand(()->ballShooter.spin(operatorController.getRightTriggerAxis(), false), ballShooter));
     operatorController.axisMagnitudeGreaterThan(1, 0.3).whileTrue(new MoveIntakeWrist(()->-operatorController.getLeftY(), intakeWrist));
     operatorController.button(8).onTrue(new InstantCommand(()->intakeWrist.zeroEncoders(), intakeWrist));
@@ -240,10 +238,6 @@ public class RobotContainer {
             swerveDrive));
         }
       }
-
-
-    
-
 
   }
 

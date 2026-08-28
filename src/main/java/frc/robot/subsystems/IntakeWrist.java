@@ -14,7 +14,10 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.CANIDConstants;
 import frc.robot.Constants.SubsystemConstants;
 
@@ -26,76 +29,92 @@ public class IntakeWrist extends SubsystemBase {
   private SparkAbsoluteEncoder encoder;
   private double targetSetpoint;
   private boolean isOpenLoop;
-  private PIDController pidController = new PIDController(SubsystemConstants.intakeWristKp, SubsystemConstants.intakeWristKi, SubsystemConstants.intakeWristKd);
+  private PIDController pidController = new PIDController(SubsystemConstants.intakeWristKp,
+      SubsystemConstants.intakeWristKi, SubsystemConstants.intakeWristKd);
+
   public IntakeWrist() {
-     encoder = rightWrist.getAbsoluteEncoder();
+    encoder = rightWrist.getAbsoluteEncoder();
     config.absoluteEncoder.inverted(true);
     setTargetSetpoint(getPose());
-    config.closedLoop.pid(SubsystemConstants.intakeWristKp, SubsystemConstants.intakeWristKi, SubsystemConstants.intakeWristKd);
-    //config.closedLoop.feedForward.kCos(0);
+    config.closedLoop.pid(SubsystemConstants.intakeWristKp, SubsystemConstants.intakeWristKi,
+        SubsystemConstants.intakeWristKd);
+    // config.closedLoop.feedForward.kCos(0);
     rightWrist.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     pidController.enableContinuousInput(0, Math.PI * 2);
     SmartDashboard.putData("Intake PID controller", pidController);
-    
-    // make left follow right, now everything sent to right, left will do automatically
+
+    // make left follow right, now everything sent to right, left will do
+    // automatically
     leftWrist.configure(new SparkMaxConfig().follow(rightWrist, true), null, PersistMode.kNoPersistParameters);
   }
 
-  public void setTargetSetpoint(double setpoint){
+  public void setTargetSetpoint(double setpoint) {
     isOpenLoop = false;
     targetSetpoint = setpoint;
   }
 
-  public double getTargetSetpoint(){
+  public double getTargetSetpoint() {
     return targetSetpoint;
   }
 
-   public double getPose(){
+  public double getPose() {
     return encoder.getPosition();
   }
 
-  public void moveWrist(double speed){
+  public void moveWrist(double speed) {
     isOpenLoop = true;
     rightWrist.set(-speed);
   }
 
-  public boolean isOpenLoop(){
+  public boolean isOpenLoop() {
     return isOpenLoop;
   }
 
-  public boolean isAtSetpoint(){
+  public boolean isAtSetpoint() {
     return rightWrist.getClosedLoopController().isAtSetpoint();
   }
 
-  public double getOutputCurrent(){
+  public double getOutputCurrent() {
     return rightWrist.getOutputCurrent();
   }
 
-  public void zeroEncoders(){
+  public void zeroEncoders() {
     leftWrist.getEncoder().setPosition(0.0);
     rightWrist.getEncoder().setPosition(0.0);
   }
 
-   public void runPID(){
+  public void runPID() {
     double angle = encoder.getPosition();
-    if(angle > 2.15){
+    if (angle > 2.15) {
       angle = angle - (Math.PI * 2);
     }
     rightWrist.set(-pidController.calculate(angle, targetSetpoint));
   }
 
+  public Command goToPosition(double setpoint) {
+    return run(() -> setTargetSetpoint(setpoint)).until(() -> isAtSetpoint());
+  }
+
+  public Command juggle() {
+    return new SequentialCommandGroup(
+        goToPosition(SubsystemConstants.wristMid), new WaitCommand(0.3),
+        goToPosition(SubsystemConstants.wristOut), new WaitCommand(0.25),
+        goToPosition(SubsystemConstants.wristIn), new WaitCommand(0.5),
+        goToPosition(SubsystemConstants.wristOut), new WaitCommand(0.25));
+  }
+
   @Override
   public void periodic() {
-    if(!isOpenLoop){
+    if (!isOpenLoop) {
       runPID();
     }
-    
+
     // This method will be called once per scheduler run
   }
 
-@Override
-  public void initSendable(SendableBuilder builder){
-    super.initSendable(builder); 
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
     builder.addBooleanProperty("Open Loop", this::isOpenLoop, null);
     builder.addDoubleProperty("Position", encoder::getPosition, null);
     builder.addDoubleProperty("Target Pos", this::getTargetSetpoint, null);
