@@ -60,7 +60,7 @@ public class RobotContainer {
   private CommandXboxController driveController = new CommandXboxController(0);
   private CommandXboxController operatorController = new CommandXboxController(1);
   private IntakeWrist intakeWrist = new IntakeWrist();
-  private Intake intake = new Intake(intakeWrist);
+  private Intake intake = new Intake();
   private Shooter ballShooter = new Shooter();
   private Indexer indexer = new Indexer();
   private LED LEDstrip = new LED();
@@ -113,7 +113,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("AutoShoot", new AutoShoot(ballShooter, swerveDrive, indexer));
     NamedCommands.registerCommand("HopperJuggle", intakeWrist.juggle());
     NamedCommands.registerCommand("ExtendHopper", intakeWrist.goToPosition(SubsystemConstants.wristOut).asProxy());
-    NamedCommands.registerCommand("StartWheels", new RepeatCommand(intake.intake(() -> 1)).asProxy());  //does this do the same thing as in main branch?
+    NamedCommands.registerCommand("StartWheels", new RepeatCommand(intake.intakeSafely(() -> 1, intakeWrist.isAtIntakePosition())).withTimeout(0.1).asProxy());
     
     var alliance = DriverStation.getAlliance();
     if(alliance.isPresent()){
@@ -184,8 +184,8 @@ public class RobotContainer {
     driveController.a().onTrue(intakeWrist.goToPosition(SubsystemConstants.wristMid));
     driveController.b().onTrue(intakeWrist.goToPosition(SubsystemConstants.wristIn));
     // new Trigger(()->driveController.getRightBumperButton()).whileTrue(new Index(()->1, indexer));
-    driveController.axisGreaterThan(2, 0.3).whileTrue(intake.intake(()->driveController.getLeftTriggerAxis()));
-    driveController.povUp().whileTrue(intake.intake(() -> -1));
+    driveController.axisGreaterThan(2, 0.3).whileTrue(intake.intakeSafely(()->driveController.getLeftTriggerAxis(), intakeWrist.isAtIntakePosition()));
+    driveController.povUp().whileTrue(intake.intakeSafely(() -> -1, intakeWrist.isAtIntakePosition()));
 
 
 
@@ -200,11 +200,11 @@ public class RobotContainer {
 
     //Operator Commands
     operatorController.rightBumper().whileTrue(new Index(()->1, indexer));
-    operatorController.leftBumper().whileTrue(intake.intake(()->-1));
+    operatorController.leftBumper().whileTrue(intake.intakeSafely(()->-1, intakeWrist.isAtIntakePosition()));
     operatorController.x().onTrue(intakeWrist.goToPosition(SubsystemConstants.wristOut));
     operatorController.b().onTrue(intakeWrist.goToPosition(SubsystemConstants.wristIn));
     //operatorController.a().onTrue(new DeployWrist(intake));
-    operatorController.axisGreaterThan(2, 0.3).whileTrue(intake.intake(()->operatorController.getLeftTriggerAxis()));
+    operatorController.axisGreaterThan(2, 0.3).whileTrue(intake.intakeSafely(()->operatorController.getLeftTriggerAxis(), intakeWrist.isAtIntakePosition()));
     operatorController.axisGreaterThan(3, 0.3).whileTrue(new RunCommand(()->ballShooter.spin(operatorController.getRightTriggerAxis(), false), ballShooter));
     operatorController.axisMagnitudeGreaterThan(1, 0.3).whileTrue(intakeWrist.manual(()->-operatorController.getLeftY()));
     operatorController.button(8).onTrue(intakeWrist.zeroEncoders());

@@ -4,12 +4,14 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CANIDConstants;
 
@@ -18,7 +20,6 @@ public class Intake extends SubsystemBase {
   private TalonFX rightIntake = new TalonFX(CANIDConstants.intakeRight);
   private TalonFXConfiguration leftConfig = new TalonFXConfiguration();
   private TalonFXConfiguration rightConfig = new TalonFXConfiguration();
-
 
   public Intake() {
 
@@ -51,7 +52,11 @@ public class Intake extends SubsystemBase {
 
   // }
 
-  public Command intake(DoubleSupplier speed) {
+  public Command intakeSafely(DoubleSupplier speed, BooleanSupplier safeToSpinBoth) {
+    return Commands.either(intake(speed), intakeOuterRollerOnly(speed), safeToSpinBoth).withName("Intake with check");
+  }
+
+  private Command intake(DoubleSupplier speed) {
     return run(
         () -> {
           rightIntake.set(-speed.getAsDouble());
@@ -60,7 +65,7 @@ public class Intake extends SubsystemBase {
         .withName("Intaking");
   }
 
-  public Command intakeOuterRollerOnly(DoubleSupplier speed) {
+  private Command intakeOuterRollerOnly(DoubleSupplier speed) {
     return run(
         () -> {
           rightIntake.set(0);
