@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
@@ -18,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.CANIDConstants;
 import frc.robot.Constants.SubsystemConstants;
 
@@ -40,50 +43,45 @@ public class IntakeWrist extends SubsystemBase {
         SubsystemConstants.intakeWristKd);
     // config.closedLoop.feedForward.kCos(0);
     rightWrist.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-    pidController.enableContinuousInput(0, Math.PI * 2);
+    pidController.enableContinuousInput(0, Math.PI * 2);  //why are there two pid controllers?
     SmartDashboard.putData("Intake PID controller", pidController);
 
     // make left follow right, now everything sent to right, left will do
     // automatically
     leftWrist.configure(new SparkMaxConfig().follow(rightWrist, true), null, PersistMode.kNoPersistParameters);
   }
-
-  public void setTargetSetpoint(double setpoint) {
-    isOpenLoop = false;
-    targetSetpoint = setpoint;
-  }
-
+  
   public double getTargetSetpoint() {
     return targetSetpoint;
   }
 
-  public double getPose() {
+  private double getPose() {
     return encoder.getPosition();
   }
 
-  public void moveWrist(double speed) {
+  private void setTargetSetpoint(double setpoint) {
+    isOpenLoop = false;
+    targetSetpoint = setpoint;
+  }
+
+  private void moveWrist(double speed) {
     isOpenLoop = true;
     rightWrist.set(-speed);
   }
 
-  public boolean isOpenLoop() {
+  private boolean isOpenLoop() {
     return isOpenLoop;
   }
 
-  public boolean isAtSetpoint() {
+  private boolean isAtSetpoint() {
     return rightWrist.getClosedLoopController().isAtSetpoint();
   }
 
-  public double getOutputCurrent() {
-    return rightWrist.getOutputCurrent();
-  }
+  // public double getOutputCurrent() {
+  // return rightWrist.getOutputCurrent();
+  // }
 
-  public void zeroEncoders() {
-    leftWrist.getEncoder().setPosition(0.0);
-    rightWrist.getEncoder().setPosition(0.0);
-  }
-
-  public void runPID() {
+  private void runPID() {
     double angle = encoder.getPosition();
     if (angle > 2.15) {
       angle = angle - (Math.PI * 2);
@@ -91,8 +89,43 @@ public class IntakeWrist extends SubsystemBase {
     rightWrist.set(-pidController.calculate(angle, targetSetpoint));
   }
 
+  public Trigger isAtIntakePosition() {
+    return new Trigger(() -> encoder.getPosition() < 0.5);
+  }
+
+  public Command manual(DoubleSupplier speed) {
+    return runEnd(() -> moveWrist(speed.getAsDouble()),
+        () -> setTargetSetpoint(encoder.getPosition()))
+        .withName("Manual Control");
+  }
+
+  public Command zeroEncoders() {
+    return run(
+        () -> {
+          leftWrist.getEncoder().setPosition(0.0);
+          rightWrist.getEncoder().setPosition(0.0);
+        })
+        .withName("Zero Encoders");
+  }
+
   public Command goToPosition(double setpoint) {
-    return run(() -> setTargetSetpoint(setpoint)).until(() -> isAtSetpoint());
+    return run(
+        () -> setTargetSetpoint(setpoint)).until(() -> isAtSetpoint())
+        .withName("Go to position: " + setpoint);
+  }
+
+  public Command deploy() {
+    return runEnd(
+        () -> {
+          moveWrist(1);
+        },
+        () -> {
+          moveWrist(0);
+          zeroEncoders();
+          setTargetSetpoint(encoder.getPosition());
+        })
+        .until(() -> rightWrist.getOutputCurrent() > SubsystemConstants.wristZeroVoltage)
+        .withName("Deploy");
   }
 
   public Command juggle() {
@@ -100,7 +133,8 @@ public class IntakeWrist extends SubsystemBase {
         goToPosition(SubsystemConstants.wristMid), new WaitCommand(0.3),
         goToPosition(SubsystemConstants.wristOut), new WaitCommand(0.25),
         goToPosition(SubsystemConstants.wristIn), new WaitCommand(0.5),
-        goToPosition(SubsystemConstants.wristOut), new WaitCommand(0.25));
+        goToPosition(SubsystemConstants.wristOut), new WaitCommand(0.25))
+        .withName("Juggle");
   }
 
   @Override
