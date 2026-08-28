@@ -5,9 +5,6 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.SubsystemConstants;
@@ -41,18 +38,16 @@ public class Superstructure extends SubsystemBase {
     shooter = container.getShooter();
     indexer = container.getIndexer();
 
-    idleState = Commands.startRun(
+    idleState = startRun(
       () -> swerve.cancelAiming(),
       () -> {
         // leave the intakeWrist where it is
         indexer.spin(0);
         shooter.spin(0, false);
         intake.spin(0);
-      },
-      this)
-      .withName("Idle Superstate");
+      }).withName("Idle Superstate");
 
-    pickingUpState = Commands.startRun(
+    pickingUpState = startRun(
       () -> {
         wrist.setTargetSetpoint(SubsystemConstants.wristOut);
         swerve.cancelAiming();
@@ -61,11 +56,9 @@ public class Superstructure extends SubsystemBase {
         indexer.spin(0);
         shooter.spin(0, false);
         intake.spin(wrist.getPose() < 1.8 ? 1 : 0);
-      },
-      this)
-      .withName("Picking Up Balls Superstate");
+      }).withName("Picking Up Balls Superstate");
 
-    shootingState = Commands.startRun(
+    shootingState = startRun(
     () -> {
       wrist.setTargetSetpoint(SubsystemConstants.wristMid);
       swerve.startAiming();
@@ -82,9 +75,7 @@ public class Superstructure extends SubsystemBase {
             .setTargetSetpoint(wrist.getTargetSetpoint() == SubsystemConstants.wristMid ? SubsystemConstants.wristIn
                 : SubsystemConstants.wristMid);
       }
-    },
-    this)
-    .withName("Shooting Superstate");
+    }).withName("Shooting Superstate");
   }
 
   public Command idleState() {
