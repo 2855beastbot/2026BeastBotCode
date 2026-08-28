@@ -7,8 +7,6 @@ package frc.robot;
 
 
 
-import java.util.function.BooleanSupplier;
-
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
@@ -20,16 +18,12 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
-import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -40,12 +34,8 @@ import frc.robot.Constants.LEDConstants;
 import frc.robot.Constants.SubsystemConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.Drive;
-import frc.robot.commands.DriveWithAim;
-import frc.robot.commands.DriveWithRange;
 import frc.robot.commands.Index;
-import frc.robot.commands.RPMShoot;
 import frc.robot.commands.ShootWithRange;
-import frc.robot.commands.SpeedUP;
 import frc.robot.commands.autoCommands.AutoShoot;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeWrist;
@@ -53,7 +43,6 @@ import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
-import swervelib.SwerveInputStream;
 
 public class RobotContainer {
   private Swerve swerveDrive = new Swerve();
@@ -129,15 +118,15 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    SwerveInputStream driveWithPose = SwerveInputStream.of(
-    swerveDrive.getSwerve(),
-     ()->-driveController.getLeftY(), 
-     ()->-driveController.getLeftX())
-     //.withControllerRotationAxis(()->driveController.getRightX())
-     .deadband(0.3)
-     .scaleTranslation(0.8)
-     .aim(targetHub)
-    .aimWhile(()->true);
+    // SwerveInputStream driveWithPose = SwerveInputStream.of(
+    // swerveDrive.getSwerve(),
+    //  ()->-driveController.getLeftY(), 
+    //  ()->-driveController.getLeftX())
+    //  //.withControllerRotationAxis(()->driveController.getRightX())
+    //  .deadband(0.3)
+    //  .scaleTranslation(0.8)
+    //  .aim(targetHub)
+    // .aimWhile(()->true);
 
 
     new Trigger(()->DriverStation.isFMSAttached()).onTrue(new InstantCommand(()->swerveDrive.updateAlliance(), swerveDrive).alongWith(new InstantCommand(()->setDefaultCommands())));
