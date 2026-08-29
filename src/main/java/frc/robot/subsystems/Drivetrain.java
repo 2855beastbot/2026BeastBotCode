@@ -12,7 +12,6 @@ import java.util.Optional;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
 
-
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -46,364 +45,354 @@ public class Drivetrain extends SubsystemBase {
   private Vision aimingCamera = new Vision(VisionConstants.aimingLimelightName, VisionConstants.aimingConfig);
   private Vision locationCamera = new Vision(VisionConstants.locationLimelightName, VisionConstants.locationConfig);
   private final PIDController pointToPosePID = new PIDController(5.0, 0.0, 0.5);
-  private Pose2d targetHub;
+  // private Pose2d targetHub;
   private double slowModeVal = 0.8;
 
   public Drivetrain() {
-    
-    File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(),"swerve");
-    try{
+
+    File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
+    try {
       swerveDrive = new SwerveParser(swerveJsonDirectory).createSwerveDrive(SwerveConstants.maxDriveSpeed);
       SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
-    }catch(IOException e){
+    } catch (IOException e) {
       throw new RuntimeException(e);
     }
 
-    try{
+    try {
       config = RobotConfig.fromGUISettings();
-    }catch(Exception e){
+    } catch (Exception e) {
       e.printStackTrace();
     }
     configureAutoBuilder();
     setMaxDriveSpeedMult(0.80);
-    swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(1.5, 1.5, 9999999)); // higher number means less trust
-    //reiously0.7,0.7,9999999
+    swerveDrive.swerveDrivePoseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(1.5, 1.5, 9999999)); // higher
+                                                                                                          // number
+                                                                                                          // means less
+                                                                                                          // trust
+    // reiously0.7,0.7,9999999
     pointToPosePID.enableContinuousInput(-Math.PI, Math.PI);
     pointToPosePID.setTolerance(2.0);
-
-    var alliance = DriverStation.getAlliance();
-    if(alliance.isPresent()){
-        targetHub = (alliance.get() == Alliance.Blue) ? VisionConstants.blueHub : VisionConstants.redHub;
-      }else{
-        targetHub = VisionConstants.blueHub;
-      }
   }
 
-  public double getMaxDriveSpeed(){
+  public double getMaxDriveSpeed() {
     return SwerveConstants.maxDriveSpeed;
   }
 
-  public double getMaxDriveSpeedMult(){
+  public double getMaxDriveSpeedMult() {
     return slowModeVal;
   }
 
-  public void setMaxDriveSpeedMult(double newSpeed){
+  public void setMaxDriveSpeedMult(double newSpeed) {
     slowModeVal = newSpeed;
   }
 
-  public double getMaxTurnSpeed(){
+  public double getMaxTurnSpeed() {
     return SwerveConstants.maxTurnSpeed;
   }
 
   /**
    * Primary method for driving robot
-   * @param translation meters per second
-   * @param rotation radians per second
+   * 
+   * @param translation   meters per second
+   * @param rotation      radians per second
    * @param fieldRelative
    * @param isOpenLoop
    */
-  public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop){
+  public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
     swerveDrive.drive(translation, rotation, fieldRelative, isOpenLoop);
   }
 
+
   /**
    * Drive robot while pointing at alliance hub
+   * 
    * @param translation x and y speeds to drive at
    */
-  /* 
-  public void drivePose(Translation2d translation){
-    swerveDrive.drive(
-      swerveDrive.getSwerveController().getTargetSpeeds(
-        translation.getX(), 
-        translation.getY(), 
-        getPointAtPoseAngle(targetHub).getRadians(),
-        getPose2d().getRotation().getRadians(),
-        //pointToPosePID.calculate(getPose2d().getRotation().getRadians(), getPointAtPoseAngle(targetHub).getRadians()),
-        getMaxTurnSpeed())
-    );}
-    */
-  
-    public void drivePose(Translation2d translation, Pose2d target) { 
-      Rotation2d desiredAngle = getPointAtPoseAngle(target); 
-      double rotationSpeed = pointToPosePID.calculate( 
-        getPose2d().getRotation().getRadians(), 
-        desiredAngle.getRadians()); 
-      swerveDrive.drive(translation, rotationSpeed, true, false); }
+  /*
+   * public void drivePose(Translation2d translation){
+   * swerveDrive.drive(
+   * swerveDrive.getSwerveController().getTargetSpeeds(
+   * translation.getX(),
+   * translation.getY(),
+   * getPointAtPoseAngle(targetHub).getRadians(),
+   * getPose2d().getRotation().getRadians(),
+   * //pointToPosePID.calculate(getPose2d().getRotation().getRadians(),
+   * getPointAtPoseAngle(targetHub).getRadians()),
+   * getMaxTurnSpeed())
+   * );}
+   */
 
+  public void drivePose(Translation2d translation, Pose2d target) {
+    Rotation2d desiredAngle = getPointAtPoseAngle(target);
+    double rotationSpeed = pointToPosePID.calculate(
+        getPose2d().getRotation().getRadians(),
+        desiredAngle.getRadians());
+    swerveDrive.drive(translation, rotationSpeed, true, false);
+  }
 
   // public void setXMode(){
-  //   swerveDrive.lockPose();
+  // swerveDrive.lockPose();
   // }
 
-  public Command lockWheels(){
+  public Command lockWheels() {
     return run(() -> swerveDrive.lockPose()).withName("Wheels Locked");
   }
 
-  public Pose2d getPose2d(){
+  public Pose2d getPose2d() {
     return swerveDrive.getPose();
   }
 
-  public void resetOdometry(Pose2d pose){
+  public void resetOdometry(Pose2d pose) {
     swerveDrive.resetOdometry(pose);
   }
 
-
   /**
-   * updates the target hub based on driver station
-   */
-  public void updateAlliance(){
-    var alliance = DriverStation.getAlliance();
-    if(alliance.isPresent()){
-        targetHub = (alliance.get() == Alliance.Blue) ? VisionConstants.blueHub : VisionConstants.redHub;
-      }else{
-        targetHub = VisionConstants.blueHub;
-      }
-  }
-
-
-  /**
-   * resets the pose of the robot to the passed in pose, rotating by 180  if in red alliance
+   * resets the pose of the robot to the passed in pose, rotating by 180 if in red
+   * alliance
+   * 
    * @param pose the pose to set to
    */
-  public void resetOdometryWithAlliance(Pose2d pose){
-    if(targetHub == VisionConstants.blueHub){
+  public void resetOdometryWithAlliance(Pose2d pose) {
+    if (VisionConstants.blueHub.equals(getTargetHub())) {
       swerveDrive.resetOdometry(pose);
-    }else{
-      swerveDrive.resetOdometry(new Pose2d(pose.getTranslation(), new Rotation2d(pose.getRotation().getRadians() + Math.PI)));
+    } else {
+      swerveDrive
+          .resetOdometry(new Pose2d(pose.getTranslation(), new Rotation2d(pose.getRotation().getRadians() + Math.PI)));
     }
   }
 
-  public ChassisSpeeds getChassisSpeeds(){
+  public ChassisSpeeds getChassisSpeeds() {
     return swerveDrive.getRobotVelocity();
   }
 
-  public void setRobotRelativeSpeeds(ChassisSpeeds speed){
+  public void setRobotRelativeSpeeds(ChassisSpeeds speed) {
     swerveDrive.setChassisSpeeds(speed);
   }
 
   /**
-   * Returns the angle of a line pointing from the robot's position to a specific position on the field
+   * Returns the angle of a line pointing from the robot's position to a specific
+   * position on the field
+   * 
    * @param targetPose position to point at
    * @return angle from robot to target position
    */
-  public Rotation2d getPointAtPoseAngle(Pose2d targetPose){
+  public Rotation2d getPointAtPoseAngle(Pose2d targetPose) {
     Translation2d delta = targetPose.getTranslation().minus(getPose2d().getTranslation());
     return new Rotation2d(delta.getX(), delta.getY()).plus(new Rotation2d(Math.PI));
   }
 
   /**
-   * Returns the length of a line from the robot's position to a specific point on the field
+   * Returns the length of a line from the robot's position to a specific point on
+   * the field
+   * 
    * @param targetPose point to measure to
    * @return distance from robot to point
    */
-  public double getDistanceFromPose(Pose2d targetPose){
+  public double getDistanceFromPose(Pose2d targetPose) {
     return targetPose.getTranslation().getDistance(getPose2d().getTranslation());
   }
+
   /**
    * gets the distance from the robot to the alliance hub
+   * 
    * @return the distance from the alliance hub
    */
-  public double getDistanceFromHub(){
-    return getDistanceFromPose(targetHub);
+  public double getDistanceFromHub() {
+    return getDistanceFromPose(getTargetHub());
   }
 
-  public double getAngleFromHub(){
-    return getPointAtPoseAngle(targetHub).getRadians();
+  public double getAngleFromHub() {
+    return getPointAtPoseAngle(getTargetHub()).getRadians();
   }
 
-  public SwerveDrive getSwerve(){
+  public SwerveDrive getSwerve() {
     return swerveDrive;
   }
 
-  public Pose2d getTargetHub(){
-    return targetHub;
+  public Pose2d getTargetHub() {
+    return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? VisionConstants.blueHub
+        : VisionConstants.redHub;
   }
 
-  public String getTargetHubAsString(){
-    if(targetHub.equals(VisionConstants.redHub)){
+  public String getTargetHubAsString() {
+    if (getTargetHub().equals(VisionConstants.redHub)) {
       return "Red";
-    }
-    else{
+    } else {
       return "Blue";
     }
   }
 
-  public double getPointAtPoseSpeed(){
-    Rotation2d desiredAngle = getPointAtPoseAngle(targetHub);
+  public double getPointAtPoseSpeed() {
+    Rotation2d desiredAngle = getPointAtPoseAngle(getTargetHub());
     double speed = pointToPosePID.calculate(getPose2d().getRotation().getRadians(), desiredAngle.getRadians());
-    if (desiredAngle.getDegrees() > 3){
+    if (desiredAngle.getDegrees() > 3) {
       return speed;
-    }
-    else{
+    } else {
       return 0.0;
     }
   }
 
-  public double getPointAtPoseError(){
+  public double getPointAtPoseError() {
     return getAngleFromHub() - getPose2d().getRotation().getRadians();
   }
 
+  // ...existing code...
+  double minimumXYstd = 0.3;
+  double maximumXYstd = 0.7;
+  double deviationToReject = 0.7;
 
-    // ...existing code...
-    double minimumXYstd = 0.3;
-    double maximumXYstd = 0.7;
-    double deviationToReject = 0.7;
+  public void setVisionStdDynamic(Pose2d newPose2dFromVision) {
+    RawFiducial[] tagsSeen = LimelightHelpers.getRawFiducials(aimingCamera.getName());
 
-    public void setVisionStdDynamic(Pose2d newPose2dFromVision) {
-      RawFiducial[] tagsSeen = LimelightHelpers.getRawFiducials(aimingCamera.getName());
-
-      if (tagsSeen == null || tagsSeen.length == 0) {
-        // No tags — don't trust vision at all
-        swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(9999999, 9999999, 9999999));
-        return;
-      }
-
-      // Find average distance to all visible tags
-      double totalDistance = 0.0;
-      for (RawFiducial tag : tagsSeen) {
-        totalDistance += tag.distToCamera;
-      }
-      double avgDistance = totalDistance / tagsSeen.length;
-
-      // When disabled, trust vision heavily so starting pose converges quickly
-      if (DriverStation.isDisabled()) {
-        // Scale lightly with distance but keep very low std devs
-        double disabledStd = 0.1 * avgDistance / tagsSeen.length;
-        disabledStd = Math.max(0.05, Math.min(disabledStd, 0.5));
-        swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(disabledStd, disabledStd, 9999999));
-        return;
-      }
-
-      // --- Normal enabled behavior below ---
-
-      // Squaring the distance better represents real-world vision noise
-      double newXYstd = (0.5 * Math.pow(avgDistance, 2)) / tagsSeen.length;
-
-      // Soft-clamp the pose jump based on tag count and distance
-      double poseJump = newPose2dFromVision.getTranslation().getDistance(getPose2d().getTranslation());
-      if (poseJump > deviationToReject) {
-        if (tagsSeen.length >= 2 && avgDistance < 2.0) {
-          // We see multiple tags up close. We probably actually got pushed.
-          // Don't penalize.
-        } else {
-          newXYstd *= 3.0; // Heavily distrust large jumps on single/far tags
-        }
-      }
-
-      // Clamp to reasonable range
-      newXYstd = Math.max(minimumXYstd, Math.min(newXYstd, maximumXYstd));
-
-      swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(newXYstd, newXYstd, 9999999));
+    if (tagsSeen == null || tagsSeen.length == 0) {
+      // No tags — don't trust vision at all
+      swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(9999999, 9999999, 9999999));
+      return;
     }
 
-  public Pose2d determineFeedPose(){
-    if(targetHub == VisionConstants.blueHub){
-      if(getPose2d().getY() > 4.0){
+    // Find average distance to all visible tags
+    double totalDistance = 0.0;
+    for (RawFiducial tag : tagsSeen) {
+      totalDistance += tag.distToCamera;
+    }
+    double avgDistance = totalDistance / tagsSeen.length;
+
+    // When disabled, trust vision heavily so starting pose converges quickly
+    if (DriverStation.isDisabled()) {
+      // Scale lightly with distance but keep very low std devs
+      double disabledStd = 0.1 * avgDistance / tagsSeen.length;
+      disabledStd = Math.max(0.05, Math.min(disabledStd, 0.5));
+      swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(disabledStd, disabledStd, 9999999));
+      return;
+    }
+
+    // --- Normal enabled behavior below ---
+
+    // Squaring the distance better represents real-world vision noise
+    double newXYstd = (0.5 * Math.pow(avgDistance, 2)) / tagsSeen.length;
+
+    // Soft-clamp the pose jump based on tag count and distance
+    double poseJump = newPose2dFromVision.getTranslation().getDistance(getPose2d().getTranslation());
+    if (poseJump > deviationToReject) {
+      if (tagsSeen.length >= 2 && avgDistance < 2.0) {
+        // We see multiple tags up close. We probably actually got pushed.
+        // Don't penalize.
+      } else {
+        newXYstd *= 3.0; // Heavily distrust large jumps on single/far tags
+      }
+    }
+
+    // Clamp to reasonable range
+    newXYstd = Math.max(minimumXYstd, Math.min(newXYstd, maximumXYstd));
+
+    swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(newXYstd, newXYstd, 9999999));
+  }
+
+  public Pose2d determineFeedPose() {
+    if (VisionConstants.blueHub.equals(getTargetHub())) {
+      if (getPose2d().getY() > 4.0) {
         return VisionConstants.leftBlueFeed;
-      }else{
+      } else {
         return VisionConstants.rightBlueFeed;
       }
-    }else{
-      if(getPose2d().getY() > 4.0){
+    } else {
+      if (getPose2d().getY() > 4.0) {
         return VisionConstants.rightRedFeed;
-      }else{
+      } else {
         return VisionConstants.leftRedFeed;
       }
     }
   }
 
+  /*
+   * public double getPointAtSpeedUsingRelative(Pose2d target){
+   * double kP = 0.017;
+   * double poseAngle = getPose2d().relativeTo(target).getRotation().getRadians();
+   * return ((poseAngle + getPose2d().getRotation().getRadians()) * kP);
+   * }
+   */
+  public void updatePoseWithVision() {
 
-  /* 
-  public double getPointAtSpeedUsingRelative(Pose2d target){
-    double kP = 0.017;
-    double poseAngle = getPose2d().relativeTo(target).getRotation().getRadians();
-    return ((poseAngle + getPose2d().getRotation().getRadians()) * kP);
-  }
-  */
-  public void updatePoseWithVision(){
-    
     LimelightHelpers.PoseEstimate measurement = aimingCamera.getMegaTag2(swerveDrive.getPose());
     LimelightHelpers.PoseEstimate locationPoseEstimate = locationCamera.getMegaTag2(swerveDrive.getPose());
     swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(1.0, 1.0, 9999999));
-    if(aimingCamera.hasValidIDs()){
+    if (aimingCamera.hasValidIDs()) {
       swerveDrive.addVisionMeasurement(measurement.pose, measurement.timestampSeconds);
       // setVisionStdDynamic(measurement.pose);
-      
-    if(locationCamera.hasValidIDs()){
-      //swerveDrive.addVisionMeasurement(locationPoseEstimate.pose, locationPoseEstimate.timestampSeconds);
+
+      if (locationCamera.hasValidIDs()) {
+        // swerveDrive.addVisionMeasurement(locationPoseEstimate.pose,
+        // locationPoseEstimate.timestampSeconds);
+      }
+
     }
-      
-    }
-    
+
   }
 
-  public Vision getAimingCamera(){
+  public Vision getAimingCamera() {
     return aimingCamera;
   }
 
-  public Optional<Alliance> getAlliance(){
+  public Optional<Alliance> getAlliance() {
     return DriverStation.getAlliance();
   }
 
-  public Command driveWithInputStream(SwerveInputStream input){
-    return run(()->{
-    swerveDrive.driveFieldOriented(input.get());
+  public Command driveWithInputStream(SwerveInputStream input) {
+    return run(() -> {
+      swerveDrive.driveFieldOriented(input.get());
     });
   }
 
-  
-
-  public void configureAutoBuilder(){
+  public void configureAutoBuilder() {
     AutoBuilder.configure(
-      this::getPose2d, 
-      this::resetOdometry, 
-      this::getChassisSpeeds, 
-      this::setRobotRelativeSpeeds, 
-      SwerveConstants.autoController, 
-      config, 
-      ()->{
-        var alliance = DriverStation.getAlliance();
-          if(alliance.isPresent()){
+        this::getPose2d,
+        this::resetOdometry,
+        this::getChassisSpeeds,
+        this::setRobotRelativeSpeeds,
+        SwerveConstants.autoController,
+        config,
+        () -> {
+          var alliance = DriverStation.getAlliance();
+          if (alliance.isPresent()) {
             return alliance.get() == DriverStation.Alliance.Red;
           } else {
             return false;
           }
-        }, 
-      this);
+        },
+        this);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     updatePoseWithVision();
-    
 
-    //swerveDrive.field.getObject("Vision Pose").setPose(LimelightHelpers.getBotPose2d_wpiBlue(VisionConstants.aimingLimelightName));
+    // swerveDrive.field.getObject("Vision
+    // Pose").setPose(LimelightHelpers.getBotPose2d_wpiBlue(VisionConstants.aimingLimelightName));
   }
 
   @Override
-  public void initSendable(SendableBuilder builder){
+  public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
     // builder.addDoubleArrayProperty("SwervePoseEstimator pose", ()->new double[]{
-    //   getPose2d().getX(),
-    //   getPose2d().getY(),
-    //   getPose2d().getRotation().getRadians()
+    // getPose2d().getX(),
+    // getPose2d().getY(),
+    // getPose2d().getRotation().getRadians()
     // }, null);
 
-    
     // Field2d theField(Field2d) Shuffleboard.getTab("field").
-    builder.addDoubleProperty("Pose/X", () -> getPose2d().getX(), null);    
+    builder.addDoubleProperty("Pose/X", () -> getPose2d().getX(), null);
     builder.addDoubleProperty("Pose/Y", () -> getPose2d().getY(), null);
     builder.addDoubleProperty("Pose/Rotation", () -> getPose2d().getRotation().getRadians(), null);
 
-    builder.addDoubleProperty("Target/X", targetHub::getX, null);
-    builder.addDoubleProperty("Target/Y", targetHub::getY, null);
+    builder.addDoubleProperty("Target/X", () -> getTargetHub().getX(), null);
+    builder.addDoubleProperty("Target/Y", () -> getTargetHub().getY(), null);
 
-    builder.addDoubleProperty("dist to rpm val", ()->aimingCamera.getDistToRPMVal(), null);
-    builder.addDoubleProperty("distance from hub", ()->getDistanceFromHub(), null);
-    builder.addDoubleProperty("angle from hub", ()->getAngleFromHub(), null);
-    builder.addStringProperty("target hub", ()->getTargetHubAsString(), null);
-    builder.addDoubleProperty("gyro heading", ()->swerveDrive.getPose().getRotation().getRadians(), null);
-    builder.addDoubleProperty("point at pose error", ()->getPointAtPoseError(), null);
+    builder.addDoubleProperty("dist to rpm val", () -> aimingCamera.getDistToRPMVal(), null);
+    builder.addDoubleProperty("distance from hub", () -> getDistanceFromHub(), null);
+    builder.addDoubleProperty("angle from hub", () -> getAngleFromHub(), null);
+    builder.addStringProperty("target hub", () -> getTargetHubAsString(), null);
+    builder.addDoubleProperty("gyro heading", () -> swerveDrive.getPose().getRotation().getRadians(), null);
+    builder.addDoubleProperty("point at pose error", () -> getPointAtPoseError(), null);
   }
 }

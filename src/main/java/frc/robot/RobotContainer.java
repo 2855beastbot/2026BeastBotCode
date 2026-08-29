@@ -53,8 +53,6 @@ public class RobotContainer {
   private String rightAuto = "Right";
   private String centerAuto = "center";
 
-  private Pose2d targetHub;
-
   public RobotContainer() {
 
     autoChooser.addOption("Right auto", rightAuto);
@@ -91,12 +89,6 @@ public class RobotContainer {
     NamedCommands.registerCommand("ExtendHopper", intakeWrist.goToPosition(SubsystemConstants.wristOut).asProxy());
     NamedCommands.registerCommand("StartWheels", intake.spamWheels());
 
-    var alliance = DriverStation.getAlliance();
-    if (alliance.isPresent()) {
-      targetHub = (alliance.get() == Alliance.Blue) ? VisionConstants.blueHub : VisionConstants.redHub;
-    } else {
-      targetHub = VisionConstants.blueHub;
-    }
     setDefaultCommands();
     configureBindings();
     LEDstrip.setPattern(LEDConstants.yellow);
@@ -104,11 +96,7 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    new Trigger(() -> DriverStation.isFMSAttached())
-        .onTrue(new InstantCommand(() -> swerveDrive.updateAlliance(), swerveDrive)
-            .alongWith(new InstantCommand(() -> setDefaultCommands())));
-    new Trigger(() -> DriverStation.isEnabled()).onTrue(new InstantCommand(() -> swerveDrive.updateAlliance())
-        .alongWith(new InstantCommand(() -> setDefaultCommands())));
+    setDefaultCommands();
 
     // Driver commands
     driveController.y().whileTrue(swerveDrive.lockWheels());
@@ -123,7 +111,7 @@ public class RobotContainer {
         new RunCommand(() -> swerveDrive.drivePose(new Translation2d(
             -MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
             -MathUtil.applyDeadband(driveController.getLeftX(), 0.1)),
-            targetHub)),
+            swerveDrive.getTargetHub())),
         ballShooter.shootDistance(() -> swerveDrive.getDistanceFromHub())));
 
     driveController.leftBumper().whileTrue(
@@ -176,33 +164,22 @@ public class RobotContainer {
   }
 
   private void setDefaultCommands() {
-    var alliance = DriverStation.getAlliance();
-    swerveDrive.setDefaultCommand(new Drive(
-        () -> -MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
-        () -> -MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
-        () -> -driveController.getRightX(),
-        swerveDrive));
-
-    if (alliance.isPresent()) {
-      if (alliance.get() == Alliance.Blue) {
-        swerveDrive.setDefaultCommand(new Drive(
-            () -> -MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
-            () -> -MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
-            () -> -driveController.getRightX(),
-            swerveDrive));
-      } else {
-        swerveDrive.setDefaultCommand(new Drive(
-            () -> MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
-            () -> MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
-            () -> -driveController.getRightX(),
-            swerveDrive));
-      }
+    if (VisionConstants.blueHub.equals(swerveDrive.getTargetHub())) {
+      swerveDrive.setDefaultCommand(new Drive(
+          () -> -MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
+          () -> -MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
+          () -> -driveController.getRightX(),
+          swerveDrive));
+    } else {
+      swerveDrive.setDefaultCommand(new Drive(
+          () -> MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
+          () -> MathUtil.applyDeadband(driveController.getLeftX(), 0.1),
+          () -> -driveController.getRightX(),
+          swerveDrive));
     }
-
   }
 
   public Command getAutonomousCommand() {
-
     return new PathPlannerAuto(autoChooser.getSelected());
   }
 }
