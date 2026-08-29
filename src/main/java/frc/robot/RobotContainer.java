@@ -100,13 +100,6 @@ public class RobotContainer {
 
     // Driver commands
     driveController.y().whileTrue(swerveDrive.lockWheels());
-    // new Trigger(()->driveController.getRightTriggerAxis() > 0.5).whileTrue(new
-    // ParallelCommandGroup(
-    // swerveDrive.driveWithInputStream(driveWithPose),
-    // new
-    // ShootWithRange(()->swerveDrive.getRPMFromRange(swerveDrive.getDistanceFromHub()),
-    // ballShooter)
-    // ));
     new Trigger(() -> driveController.getRightTriggerAxis() > 0.5).whileTrue(new ParallelCommandGroup(
         new RunCommand(() -> swerveDrive.drivePose(new Translation2d(
             -MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
@@ -120,12 +113,12 @@ public class RobotContainer {
                 new Translation2d(
                     -MathUtil.applyDeadband(driveController.getLeftY(), 0.1),
                     -MathUtil.applyDeadband(driveController.getLeftX(), 0.1)),
-                swerveDrive.determineFeedPose()),
+                swerveDrive.getFeedPose()),
                 swerveDrive),
-            ballShooter.shootDistance(() -> swerveDrive.getDistanceFromPose(swerveDrive.determineFeedPose()))));
+            ballShooter.shootDistance(() -> swerveDrive.getDistanceFromPose(swerveDrive.getFeedPose()))));
 
     driveController.button(8).onTrue(new InstantCommand(() -> swerveDrive.resetOdometryWithAlliance(
-        new Pose2d(swerveDrive.getPose2d().getX(), swerveDrive.getPose2d().getX(), new Rotation2d()))));
+        new Pose2d(swerveDrive.getRobotPose().getX(), swerveDrive.getRobotPose().getX(), new Rotation2d()))));
     driveController.button(7).onTrue(
         new InstantCommand(() -> swerveDrive.resetOdometryWithAlliance(swerveDrive.getAimingCamera().getPose())));
     driveController.x().onTrue(intakeWrist.goToPosition(SubsystemConstants.wristOut));

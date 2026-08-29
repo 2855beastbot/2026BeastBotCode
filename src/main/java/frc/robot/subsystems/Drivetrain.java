@@ -6,9 +6,6 @@ package frc.robot.subsystems;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.util.Optional;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
 
@@ -18,13 +15,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -102,43 +95,29 @@ public class Drivetrain extends SubsystemBase {
     swerveDrive.drive(translation, rotation, fieldRelative, isOpenLoop);
   }
 
-
-  /**
-   * Drive robot while pointing at alliance hub
-   * 
-   * @param translation x and y speeds to drive at
-   */
-  /*
-   * public void drivePose(Translation2d translation){
-   * swerveDrive.drive(
-   * swerveDrive.getSwerveController().getTargetSpeeds(
-   * translation.getX(),
-   * translation.getY(),
-   * getPointAtPoseAngle(targetHub).getRadians(),
-   * getPose2d().getRotation().getRadians(),
-   * //pointToPosePID.calculate(getPose2d().getRotation().getRadians(),
-   * getPointAtPoseAngle(targetHub).getRadians()),
-   * getMaxTurnSpeed())
-   * );}
-   */
+  public Command defaultTeleop(){
+    //TODO: add code
+    return null;
+  }
 
   public void drivePose(Translation2d translation, Pose2d target) {
     Rotation2d desiredAngle = getPointAtPoseAngle(target);
     double rotationSpeed = pointToPosePID.calculate(
-        getPose2d().getRotation().getRadians(),
+        getRobotPose().getRotation().getRadians(),
         desiredAngle.getRadians());
     swerveDrive.drive(translation, rotationSpeed, true, false);
   }
 
-  // public void setXMode(){
-  // swerveDrive.lockPose();
-  // }
+  public Command driveWhileAiming(){
+    //TODO: add code
+    return null;
+  }
 
   public Command lockWheels() {
     return run(() -> swerveDrive.lockPose()).withName("Wheels Locked");
   }
 
-  public Pose2d getPose2d() {
+  public Pose2d getRobotPose() {
     return swerveDrive.getPose();
   }
 
@@ -177,7 +156,7 @@ public class Drivetrain extends SubsystemBase {
    * @return angle from robot to target position
    */
   public Rotation2d getPointAtPoseAngle(Pose2d targetPose) {
-    Translation2d delta = targetPose.getTranslation().minus(getPose2d().getTranslation());
+    Translation2d delta = targetPose.getTranslation().minus(getRobotPose().getTranslation());
     return new Rotation2d(delta.getX(), delta.getY()).plus(new Rotation2d(Math.PI));
   }
 
@@ -189,7 +168,7 @@ public class Drivetrain extends SubsystemBase {
    * @return distance from robot to point
    */
   public double getDistanceFromPose(Pose2d targetPose) {
-    return targetPose.getTranslation().getDistance(getPose2d().getTranslation());
+    return targetPose.getTranslation().getDistance(getRobotPose().getTranslation());
   }
 
   /**
@@ -215,16 +194,12 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public String getTargetHubAsString() {
-    if (getTargetHub().equals(VisionConstants.redHub)) {
-      return "Red";
-    } else {
-      return "Blue";
-    }
+    return getTargetHub().equals(VisionConstants.redHub) ? "Red" : "Blue";
   }
 
   public double getPointAtPoseSpeed() {
     Rotation2d desiredAngle = getPointAtPoseAngle(getTargetHub());
-    double speed = pointToPosePID.calculate(getPose2d().getRotation().getRadians(), desiredAngle.getRadians());
+    double speed = pointToPosePID.calculate(getRobotPose().getRotation().getRadians(), desiredAngle.getRadians());
     if (desiredAngle.getDegrees() > 3) {
       return speed;
     } else {
@@ -233,7 +208,7 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public double getPointAtPoseError() {
-    return getAngleFromHub() - getPose2d().getRotation().getRadians();
+    return getAngleFromHub() - getRobotPose().getRotation().getRadians();
   }
 
   // ...existing code...
@@ -272,7 +247,7 @@ public class Drivetrain extends SubsystemBase {
     double newXYstd = (0.5 * Math.pow(avgDistance, 2)) / tagsSeen.length;
 
     // Soft-clamp the pose jump based on tag count and distance
-    double poseJump = newPose2dFromVision.getTranslation().getDistance(getPose2d().getTranslation());
+    double poseJump = newPose2dFromVision.getTranslation().getDistance(getRobotPose().getTranslation());
     if (poseJump > deviationToReject) {
       if (tagsSeen.length >= 2 && avgDistance < 2.0) {
         // We see multiple tags up close. We probably actually got pushed.
@@ -288,15 +263,15 @@ public class Drivetrain extends SubsystemBase {
     swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(newXYstd, newXYstd, 9999999));
   }
 
-  public Pose2d determineFeedPose() {
+  public Pose2d getFeedPose() {
     if (VisionConstants.blueHub.equals(getTargetHub())) {
-      if (getPose2d().getY() > 4.0) {
+      if (getRobotPose().getY() > 4.0) {
         return VisionConstants.leftBlueFeed;
       } else {
         return VisionConstants.rightBlueFeed;
       }
     } else {
-      if (getPose2d().getY() > 4.0) {
+      if (getRobotPose().getY() > 4.0) {
         return VisionConstants.rightRedFeed;
       } else {
         return VisionConstants.leftRedFeed;
@@ -312,7 +287,6 @@ public class Drivetrain extends SubsystemBase {
    * }
    */
   public void updatePoseWithVision() {
-
     LimelightHelpers.PoseEstimate measurement = aimingCamera.getMegaTag2(swerveDrive.getPose());
     LimelightHelpers.PoseEstimate locationPoseEstimate = locationCamera.getMegaTag2(swerveDrive.getPose());
     swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(1.0, 1.0, 9999999));
@@ -324,17 +298,15 @@ public class Drivetrain extends SubsystemBase {
         // swerveDrive.addVisionMeasurement(locationPoseEstimate.pose,
         // locationPoseEstimate.timestampSeconds);
       }
-
     }
-
   }
 
   public Vision getAimingCamera() {
     return aimingCamera;
   }
 
-  public Optional<Alliance> getAlliance() {
-    return DriverStation.getAlliance();
+  private boolean flipPaths(){
+    return VisionConstants.redHub.equals(getTargetHub());
   }
 
   public Command driveWithInputStream(SwerveInputStream input) {
@@ -345,20 +317,13 @@ public class Drivetrain extends SubsystemBase {
 
   public void configureAutoBuilder() {
     AutoBuilder.configure(
-        this::getPose2d,
+        this::getRobotPose,
         this::resetOdometry,
         this::getChassisSpeeds,
         this::setRobotRelativeSpeeds,
         SwerveConstants.autoController,
         config,
-        () -> {
-          var alliance = DriverStation.getAlliance();
-          if (alliance.isPresent()) {
-            return alliance.get() == DriverStation.Alliance.Red;
-          } else {
-            return false;
-          }
-        },
+        this::flipPaths,
         this);
   }
 
@@ -374,16 +339,11 @@ public class Drivetrain extends SubsystemBase {
   @Override
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
-    // builder.addDoubleArrayProperty("SwervePoseEstimator pose", ()->new double[]{
-    // getPose2d().getX(),
-    // getPose2d().getY(),
-    // getPose2d().getRotation().getRadians()
-    // }, null);
 
     // Field2d theField(Field2d) Shuffleboard.getTab("field").
-    builder.addDoubleProperty("Pose/X", () -> getPose2d().getX(), null);
-    builder.addDoubleProperty("Pose/Y", () -> getPose2d().getY(), null);
-    builder.addDoubleProperty("Pose/Rotation", () -> getPose2d().getRotation().getRadians(), null);
+    builder.addDoubleProperty("Pose/X", () -> getRobotPose().getX(), null);
+    builder.addDoubleProperty("Pose/Y", () -> getRobotPose().getY(), null);
+    builder.addDoubleProperty("Pose/Rotation", () -> getRobotPose().getRotation().getRadians(), null);
 
     builder.addDoubleProperty("Target/X", () -> getTargetHub().getX(), null);
     builder.addDoubleProperty("Target/Y", () -> getTargetHub().getY(), null);
