@@ -11,6 +11,7 @@ import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -22,7 +23,6 @@ public class Shooter extends SubsystemBase {
   /** Creates a new Shooter. */
   private TalonFX left = new TalonFX(CANIDConstants.shooterLeft);
   private TalonFX right = new TalonFX(CANIDConstants.shooterRight);
-  private final double passiveTargetRPM = SubsystemConstants.maxShooterRPM / 30;
   private double targetRPS; // making this RPS instead of RPM for better internal consistency, everything
                             // outside the class is still RPM
   private TalonFXConfiguration config = new TalonFXConfiguration();
@@ -32,8 +32,8 @@ public class Shooter extends SubsystemBase {
   private final VelocityVoltage rightVelocity;
 
   public Shooter() {
-    leftVelocity = new VelocityVoltage(passiveTargetRPM);
-    rightVelocity = new VelocityVoltage(passiveTargetRPM);
+    leftVelocity = new VelocityVoltage(0);
+    rightVelocity = new VelocityVoltage(0);
     leftDutyCycle = new DutyCycleOut(0);
     rightDutyCycle = new DutyCycleOut(0);
 
@@ -48,17 +48,18 @@ public class Shooter extends SubsystemBase {
     setDefaultCommand(stop());
   }
 
-  public Command shootDutycycle(DoubleSupplier speed) {
+  public Command shootProportionalRPM(DoubleSupplier speed) {
     return run(
         () -> {
-          left.setControl(leftDutyCycle.withOutput(speed.getAsDouble()));
-          right.setControl(rightDutyCycle.withOutput(speed.getAsDouble()));
+          double targetRPS = SubsystemConstants.maxShooterRPM * MathUtil.clamp(speed.getAsDouble(), 0, 1) /60;
+          left.setControl(leftVelocity.withVelocity(targetRPS));
+          right.setControl(rightVelocity.withVelocity(targetRPS));
         })
-        .withName("Shoot Duty Cycle");
+        .withName("Shoot Proportional");
   }
 
-  public Command shootDutycycle(double speed) {
-    return shootDutycycle(() -> speed);
+  public Command shootProportionalRPM(double speed) {
+    return shootProportionalRPM(() -> speed);
   }
 
   public Command shootRPM(DoubleSupplier rpm) {
@@ -77,11 +78,14 @@ public class Shooter extends SubsystemBase {
 
   public Command shootDistance(DoubleSupplier meters) {
     return shootRPM(() -> (VisionConstants.distanceToRPMRatio * meters.getAsDouble()) + VisionConstants.baseRPM)
-        .withName("Shooting for Distance");
+        .withName("Shoot for Distance");
   }
 
   public Command stop() {
-    return shootDutycycle(0).withName("Stopped");
+    return run(() -> {
+      left.setControl(leftDutyCycle);
+      right.setControl(rightDutyCycle);
+    }).withName("Stopped");
   }
 
   @Override

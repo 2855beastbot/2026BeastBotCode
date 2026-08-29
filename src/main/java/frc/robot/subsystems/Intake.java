@@ -32,28 +32,8 @@ public class Intake extends SubsystemBase {
     rightIntake.getConfigurator().apply(rightConfig);
   }
 
-  /**
-   * runs the intake wheels
-   * 
-   * @param speed the percent power to the wheels, from 0-1
-   */
-  // public void spin(double speed){
-  // if(intakeWrist.getPose() < 0.5) {
-  // //leftIntake.set(-speed);
-  // //rightIntake.set(-speed);
-
-  // rightIntake.set(-speed);
-  // }
-  // else{
-
-  // rightIntake.set(0);
-  // }
-  // leftIntake.set(-speed);
-
-  // }
-
   public Command intakeSafely(DoubleSupplier speed, BooleanSupplier safeToSpinBoth) {
-    return Commands.either(intake(speed), intakeOuterRollerOnly(speed), safeToSpinBoth).withName("Intake with check");
+    return Commands.either(intake(speed), intakeOneRollerOnly(speed), safeToSpinBoth).withName("Intake with check");
   }
 
   private Command intake(DoubleSupplier speed) {
@@ -69,7 +49,7 @@ public class Intake extends SubsystemBase {
         .withName("Intaking");
   }
 
-  private Command intakeOuterRollerOnly(DoubleSupplier speed) {
+  private Command intakeOneRollerOnly(DoubleSupplier speed) {
     return runEnd(
         () -> {
           rightIntake.set(0);
@@ -78,7 +58,17 @@ public class Intake extends SubsystemBase {
         () -> {
           leftIntake.set(0);
         })
-        .withName("Intaking Outer Roller Only");
+        .withName("Intaking One Roller Only");
+  }
+
+  /**
+   * Use this command during auto to ensure the intake rollers start spinning in
+   * time
+   * 
+   * @return
+   */
+  public Command spamWheels() {
+    return intake(() -> 1).withTimeout(0.1).repeatedly().asProxy().withName("SPAM SPAM SPAM FUEL AND SPAM");
   }
 
   @Override
