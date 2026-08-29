@@ -57,19 +57,26 @@ public class Intake extends SubsystemBase {
   }
 
   private Command intake(DoubleSupplier speed) {
-    return run(
+    return runEnd(
         () -> {
           rightIntake.set(-speed.getAsDouble());
           leftIntake.set(-speed.getAsDouble());
+        },
+        () -> {
+          rightIntake.set(0);
+          leftIntake.set(0);
         })
         .withName("Intaking");
   }
 
   private Command intakeOuterRollerOnly(DoubleSupplier speed) {
-    return run(
+    return runEnd(
         () -> {
           rightIntake.set(0);
           leftIntake.set(-speed.getAsDouble());
+        },
+        () -> {
+          leftIntake.set(0);
         })
         .withName("Intaking Outer Roller Only");
   }

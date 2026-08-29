@@ -131,8 +131,12 @@ public class Swerve extends SubsystemBase {
       swerveDrive.drive(translation, rotationSpeed, true, false); }
 
 
-  public void setXMode(){
-    swerveDrive.lockPose();
+  // public void setXMode(){
+  //   swerveDrive.lockPose();
+  // }
+
+  public Command lockWheels(){
+    return run(() -> swerveDrive.lockPose()).withName("Wheels Locked");
   }
 
   public Pose2d getPose2d(){
@@ -335,10 +339,6 @@ public class Swerve extends SubsystemBase {
 
   public Vision getAimingCamera(){
     return aimingCamera;
-  }
-
-  public double getRPMFromRange(double range){
-    return (VisionConstants.distanceToRPMRatio * range) + VisionConstants.baseRPM;
   }
 
   public Optional<Alliance> getAlliance(){

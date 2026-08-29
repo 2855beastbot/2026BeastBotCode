@@ -2,39 +2,48 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
-
-import java.util.function.DoubleSupplier;
+package frc.robot.commands.autoCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Indexer;
+import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Swerve;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class Index extends Command {
-  /** Creates a new Index. */
-  private Indexer indexer; 
-  private DoubleSupplier speed;
-  public Index(DoubleSupplier speed, Indexer indexer) {
-    addRequirements(indexer);
+public class AutoShootOld extends Command {
+  /** Creates a new AutoShoot. */
+  private Shooter ballShooter;
+  private Swerve drivetrain;
+  private Indexer indexer;
+  public AutoShootOld(Shooter ballShooter, Swerve drivetrain, Indexer indexer) {
+    addRequirements(ballShooter);
+    addRequirements(drivetrain);
+    this.ballShooter = ballShooter;
+    this.drivetrain = drivetrain;
     this.indexer = indexer;
-    this.speed = speed;
+
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    drivetrain.setXMode();
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    indexer.spin(speed.getAsDouble());
+    ballShooter.setRPMUse(true);
+    ballShooter.setTargetRPM(drivetrain.getRPMFromRange(drivetrain.getDistanceFromHub()));
+    indexer.spin(1);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     indexer.spin(0);
+    ballShooter.spin(0, false);
   }
 
   // Returns true when the command should end.
