@@ -30,6 +30,8 @@ public class Intake extends SubsystemBase {
 
     leftIntake.getConfigurator().apply(leftConfig);
     rightIntake.getConfigurator().apply(rightConfig);
+
+    setDefaultCommand(stop());
   }
 
   public Command intakeSafely(DoubleSupplier speed, BooleanSupplier safeToSpinBoth) {
@@ -37,26 +39,19 @@ public class Intake extends SubsystemBase {
   }
 
   private Command intake(DoubleSupplier speed) {
-    return runEnd(
+    return run(
         () -> {
           rightIntake.set(-speed.getAsDouble());
           leftIntake.set(-speed.getAsDouble());
-        },
-        () -> {
-          rightIntake.set(0);
-          leftIntake.set(0);
         })
         .withName("Intaking");
   }
 
   private Command intakeOneRollerOnly(DoubleSupplier speed) {
-    return runEnd(
+    return run(
         () -> {
           rightIntake.set(0);
           leftIntake.set(-speed.getAsDouble());
-        },
-        () -> {
-          leftIntake.set(0);
         })
         .withName("Intaking One Roller Only");
   }
@@ -69,6 +64,10 @@ public class Intake extends SubsystemBase {
    */
   public Command spamWheels() {
     return intake(() -> 1).withTimeout(0.1).repeatedly().asProxy().withName("SPAM SPAM SPAM FUEL AND SPAM");
+  }
+
+  public Command stop(){
+    return intake(() -> 0).withName("Stopped");
   }
 
   @Override

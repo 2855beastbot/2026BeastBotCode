@@ -10,7 +10,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.Constants.VisionConstants;
-import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Vision;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -18,7 +18,7 @@ public class DriveWithRange extends Command {
   /** Creates a new DriveWithRange. */
   private DoubleSupplier xSpeed;
   private Vision aimingCamera;
-  private Swerve drivetrain;
+  private Drivetrain drivetrain;
   private double range;
   /**
    * drives the robot to a certain range from valid apriltag while also aiming at it. the driver can still control lateral movement, which will result in an arc
@@ -26,7 +26,7 @@ public class DriveWithRange extends Command {
    * @param swerve the drivetrain subsystem
    * @param range the distance to maintain between the robot and the Apriltag, in meters
    */
-  public DriveWithRange(DoubleSupplier leftX, Swerve swerve, double range) {
+  public DriveWithRange(DoubleSupplier leftX, Drivetrain swerve, double range) {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(swerve);
     xSpeed = leftX;

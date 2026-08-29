@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.Constants.VisionConstants;
-import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Vision;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -21,7 +21,7 @@ public class DriveWithAim extends Command {
   /** Creates a new DriveWithAim. */
   private DoubleSupplier xSpeed, ySpeed;
   private Vision aimingCamera;
-  private Swerve drivetrain;
+  private Drivetrain drivetrain;
   private Pose2d targetPose;
   /**
    * aims the drivetrain at valid Apriltags, driver still controls translational movement
@@ -29,7 +29,7 @@ public class DriveWithAim extends Command {
    * @param leftX the sideways speed of the robot
    * @param swerve the drivetrain class
    */
-  public DriveWithAim(DoubleSupplier leftY, DoubleSupplier leftX, Swerve swerve, Pose2d targetPose) {
+  public DriveWithAim(DoubleSupplier leftY, DoubleSupplier leftX, Drivetrain swerve, Pose2d targetPose) {
     addRequirements(swerve);
     xSpeed = leftY;
     ySpeed = leftX;

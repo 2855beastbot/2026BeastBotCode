@@ -39,7 +39,7 @@ import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
-public class Swerve extends SubsystemBase {
+public class Drivetrain extends SubsystemBase {
   /** Creates a new Swerve. */
   private SwerveDrive swerveDrive;
   private RobotConfig config;
@@ -49,7 +49,7 @@ public class Swerve extends SubsystemBase {
   private Pose2d targetHub;
   private double slowModeVal = 0.8;
 
-  public Swerve() {
+  public Drivetrain() {
     
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(),"swerve");
     try{

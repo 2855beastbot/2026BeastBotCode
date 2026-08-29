@@ -36,10 +36,10 @@ import frc.robot.subsystems.IntakeWrist;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.Drivetrain;
 
 public class RobotContainer {
-  private Swerve swerveDrive = new Swerve();
+  private Drivetrain swerveDrive = new Drivetrain();
   private CommandXboxController driveController = new CommandXboxController(0);
   private CommandXboxController operatorController = new CommandXboxController(1);
   private IntakeWrist intakeWrist = new IntakeWrist();
@@ -170,8 +170,8 @@ public class RobotContainer {
     operatorController.axisMagnitudeGreaterThan(1, 0.3)
         .whileTrue(intakeWrist.manual(() -> -operatorController.getLeftY()));
     operatorController.button(8).onTrue(intakeWrist.zeroEncoders());
-    operatorController.y().whileTrue(ballShooter.shootRPM(5000));
-    operatorController.a().whileTrue(ballShooter.shootRPM(1000));
+    operatorController.y().whileTrue(ballShooter.shootExactRPM(5000));
+    operatorController.a().whileTrue(ballShooter.shootExactRPM(1000));
 
   }
 

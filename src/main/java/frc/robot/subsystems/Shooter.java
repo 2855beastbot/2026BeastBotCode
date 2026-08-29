@@ -48,10 +48,16 @@ public class Shooter extends SubsystemBase {
     setDefaultCommand(stop());
   }
 
+  /**
+   * <p>Determines shooting speed as a proportion (0.0 to 1.0) of max possible shooting speed</p>
+   * <p>Intended for use with controller axes such as triggers</p>
+   * @param speed
+   * @return
+   */
   public Command shootProportionalRPM(DoubleSupplier speed) {
     return run(
         () -> {
-          double targetRPS = SubsystemConstants.maxShooterRPM * MathUtil.clamp(speed.getAsDouble(), 0, 1) /60;
+          double targetRPS = SubsystemConstants.maxShooterRPM * MathUtil.clamp(speed.getAsDouble(), 0, 1) / 60;
           left.setControl(leftVelocity.withVelocity(targetRPS));
           right.setControl(rightVelocity.withVelocity(targetRPS));
         })
@@ -62,7 +68,12 @@ public class Shooter extends SubsystemBase {
     return shootProportionalRPM(() -> speed);
   }
 
-  public Command shootRPM(DoubleSupplier rpm) {
+  /**
+   * Shoots at the exact rpm specified
+   * @param rpm
+   * @return
+   */
+  public Command shootExactRPM(DoubleSupplier rpm) {
     return run(
         () -> {
           double targetRPS = rpm.getAsDouble() / 60;
@@ -72,12 +83,12 @@ public class Shooter extends SubsystemBase {
         .withName("Shoot RPM");
   }
 
-  public Command shootRPM(double rpm) {
-    return shootRPM(() -> rpm);
+  public Command shootExactRPM(double rpm) {
+    return shootExactRPM(() -> rpm);
   }
 
   public Command shootDistance(DoubleSupplier meters) {
-    return shootRPM(() -> (VisionConstants.distanceToRPMRatio * meters.getAsDouble()) + VisionConstants.baseRPM)
+    return shootExactRPM(() -> (VisionConstants.distanceToRPMRatio * meters.getAsDouble()) + VisionConstants.baseRPM)
         .withName("Shoot for Distance");
   }
 
