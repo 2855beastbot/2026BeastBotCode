@@ -172,8 +172,8 @@ public class RobotContainer {
        swerveDrive,
         VisionConstants.idealShootingRange));
     */
-    new Trigger(()->driveController.getRawButton(8)).onTrue(new InstantCommand(()->swerveDrive.resetOdometryWithAlliance(new Pose2d(swerveDrive.getPose2d().getX(), swerveDrive.getPose2d().getX(), new Rotation2d()))));
-    new Trigger(()->driveController.getRawButton(7)).onTrue(new InstantCommand(()->swerveDrive.resetOdometryWithAlliance(swerveDrive.getAimingCamera().getPose())));
+    new Trigger(()->driveController.getStartButton()).onTrue(new InstantCommand(()->swerveDrive.resetOdometryWithAlliance(new Pose2d(swerveDrive.getPose2d().getX(), swerveDrive.getPose2d().getX(), new Rotation2d()))));
+    new Trigger(()->driveController.getBackButton()).onTrue(new InstantCommand(()->swerveDrive.resetOdometryWithAlliance(swerveDrive.getAimingCamera().getPose())));
     new Trigger(()->driveController.getXButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristOut)));
     new Trigger(()->driveController.getAButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristMid)));
     new Trigger(()->driveController.getBButton()).onTrue(new InstantCommand(()->intakeWrist.setTargetSetpoint(SubsystemConstants.wristIn)));
@@ -200,11 +200,11 @@ public class RobotContainer {
     //operatorController.a().onTrue(new DeployWrist(intake));
     operatorController.axisGreaterThan(2, 0.3).whileTrue(new SpinIntake(()->operatorController.getLeftTriggerAxis(), intake));
     operatorController.axisGreaterThan(3, 0.3).whileTrue(new RunCommand(()->ballShooter.spin(operatorController.getRightTriggerAxis(), false), ballShooter));
-    operatorController.axisMagnitudeGreaterThan(1, 0.3).whileTrue(new MoveIntakeWrist(()->-operatorController.getLeftY(), intakeWrist));
-    operatorController.button(8).onTrue(new InstantCommand(()->intakeWrist.zeroEncoders(), intakeWrist));
+    // operatorController.axisMagnitudeGreaterThan(1, 0.3).whileTrue(new MoveIntakeWrist(()->-operatorController.getLeftY(), intakeWrist));
+    operatorController.start().onTrue(new InstantCommand(()->intakeWrist.zeroEncoders(), intakeWrist));
     operatorController.y().whileTrue(new RunCommand(()->ballShooter.spin(5000, true), ballShooter));
     operatorController.a().whileTrue(new RunCommand(()->ballShooter.spin(1000, true), ballShooter));
-    operatorController.axisMagnitudeGreaterThan(5, 0.1).whileTrue(new RunCommand(()->intakeWrist.moveWrist(-operatorController.getRightY()), intakeWrist));
+    operatorController.axisMagnitudeGreaterThan(5, 0.3).whileTrue(new RunCommand(()->intakeWrist.moveWrist(operatorController.getRightY()), intakeWrist));
     // operatorController.axisGreaterThan(6, 0.1).whileTrue(new RunCommand(()->intakeWrist.moveWrist(operatorController.getRightX()), intakeWrist));
     // operatorController.axisLessThan(6, -0.1).whileTrue(new RunCommand(()->intakeWrist.moveWrist(operatorController.getRightX()), intakeWrist));
     
