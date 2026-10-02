@@ -7,8 +7,6 @@ package frc.robot;
 
 
 
-import java.util.function.BooleanSupplier;
-
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
@@ -25,11 +23,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
-import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -39,15 +34,10 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.LEDConstants;
 import frc.robot.Constants.SubsystemConstants;
 import frc.robot.Constants.VisionConstants;
-import frc.robot.commands.DeployWrist;
 import frc.robot.commands.Drive;
-import frc.robot.commands.DriveWithAim;
-import frc.robot.commands.DriveWithRange;
 import frc.robot.commands.Index;
 import frc.robot.commands.MoveIntakeWrist;
-import frc.robot.commands.RPMShoot;
 import frc.robot.commands.ShootWithRange;
-import frc.robot.commands.SpeedUP;
 import frc.robot.commands.SpinIntake;
 import frc.robot.commands.WristJuggle;
 import frc.robot.commands.autoCommands.AutoShoot;
@@ -214,6 +204,9 @@ public class RobotContainer {
     operatorController.button(8).onTrue(new InstantCommand(()->intakeWrist.zeroEncoders(), intakeWrist));
     operatorController.y().whileTrue(new RunCommand(()->ballShooter.spin(5000, true), ballShooter));
     operatorController.a().whileTrue(new RunCommand(()->ballShooter.spin(1000, true), ballShooter));
+    operatorController.axisMagnitudeGreaterThan(5, 0.1).whileTrue(new RunCommand(()->intakeWrist.moveWrist(-operatorController.getRightY()), intakeWrist));
+    // operatorController.axisGreaterThan(6, 0.1).whileTrue(new RunCommand(()->intakeWrist.moveWrist(operatorController.getRightX()), intakeWrist));
+    // operatorController.axisLessThan(6, -0.1).whileTrue(new RunCommand(()->intakeWrist.moveWrist(operatorController.getRightX()), intakeWrist));
     
   }
 
